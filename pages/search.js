@@ -1,0 +1,171 @@
+import clsx from 'clsx';
+import useSWR from 'swr';
+import { useRef, useState, useEffect } from 'react';
+import { useUpdate } from 'react-use';
+import { useQuery } from 'react-query';
+import Head from 'next/head';
+import Fetcher from '@/lib/fetcher';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
+import { FaHourglassHalf, FaSearch, FaSpinner } from 'react-icons/fa';
+import { FcNext } from 'react-icons/fc';
+import { FaArrowLeft as ArrowLeft, FaArrowRight as ArrowRight } from 'react-icons/fa';
+
+import { searchUrl, searchLimit } from '@/lib/api';
+import { ResultGrid } from '@/components/ImageGrid';
+
+const useStickySWR = (...args) => {
+  const val = useRef();
+  const { data, error, loading, ...rest } = useSWR(...args);
+
+  if (data !== undefined) {
+    val.current = data;
+  }
+
+  return {
+    ...rest,
+    loading,
+    error,
+    data: val.current,
+  };
+};
+
+const Pagination = ({ results, page, setPage, loading, limit = 10 }) => {
+  const pages = Math.ceil(Number(results)/limit);
+  if (pages === 1) return null;
+
+  return (
+    <div className="flex items-start">
+      <ul className="flex items-start flex-wrap gap-4 -ml-2">
+      { Array.from(Array(pages)).map((_el,i) => {
+        const active = i+1 === page;
+        return <li
+          onClick={() => setPage(i+1)}
+          key={i}
+          className={clsx(
+            'flex justify-center items-center w-12 h-12 p-2 cursor-pointer border border-8 border-pink-500 text-xl rounded-sm',
+            !active && 'hover:bg-pink-600',
+            active && 'bg-pink-500 text-white hover:text-white')}>{ loading && active ? <FaSpinner className="animate-spin" /> : i+1 }</li>;
+      }) }
+      </ul>
+      {/* <div className="align-center text-4xl p-2 fill-current stroke-current text-pink-500 cursor-pointer hover:text-pink-600"><ArrowRight/></div> */}
+    </div>
+   );
+};
+
+const Results = ({ data }) => (
+  <div>
+    {data?.status === 'OK' &&
+     <>
+       <ul>
+        {data.records?.map(rec => (
+          <a key={rec.id} className="text-blue-500 hover:text-blue-600 hover:underline" target="_blank" href={`https://finna.fi${rec.recordPage}`}>
+            <li className="mt-2">{`${rec.title} - ${rec.id}`}</li>
+          </a>))}
+      </ul>
+     </>}
+  </div>
+);
+
+const SearchHeading = ({title, value, results}) => <h1 className="-ml-2 text-4xl mx-text 2-500-pink">{title}: <span className="text-gray-200 italic">{value}{ results ? <span class="ml-3 text-gray-400">({results})</span> : ''}</span></h1>;
+
+
+let mounted = false
+
+export default function Home() {
+  const router = useRouter();
+
+  const [ lookfor, setLookfor ] = useState(router.query.lookfor);
+  const [ currentLookfor, setCurrentLookfor ] = useState(lookfor);
+  const [ nextLookfor, setNextLookfor ] = useState(lookfor);
+  const [ page, setPage ] = useState(Number(router.query.page));
+  const [ resetScroll, setResetScroll ] = useState(false);
+
+  const [ loading, setLoading ] = useState(false);
+  const opt = {
+    loadingTimeout: 10,
+    onLoadingSlow: (_key, _config) => {
+      setLoading(true);
+    },
+    onError: (_err, _key, config) => {
+      setLoading(false);
+      setCurrentLookfor(nextLookfor);
+    },
+    onSuccess: (_data, _key, _config) => {
+      setLoading(false);
+      setCurrentLookfor(nextLookfor);
+      if (resetScroll) {
+        window.scrollTo(0,0);
+        setResetScroll(false);
+      }
+    }
+  };
+  const topicFacet = router.query?.topic_facet;
+  const genreFacet = router.query?.genre_facet;
+
+  const { data, error } = useStickySWR(typeof nextLookfor !== 'undefined' ? searchUrl(nextLookfor, page, topicFacet, genreFacet) : null, Fetcher, opt);
+//  const { data } = useSWR(mounted && currentLookfor ? searchUrl(currentLookfor, page) : null, Fetcher, opt);
+
+  const queryUpdated = () => {
+    const l = router.query.lookfor ?? '';
+    setLookfor(l);
+    setNextLookfor(l);
+    setPage(Number(router.query.page ?? 1));
+  };
+
+  useEffect(() => {
+    if (!router.isReady) {
+      return;
+    }
+    queryUpdated();
+  }, [router.isReady, router.query]);
+
+
+  const search = () => {
+    setLoading(false);
+    router.query.page = 1;
+    router.query.lookfor = lookfor;
+    router.push(router);
+  };
+
+  const changePage = (page) => {
+    setLoading(false);
+    setResetScroll(true);
+    router.query.page = page;
+    router.push(router);
+  };
+
+  const openRecord = (id) => {
+    router.push(`/view?id=${encodeURIComponent(id)}`);
+  };
+
+
+  const resultCount = data?.resultCount || null;
+  const isFaceted = topicFacet || genreFacet;
+
+  return (
+    <div className="w-full font-sans">
+      <Head>
+        <title>SWR search</title>
+        <link rel="icon" href="/favicon.ico" />
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0"/>
+      </Head>
+      <div className="p-5 w-full">
+        <div className="flex flex-col gap-y-4 .items-center flex-wrap md:flex-nowrap">
+          { topicFacet && <SearchHeading title="Aihe" value={topicFacet} results={resultCount} /> }
+          { genreFacet && <SearchHeading title="Genre" value={genreFacet} results={resultCount} /> }
+          { !isFaceted && <SearchHeading title="Hakusana" value={currentLookfor} results={resultCount}/> }
+          { data && <Pagination results={data.resultCount} page={page} setPage={(page) => changePage(page)} loading={loading} limit={searchLimit} /> }
+        </div>
+      </div>
+      <div className="p-5">
+
+        { loading && <FaSpinner className="ml-4 w-8 h-8 animate-spin" /> }
+        { !loading && error && <p>error...</p> }
+        { !loading && data && data?.status === 'ERROR' && <p>error...</p> }
+        { !loading && data && data.resultCount === 0 && <p>ei tuloksia...</p> }
+        { !loading && data?.status === 'OK' && <ResultGrid records={data.records} onOpenRecord={openRecord} width="200" height="200"/> }
+      </div>
+    </div>
+  )
+}
