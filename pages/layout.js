@@ -22,7 +22,7 @@ const Header = () => {
     <div className="sticky w-full z-50 top-0 bg-gray-900 px-5 py-5 gap-y-2 flex flex-col md:flex-row items-center justify-between">
       <Link href="/">
         <div className="flex align-center items-center fill-current text-pink-500 stroke-current text-white hover:text-pink-300 cursor-pointer">
-          <div className="text-2xl font-bold">Joku nimi tähän</div>
+          <div className="text-2xl font-bold">Elävät kuvat</div>
           <FaPlayCircle className="pl-2" style={{ width: '40px', height: '40px' }} />
         </div>
       </Link>

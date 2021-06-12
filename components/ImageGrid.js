@@ -1,24 +1,23 @@
 import Link from 'next/link';
 
-export const Image = ({ src, width = 300, height = 300 }) => <img src={`https://api.finna.fi${src}&w=${width}`} width={width} height={height} />;
+const imageH = 300;
+
+export const Image = ({ src, width = 300, height = 300 }) => <img src={`https://api.finna.fi${src}&w=${width}`} className="w-auto rouded-xl overflow-hidden" style={{ maxHeight: '${imageH}px' }}/>;
 
 export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 }) => (
   <div>
-    <ul className="flex flex-wrap">
+    <ul className="grid sm:grid-cols-2 lg:grid-cols-3">
       {records?.map(rec => (
-          <Link key={rec.id} href={`/view?id=${encodeURIComponent(rec.id)}`}>
-            <li className="xl:w-1/3 lg:w-1/2 w-full mb-4 flex hover:bg-pink-500 rounded-xl .p-2 cursor-pointer">
-              <a className="">
-                <div className="flex">
-                  { rec.images && <div className="rounded-lg overflow-hidden"><Image src={rec.images[0]} width={width} height={height} /></div> }
-                  <div className="ml-2">
-                    <div className="text-2xl">{rec.title}</div>
-                    <div>{ rec.corporateAuthors && rec.corporateAuthors.join(", ") }{ rec.year && ` ${rec.year}` }</div>
-                  </div>
-                </div>
-              </a>
-            </li>
-          </Link>
+          <li className="mb-4 flex flex-col rounded-xl cursor-pointer .bg-yellow-100" style={{  }}>
+            <div className="flex flex-col justify-between h-full">
+              <Link key={rec.id} href={`/view?id=${encodeURIComponent(rec.id)}`}>
+                <a className="flex items-center p-3 rounded-lg">
+                  { rec.images && <div className="flex h-auto overflow-hidden w-full" style={{ height: '${imageH}px' }}><Image src={rec.images[0]} width="550" /></div> }
+                </a>
+              </Link>
+              <div className="w-full bg-gray-900 px-2 text-center text-gray-100 overflow-hidden text-xl line-clamp-2">{rec.title}</div>
+            </div>
+          </li>
       ))}
     </ul>
   </div>
