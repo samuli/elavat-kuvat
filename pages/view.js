@@ -43,7 +43,7 @@ const Header = ({ record }) => {
   const d = record.rawData;
   return (
     <div>
-      <h1 className="text-4xl mb-2">{record.title}</h1>
+      <h1 className="text-4xl font-bold mb-2">{record.title}</h1>
       <p className="text-lg">{ d.author_corporate && `${d.author_corporate} ` }{ d.main_date_str && d.main_date_str}</p>
       {/* <Authors record={record} /> */}
     </div>
@@ -90,8 +90,6 @@ export default function View() {
   const [loading, setLoading] = useState(false);
   const id = router.query.id;
 
-
-  console.log("id: %o", id);
   const opt = {
     loadingTimeout: 1,
     onLoadingSlow: (_key, _config) => {
@@ -111,7 +109,6 @@ export default function View() {
 
   const rec = data && !error && data.resultCount > 0 && data.records[0];
 
-  console.log("2: %o", [error, rec]);
   if (error) return <p>error...</p>;
 
 

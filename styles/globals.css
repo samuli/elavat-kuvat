@@ -16,3 +16,9 @@ video {
   top: 0;
   left: 0;
 }
+
+select {
+  background: url(http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/br_down.png) no-repeat;
+  background-position: right 10% top 55%;
+  background-repeat: no-repeat;
+}

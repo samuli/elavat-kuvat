@@ -67,8 +67,7 @@ const Autocomplete = () => {
     return false;
   });
 
-  const onSearchResultsPage = false; //router.pathname === "/search";
-  const autocompleteMode = !onSearchResultsPage;
+  const onSearchResultsPage = false;
 
   const {
     isOpen,
@@ -84,8 +83,6 @@ const Autocomplete = () => {
     id: 'search',
     items: inputItems,
     onInputValueChange: ({ inputValue }) => {
-      //if (!autocompleteMode) return;
-
       if (inputValue.trim() != "") {
         debounced.cancel();
         debounced(inputValue.trim());
@@ -135,8 +132,8 @@ const Autocomplete = () => {
               },
               placeholder: "Etsi... (Ctrl K)"
             })}
-            style={{ maxWidth: '400px' }}
-            className="h-12 px-4 py-4 rounded-lg text-xl text-gray-900 focus:outline-none ring-inset focus:ring-4 focus:ring-pink-500"
+            style={{ }}
+            className="w-full h-12 px-4 py-4 rounded-lg text-xl text-gray-900 focus:outline-none ring-inset focus:ring-4 focus:ring-pink-500"
           />
         </div>
       </div>

@@ -14,6 +14,7 @@ import { FaArrowLeft as ArrowLeft, FaArrowRight as ArrowRight } from 'react-icon
 import { searchUrl, searchLimit } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
 import Spinner from '@/components/Spinner';
+import { yearTitle } from '@/lib/util';
 
 const useStickySWR = (...args) => {
   const val = useRef();
@@ -31,48 +32,49 @@ const useStickySWR = (...args) => {
   };
 };
 
-const Pagination = ({ results, page, setPage, loading, limit = 10 }) => {
+const PageMenu = ({ items, activePage, onPageSelect }) => {
+  return (
+    <select
+      onChange={(e) => onPageSelect(e.target.value)}
+      value={activePage}
+      className="appearance-none w-auto pl-4 pr-10 py-3 border bg-gray-100 border-gray-400 rounded-md text-xl text-gray-900 cursor-pointer">
+      { items.map((item, idx) => {
+        const active = activePage === item;
+        return <option key={idx} disabled={active} value={item}>Sivu {item}</option>;
+      })}
+    </select>
+  );
+};
+
+const NaviButton = ({ children, onClick, disabled }) => (
+  <div className={clsx(
+    "w-16 h-16 flex justify-center items-center text-4xl rounded-full border-gray-400",
+    disabled && " text-gray-500",
+    !disabled && "cursor-pointer hover:text-pink-500 text-gray-100")}
+       onClick={() => {
+         if (disabled) return;
+         onClick()
+       }}>
+    {children}</div>
+);
+
+const Pagination = ({ results, page, setPage, loading, showResultCount, limit = 10 }) => {
   const pages = Math.ceil(Number(results)/limit);
   if (pages === 1) return null;
-  const maxItems = 7;
-  const startPage = Math.max(0, Math.floor(page-maxItems/2));
-  const endPage = Math.min(pages-1, Math.floor(page+maxItems/2));
-  const scrollButtons = pages > maxItems;
-  const buttons = Math.min(pages, 6);
-  let pageIdxs = Array.from(new Array(buttons), (x, i) => i + startPage);
-  const addFirstPage = pageIdxs[0] > 0;
-  const showEllipsis = pageIdxs[0] > 1;
-  if (addFirstPage) {
-    pageIdxs = [0, ...pageIdxs];
 
-  }
+  const pageIdxs = Array.from(Array(pages), (_el,i) => i+1);
+  const scrollButtons = pages > 1;
 
   return (
     <div className="flex items-start items-center -ml-2">
-      { scrollButtons && <div onClick={() => setPage(page-1)}><ArrowLeft /></div> }
-      <ul className="flex items-start flex-wrap gap-4 mx-4">
-        { pageIdxs.map((el,i) => {
-
-          const pageIdx = el;
-          const active = pageIdx+1 === page;
-          return (
-            <li key={pageIdx} className="flex">
-              <div
-                onClick={() => setPage(pageIdx+1)}
-
-                className={clsx(
-                  'flex justify-center items-center w-12 h-12 p-2 ring-1 ring-pink-500 text-gray-200 text-xl rounded-sm',
-                  !active && 'hover:text-white cursor-pointer',
-                  active && 'bg-pink-500 text-white hover:text-white')}>{ loading && active ? <Spinner width="6" height="6"/> : pageIdx+1 }
-              </div>
-              { showEllipsis && i === 0 && <div className="flex ml-4 text-2xl tracking-widest justify-center items-end">...</div> }
-            </li>);
-      }) }
-      </ul>
-      { scrollButtons && <div onClick={() => setPage(page+1)}><ArrowRight /></div> }
+      { scrollButtons && <NaviButton disabled={page === 1} onClick={() => setPage(page-1)}><ArrowLeft /></NaviButton> }
+      <PageMenu activePage={page} items={pageIdxs} onPageSelect={(page) => setPage(page)}/>
+      { scrollButtons && <NaviButton disabled={page === pages} onClick={() => setPage(page+1)}><ArrowRight /></NaviButton> }
+      { showResultCount && <div className="ml-5 text-xl text-gray-200">({results} klippiä)</div> }
     </div>
    );
 };
+
 
 const Results = ({ data }) => (
   <div>
@@ -88,7 +90,11 @@ const Results = ({ data }) => (
   </div>
 );
 
-const SearchHeading = ({title, value, results}) => <h1 className="-ml-2 text-4xl mx-text 2-500-pink">{title}: <span className="text-gray-200">{value}{ results ? <span className="ml-3 text-gray-400">({results} klippiä)</span> : ''}</span></h1>;
+const SearchHeading = ({title, value, results}) => (
+  <h1 className="text-4xl mx-text 2-500-pink font-bold">
+    {title}: <span className="ml-1 font-normal text-gray-200">{value}</span>
+  </h1>
+);
 
 
 let mounted = false
@@ -123,9 +129,13 @@ export default function Home() {
   };
   const topicFacet = router.query?.topic_facet;
   const genreFacet = router.query?.genre_facet;
+  const daterange = router.query?.date;
+  let rangeYears = daterange && daterange.split('-') || null;
 
-  const { data, error } = useStickySWR(typeof nextLookfor !== 'undefined' ? searchUrl(nextLookfor, page, topicFacet, genreFacet) : null, Fetcher, opt);
-//  const { data } = useSWR(mounted && currentLookfor ? searchUrl(currentLookfor, page) : null, Fetcher, opt);
+  const { data, error } = useStickySWR(typeof nextLookfor !== 'undefined'
+    ? searchUrl(nextLookfor, page, topicFacet, genreFacet, rangeYears) : null,
+    Fetcher, opt
+  );
 
   const queryUpdated = () => {
     const l = router.query.lookfor ?? '';
@@ -163,7 +173,9 @@ export default function Home() {
   const resultCount = data?.resultCount || null;
   const isFaceted = topicFacet || genreFacet;
 
-  const getPagination = () => data && <Pagination results={resultCount} page={page} setPage={(page) => changePage(page)} loading={loading} limit={searchLimit} />;
+  const getPagination = (showResultCount = true) => data &&
+    <Pagination results={resultCount} page={page} setPage={(page) => changePage(page)}
+                loading={loading} showResultCount={showResultCount} limit={searchLimit} />;
 
   return (
     <div className="w-full font-sans">
@@ -172,7 +184,9 @@ export default function Home() {
         <div className="flex flex-col gap-y-4 flex-wrap md:flex-nowrap">
           { topicFacet && <SearchHeading title="Aihe" value={topicFacet} results={resultCount} /> }
           { genreFacet && <SearchHeading title="Genre" value={genreFacet} results={resultCount} /> }
-          { !isFaceted && <SearchHeading title="Hakusana" value={currentLookfor} results={resultCount}/> }
+          { daterange && <SearchHeading title="Aikakausi" value={yearTitle(rangeYears[0])} results={resultCount} /> }
+          { !isFaceted && !daterange && <SearchHeading title="Hakusana" value={currentLookfor} results={resultCount}/> }
+
           { data && getPagination()}
         </div>
       </div>
@@ -183,8 +197,8 @@ export default function Home() {
         { !loading && data && resultCount === 0 && <p>ei tuloksia...</p> }
         { !loading && data?.status === 'OK' && <ResultGrid records={data.records} onOpenRecord={openRecord} width="200" height="200"/> }
       </div>
-      <div className="">
-        { !loading && getPagination()}
+      <div className="flex justify-center">
+        { !loading && getPagination(false)}
       </div>
     </div>
   )
