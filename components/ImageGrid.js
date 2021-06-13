@@ -14,7 +14,7 @@ export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 })
         return (
           <Link key={rec.id} href={`/view?id=${encodeURIComponent(rec.id)}`}>
             <li className={clsx("w-full sm:w-1/2 lg:w-1/3 mb-4 flex flex-col rounded-xl cursor-pointer group")} style={{  }}>
-              <div className="flex flex-col justify-between">
+              <div className="flex flex-col">
                   <div className="flex items-center p-3">
                     { rec.images &&
                       <div className="flex overflow-hidden w-full"
