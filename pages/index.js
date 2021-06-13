@@ -30,9 +30,9 @@ const DecadeFilter = ({ title, startYear }) => {
 };
 
 const DecadeFilters = () => (
-  <ul className="flex flex-wrap gap-2 mt-2">
+  <ul className="flex flex-wrap mt-2">
     { [1950, 1960, 1970, 1980, 1990, 2000].map(year => (
-      <li key={`decade-${year}`}>
+      <li key={`decade-${year}`} className="mr-2 mb-2">
         <DecadeFilter startYear={year} title={yearTitle(year)} />
       </li>
     ))}

@@ -181,11 +181,12 @@ export default function Home() {
     <div className="w-full font-sans">
       <HeadTags />
       <div className="p-5 w-full">
-        <div className="flex flex-col gap-y-4 flex-wrap md:flex-nowrap">
+        <div className="flex flex-col flex-wrap md:flex-nowrap">
           { topicFacet && <SearchHeading title="Aihe" value={topicFacet} results={resultCount} /> }
           { genreFacet && <SearchHeading title="Genre" value={genreFacet} results={resultCount} /> }
           { daterange && <SearchHeading title="Aikakausi" value={yearTitle(rangeYears[0])} results={resultCount} /> }
-          { !isFaceted && !daterange && <SearchHeading title="Hakusana" value={currentLookfor} results={resultCount}/> }
+          { !isFaceted && !daterange &&
+            <div className="mb-4"><SearchHeading title="Hakusana" value={currentLookfor} results={resultCount}/></div> }
 
           { data && getPagination()}
         </div>

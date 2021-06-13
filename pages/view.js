@@ -121,13 +121,13 @@ export default function View() {
       { loading && <Spinner /> }
       { !loading && data && (
          <div>
-            <div className="flex flex-col gap-x-10 gap-y-5 md:flex-row">
+            <div className="flex flex-col md:flex-row">
               <div className="md:w-3/5 w-full">
                 <PreviewWrapper record={rec} videoAvailable={videoAvailable}>
                   <Preview images={rec?.images} videoAvailable={videoAvailable} recordUrl={finnaRecordPage(rec.recordPage)} />
                 </PreviewWrapper>
               </div>
-              <div className="flex items-center">
+              <div className="ml-5 flex items-center">
                 <div>
                   <Header record={rec} />
                   { videoUrls.length > 1 && <ul className="mt-5">{ videoUrls.map(({src, title}, idx) => (
