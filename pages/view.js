@@ -10,6 +10,7 @@ import { recordUrl } from '@/lib/api';
 import { extractVideoUrls, finnaRecordPage } from '@/lib/record';
 import { Image, ImageGrid } from '@/components/ImageGrid';
 import Facets from '@/components/Topics';
+import Spinner from '@/components/Spinner';
 import Fetcher from '@/lib/fetcher';
 
 const Copyright = ({ record }) => {
@@ -25,7 +26,7 @@ const Copyright = ({ record }) => {
 
   return (
     <div>
-      <span className="text-gray-300 italic">Aineiston käyttöoikeudet: </span><span className="ml-2">{rightsLink}</span> <span className="text-gray-300 ml-1">(lisätietoja: <a target="_blank" href={  finnaRecordPage(record.id)} className="underline hover:no-underline">Finna.fi</a>)</span>
+      <span className="text-gray-300 italic">Aineiston käyttöoikeudet: </span><span className="ml-2">{rightsLink}</span> <span className="text-gray-300 ml-1">(lisätietoja: <a target="_blank" href={  finnaRecordPage(record.recordPage)} className="underline hover:no-underline">Finna.fi</a>)</span>
     </div>
   );
 };
@@ -86,15 +87,35 @@ const PreviewWrapper = ({ children, record, videoAvailable }) => {
 
 export default function View() {
   const router = useRouter();
-
+  const [loading, setLoading] = useState(false);
   const id = router.query.id;
-  const { data, error, loading, ...rest } = useSWR(id ? recordUrl(id) : null, Fetcher);
+
+
+  console.log("id: %o", id);
+  const opt = {
+    loadingTimeout: 1,
+    onLoadingSlow: (_key, _config) => {
+      setLoading(true);
+    },
+    onError: (_err, _key, config) => {
+      setLoading(false);
+    },
+    onSuccess: (_data, _key, _config) => {
+      setLoading(false);
+    }
+  };
+
+  const { data, error, ...rest } = useSWR(id ? recordUrl(id) : null, Fetcher, opt);
+
+  if (!id) return "";
+
   const rec = data && !error && data.resultCount > 0 && data.records[0];
 
-  if (loading) return <p>loading...</p>;
-  if (!loading && !rec) return <p>error...</p>;
+  console.log("2: %o", [error, rec]);
+  if (error) return <p>error...</p>;
 
-  const videoUrls = extractVideoUrls(rec);
+
+  const videoUrls = rec ? extractVideoUrls(rec) : [];
   const videoAvailable = videoUrls.length > 0;
 
   return (
@@ -103,8 +124,10 @@ export default function View() {
         <title>SWR search</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div>
+        { loading && <Spinner /> }
         { data && (
+
+      <div>
             <div className="flex flex-col gap-x-10 gap-y-5 md:flex-row">
               <div className="md:w-3/5 w-full">
                 <PreviewWrapper record={rec} videoAvailable={videoAvailable}>
@@ -124,16 +147,29 @@ export default function View() {
                 </div>
               </div>
             </div>
-        ) }
+
         <div className="mt-5 mb-3">
           { rec.buildings && <p className="mt-2"><span className="italic text-gray-300">Aineiston tarjoaa: </span><span className="ml-2">{rec.buildings[0].translated}</span></p> }
           <Copyright record={rec} />
         </div>
-        { rec.rawData.topic_facet && <div className="my-4"><Facets facet="topic_facet" facets={rec.rawData.topic_facet.map(f => {
-          return { value: f, translated: f };
-        })} collapse={true} /></div> }
+        { rec.rawData.topic_facet &&
+          <div className="my-4">
+             <h2 className="text-xl mb-2">Aiheet:</h2>
+            <Facets facet="topic_facet" facets={rec.rawData.topic_facet.map(f => {
+              return { value: f, translated: f };
+            })} collapse={true} />
+          </div> }
+        { rec.rawData.genre_facet &&
+          <div className="my-4">
+             <h2 className="text-xl mb-2">Genret:</h2>
+             <Facets facet="genre_facet" facets={rec.rawData.genre_facet.map(f => {
+              return { value: f, translated: f };
+            })} collapse={true} />
+          </div> }
+
         { rec.rawData.description && <p className="mt-10 whitespace-pre-line leading-6 text-lg">{rec.rawData.description.replace(/<br( )?\/>/g, '\n')}</p>}
       </div>
-    </div>
+        ) }
+          </div>
   )
 }

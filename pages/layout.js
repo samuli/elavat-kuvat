@@ -35,7 +35,7 @@ const Layout = ({ children }) => (
 
   <div style={{ minHeight: "120vh"}} className="flex flex-col bg-gray-900 text-white align-center items-center">
     <Header />
-    <div className="w-full max-w-6xl" style={{ minHeight: "120vh"}}>
+    <div className="w-full max-w-6xl mb-5" style={{ minHeight: "120vh"}}>
       {children}
     </div>
   </div>

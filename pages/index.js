@@ -8,14 +8,16 @@ import Facets from '@/components/Topics';
 
 const FacetSection = ({ facet, title, facets }) => {
 
-  return Object.entries(facets).map(([key, values]) => {
       return (
-        <div key={`facet-${key}`}>
+        <div className="mb-4">
           <h2 className="text-2xl">{title}:</h2>
-          <div className="my-3"><Facets facet={facet} facets={values} /></div>
+          <div className="mt-4"><Facets facet={facet} facets={facets} /></div>
         </div>
       );
-  });
+};
+
+const Genres = ({ facets }) => {
+
 };
 
 const FrontPage = () => {
@@ -35,18 +37,21 @@ const FrontPage = () => {
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0"/>
       </Head>
       <div className="p-5">
-        <div>
-          { genreFacets?.status === 'OK' && <FacetSection title="Genre" facet="genre_facet" facets={genreFacets.facets} /> }
+      <div>
+      { genreFacets?.status === 'OK' && <FacetSection title="Genret" facet="genre_facet" facets={genreFacets.facets.genre_facet} /> }
+      </div>
+
+      <div>
+      { topicFacets?.status === 'OK' && <FacetSection title="Aiheet" facet="topic_facet" facets={topicFacets.facets.topic_facet} /> }
         </div>
-        <div>
-          { topicFacets?.status === 'OK' && <FacetSection title="Aiheet" facet="topic_facet" facets={topicFacets.facets} /> }
-        </div>
-        <div className="mt-5">
-          <h2 className="text-2xl">Uusimmat:</h2>
+        <div className="mt-8">
+          <h2 className="text-2xl">Viimeksi lisätyt:</h2>
           { data?.status === 'OK' && (
-            <div>
+            <div className="flex flex-col items-center ">
               <ResultGrid records={data.records} onOpenRecord={openRecord} width="200" height="200"/>
-              <div><Link href="/search"><a>Näytä kaikki ({data.resultCount})</a></Link></div>
+              <div className="flex justify-center p-4 text-2xl rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer">
+                <Link href="/search"><a>Näytä kaikki ({data.resultCount})</a></Link>
+              </div>
             </div>
           ) }
         </div>

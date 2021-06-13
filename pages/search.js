@@ -7,12 +7,13 @@ import Head from 'next/head';
 import Fetcher from '@/lib/fetcher';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { FaHourglassHalf, FaSearch, FaSpinner } from 'react-icons/fa';
+import { FaHourglassHalf, FaSearch } from 'react-icons/fa';
 import { FcNext } from 'react-icons/fc';
 import { FaArrowLeft as ArrowLeft, FaArrowRight as ArrowRight } from 'react-icons/fa';
 
 import { searchUrl, searchLimit } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
+import Spinner from '@/components/Spinner';
 
 const useStickySWR = (...args) => {
   const val = useRef();
@@ -45,7 +46,7 @@ const Pagination = ({ results, page, setPage, loading, limit = 10 }) => {
           className={clsx(
             'flex justify-center items-center w-12 h-12 p-2 cursor-pointer border border-8 border-pink-500 text-xl rounded-sm',
             !active && 'hover:bg-pink-600',
-            active && 'bg-pink-500 text-white hover:text-white')}>{ loading && active ? <FaSpinner className="animate-spin" /> : i+1 }</li>;
+            active && 'bg-pink-500 text-white hover:text-white')}>{ loading && active ? <Spinner /> : i+1 }</li>;
       }) }
       </ul>
       {/* <div className="align-center text-4xl p-2 fill-current stroke-current text-pink-500 cursor-pointer hover:text-pink-600"><ArrowRight/></div> */}
@@ -67,7 +68,7 @@ const Results = ({ data }) => (
   </div>
 );
 
-const SearchHeading = ({title, value, results}) => <h1 className="-ml-2 text-4xl mx-text 2-500-pink">{title}: <span className="text-gray-200 italic">{value}{ results ? <span class="ml-3 text-gray-400">({results})</span> : ''}</span></h1>;
+const SearchHeading = ({title, value, results}) => <h1 className="-ml-2 text-4xl mx-text 2-500-pink">{title}: <span className="text-gray-200">{value}{ results ? <span class="ml-3 text-gray-400">({results} klippiä)</span> : ''}</span></h1>;
 
 
 let mounted = false
@@ -160,7 +161,7 @@ export default function Home() {
         </div>
       </div>
       <div className="p-5">
-        { loading && <FaSpinner className="ml-4 w-8 h-8 animate-spin" /> }
+        { loading && <div className="ml-4 w-8 h-8"><Spinner /></div> }
         { !loading && error && <p>error...</p> }
         { !loading && data && data?.status === 'ERROR' && <p>error...</p> }
         { !loading && data && resultCount === 0 && <p>ei tuloksia...</p> }

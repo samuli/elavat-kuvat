@@ -40,12 +40,10 @@ const Play = () => {
   const rec = data && !error && data.resultCount > 0 && data.records[0];
 
   if (loading) return <p>loading...</p>;
-  if (!loading && !rec) return <p>error...</p>;
+  if (!loading && data && !rec) return <p>error...</p>;
 
   const videoUrls = extractVideoUrls(rec);
   const videoUrl = videoUrls[clip-1];
-
-  if (!videoUrl) return <p>error...</p>;
 
   return (
     <div className="w-full w-screen p-5 font-sans">

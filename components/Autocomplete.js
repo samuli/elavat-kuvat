@@ -11,7 +11,7 @@ import { autocompleteUrl } from '@/lib/api';
 import Fetcher from '@/lib/fetcher';
 import { recordUrl } from '@/lib/record';
 import { Image } from '@/components/ImageGrid';
-
+import Spinner from '@/components/Spinner';
 
 const Autocomplete = () => {
   const [ inputItems, setInputItems ] = useState([]);
@@ -96,7 +96,7 @@ const Autocomplete = () => {
   const searchResultsUrl = term => `/search?lookfor=${encodeURIComponent(term)}`;
 
   const icon = loading
-    ?  <FaSpinner style={{ width: '30px', height: '30px'}} className="mr-4 animate-spin" />
+    ?  <div className="mr-4"><Spinner style={{ width: '30px', height: '30px'}} /></div>
     :  <FaSearch className="animate-spin" style={{ width: '30px', height: '30px'}} className="mr-4" />;
 
   const menuItemClasses = active => clsx('mb-1 p-2 hover:text-gray-100', active && 'rounded-xl bg-pink-500');
