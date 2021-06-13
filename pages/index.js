@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import useSWR from 'swr';
 import Fetcher from '@/lib/fetcher';
-import { frontPageUrl, searchUrl, genreFacetsUrl, topicFacetsUrl, yearFacetsUrl } from '@/lib/api';
+import { frontPageUrl, genreFacetsUrl, topicFacetsUrl, yearFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
 import Facets from '@/components/Topics';
 import HeadTags from '@/components/Head'

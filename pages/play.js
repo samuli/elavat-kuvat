@@ -7,12 +7,12 @@ import useSWR from 'swr';
 import { recordUrl } from '@/lib/api';
 import { extractVideoUrls, finnaRecordPage } from '@/lib/record';
 import Fetcher from '@/lib/fetcher';
-import { FullscreenLayout } from '@/pages/layout';
+import { FullscreenLayout } from '@/components/layout';
 import ReactPlayer from 'react-player/file'
 import { FaArrowLeft as BackIcon } from 'react-icons/fa';
 import HeadTags from '@/components/Head';
 
-const Play = () => {
+function Play() {
   const router = useRouter();
   const [ playerOpen, setPlayerOpen ] = useState(true);
   const [ showUI, setShowUI ] = useState(false);

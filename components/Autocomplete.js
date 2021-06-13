@@ -96,7 +96,7 @@ const Autocomplete = () => {
     ?  <div className="mr-4"><Spinner style={{ width: '30px', height: '30px'}} /></div>
     :  <FaSearch className="animate-spin" style={{ width: '30px', height: '30px'}} className="mr-4" />;
 
-  const menuItemClasses = active => clsx('mb-1 p-2 hover:text-gray-100', active && 'rounded-xl bg-pink-500');
+  const menuItemClasses = active => clsx('mb-1 p-2 hover:text-gray-100', active && 'bg-pink-500');
 
   return (
     <div>
