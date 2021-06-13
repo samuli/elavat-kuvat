@@ -34,22 +34,42 @@ const useStickySWR = (...args) => {
 const Pagination = ({ results, page, setPage, loading, limit = 10 }) => {
   const pages = Math.ceil(Number(results)/limit);
   if (pages === 1) return null;
+  const maxItems = 7;
+  const startPage = Math.max(0, Math.floor(page-maxItems/2));
+  const endPage = Math.min(pages-1, Math.floor(page+maxItems/2));
+  const scrollButtons = pages > maxItems;
+  const buttons = Math.min(pages, 6);
+  let pageIdxs = Array.from(new Array(buttons), (x, i) => i + startPage);
+  const addFirstPage = pageIdxs[0] > 0;
+  const showEllipsis = pageIdxs[0] > 1;
+  if (addFirstPage) {
+    pageIdxs = [0, ...pageIdxs];
+
+  }
 
   return (
-    <div className="flex items-start">
-      <ul className="flex items-start flex-wrap gap-4 -ml-2">
-      { Array.from(Array(pages)).map((_el,i) => {
-        const active = i+1 === page;
-        return <li
-          onClick={() => setPage(i+1)}
-          key={i}
-          className={clsx(
-            'flex justify-center items-center w-12 h-12 p-2 cursor-pointer border border-8 border-pink-500 text-xl rounded-sm',
-            !active && 'hover:bg-pink-600',
-            active && 'bg-pink-500 text-white hover:text-white')}>{ loading && active ? <Spinner width="6" height="6"/> : i+1 }</li>;
+    <div className="flex items-start items-center -ml-2">
+      { scrollButtons && <div onClick={() => setPage(page-1)}><ArrowLeft /></div> }
+      <ul className="flex items-start flex-wrap gap-4 mx-4">
+        { pageIdxs.map((el,i) => {
+
+          const pageIdx = el;
+          const active = pageIdx+1 === page;
+          return (
+            <li key={pageIdx} className="flex">
+              <div
+                onClick={() => setPage(pageIdx+1)}
+
+                className={clsx(
+                  'flex justify-center items-center w-12 h-12 p-2 ring-1 ring-pink-500 text-gray-200 text-xl rounded-sm',
+                  !active && 'hover:text-white cursor-pointer',
+                  active && 'bg-pink-500 text-white hover:text-white')}>{ loading && active ? <Spinner width="6" height="6"/> : pageIdx+1 }
+              </div>
+              { showEllipsis && i === 0 && <div className="flex ml-4 text-2xl tracking-widest justify-center items-end">...</div> }
+            </li>);
       }) }
       </ul>
-      {/* <div className="align-center text-4xl p-2 fill-current stroke-current text-pink-500 cursor-pointer hover:text-pink-600"><ArrowRight/></div> */}
+      { scrollButtons && <div onClick={() => setPage(page+1)}><ArrowRight /></div> }
     </div>
    );
 };
@@ -68,7 +88,7 @@ const Results = ({ data }) => (
   </div>
 );
 
-const SearchHeading = ({title, value, results}) => <h1 className="-ml-2 text-4xl mx-text 2-500-pink">{title}: <span className="text-gray-200">{value}{ results ? <span class="ml-3 text-gray-400">({results} klippiä)</span> : ''}</span></h1>;
+const SearchHeading = ({title, value, results}) => <h1 className="-ml-2 text-4xl mx-text 2-500-pink">{title}: <span className="text-gray-200">{value}{ results ? <span className="ml-3 text-gray-400">({results} klippiä)</span> : ''}</span></h1>;
 
 
 let mounted = false
