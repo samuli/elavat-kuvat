@@ -104,7 +104,7 @@ const Autocomplete = () => {
   return (
     <div>
       <div className="flex justify-center items-center">
-        { icon } <label {...getLabelProps()} className="hidden">Hae:</label>
+        { icon } <label {...getLabelProps()} className="hidden">Etsi:</label>
         <div {...getComboboxProps()}>
           <input
             {...getInputProps({
@@ -133,7 +133,7 @@ const Autocomplete = () => {
                   closeMenu();
                 }
               },
-              placeholder: "Hae elokuvia... (Ctrl K)"
+              placeholder: "Etsi... (Ctrl K)"
             })}
             style={{ maxWidth: '400px' }}
             className="h-12 px-4 py-4 rounded-lg text-xl text-gray-900 focus:outline-none ring-inset focus:ring-4 focus:ring-pink-500"

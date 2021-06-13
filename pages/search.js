@@ -139,9 +139,10 @@ export default function Home() {
     router.push(`/view?id=${encodeURIComponent(id)}`);
   };
 
-
   const resultCount = data?.resultCount || null;
   const isFaceted = topicFacet || genreFacet;
+
+  const getPagination = () => data && <Pagination results={resultCount} page={page} setPage={(page) => changePage(page)} loading={loading} limit={searchLimit} />;
 
   return (
     <div className="w-full font-sans">
@@ -151,20 +152,22 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0"/>
       </Head>
       <div className="p-5 w-full">
-        <div className="flex flex-col gap-y-4 .items-center flex-wrap md:flex-nowrap">
+        <div className="flex flex-col gap-y-4 flex-wrap md:flex-nowrap">
           { topicFacet && <SearchHeading title="Aihe" value={topicFacet} results={resultCount} /> }
           { genreFacet && <SearchHeading title="Genre" value={genreFacet} results={resultCount} /> }
           { !isFaceted && <SearchHeading title="Hakusana" value={currentLookfor} results={resultCount}/> }
-          { data && <Pagination results={data.resultCount} page={page} setPage={(page) => changePage(page)} loading={loading} limit={searchLimit} /> }
+          { data && getPagination()}
         </div>
       </div>
       <div className="p-5">
-
         { loading && <FaSpinner className="ml-4 w-8 h-8 animate-spin" /> }
         { !loading && error && <p>error...</p> }
         { !loading && data && data?.status === 'ERROR' && <p>error...</p> }
-        { !loading && data && data.resultCount === 0 && <p>ei tuloksia...</p> }
+        { !loading && data && resultCount === 0 && <p>ei tuloksia...</p> }
         { !loading && data?.status === 'OK' && <ResultGrid records={data.records} onOpenRecord={openRecord} width="200" height="200"/> }
+      </div>
+      <div className="">
+        { !loading && getPagination()}
       </div>
     </div>
   )

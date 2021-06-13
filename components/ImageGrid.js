@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import clsx from 'clsx';
+import { extractVideoUrls } from '@/lib/record';
 
 const imageH = 300;
 
@@ -7,18 +9,21 @@ export const Image = ({ src, width = 300, height = 300 }) => <img src={`https://
 export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 }) => (
   <div>
     <ul className="grid sm:grid-cols-2 lg:grid-cols-3">
-      {records?.map(rec => (
-          <li className="mb-4 flex flex-col rounded-xl cursor-pointer .bg-yellow-100" style={{  }}>
-            <div className="flex flex-col justify-between h-full">
-              <Link key={rec.id} href={`/view?id=${encodeURIComponent(rec.id)}`}>
-                <a className="flex items-center p-3 rounded-lg">
-                  { rec.images && <div className="flex h-auto overflow-hidden w-full" style={{ height: '${imageH}px' }}><Image src={rec.images[0]} width="550" /></div> }
-                </a>
-              </Link>
-              <div className="w-full bg-gray-900 px-2 text-center text-gray-100 overflow-hidden text-xl line-clamp-2">{rec.title}</div>
-            </div>
-          </li>
-      ))}
+      {records?.map(rec => {
+        const playable = extractVideoUrls(rec).length > 0;
+        return (
+          <Link key={rec.id} href={`/view?id=${encodeURIComponent(rec.id)}`}>
+            <li className={clsx("mb-4 flex flex-col rounded-xl cursor-pointer", !playable && "bg-yellow-100")} style={{  }}>
+              <div className="flex flex-col justify-between h-full">
+                  <div className="flex items-center p-3 rounded-lg">
+                    { rec.images && <div className="flex h-auto overflow-hidden w-full" style={{ height: '${imageH}px' }}><Image src={rec.images[0]} width="550" /></div> }
+                  </div>
+                <div className="w-full bg-gray-900 px-2 text-center text-gray-100 overflow-hidden text-xl line-clamp-2">{rec.title}</div>
+              </div>
+            </li>
+          </Link>
+        );
+      })}
     </ul>
   </div>
 );

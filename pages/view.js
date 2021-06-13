@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import clsx from 'clsx';
-import { FaPlay as PlayIcon } from 'react-icons/fa';
+import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon } from 'react-icons/fa';
 import { recordUrl } from '@/lib/api';
 import { extractVideoUrls, finnaRecordPage } from '@/lib/record';
 import { Image, ImageGrid } from '@/components/ImageGrid';
@@ -50,29 +50,39 @@ const Header = ({ record }) => {
 };
 
 
-const PlayButton = ({ big = true }) => (
-  <div className={clsx(
-    "bg-white text-gray-900 group-hover:bg-pink-500 group-hover:text-gray-100 fill-current stroke-current rounded-full",
-    big && "p-10 text-4xl",  !big && "p-2 text-sm")}><PlayIcon/></div>
+const PlayButton = () => (
+  <div className="bg-white text-gray-900 group-hover:bg-pink-500 group-hover:text-gray-100 fill-current stroke-current rounded-full items-center justify-center flex w-32 h-32 text-4xl"><div className="ml-2"><PlayIcon/></div></div>
 );
 
-const Preview = ({ images = [], videoAvailable}) => {
+const SmallPlayButton = () => (
+  <div className="text-gray-100 group-hover:text-pink-500 fill-current stroke-current items-center justify-center flex text-sm"><div className="ml-1"><PlayIcon/></div></div>
+);
+
+const Preview = ({ images = [], videoAvailable, recordUrl }) => {
   return (
     <div className="flex relative justify-center bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl group cursor-pointer">
-
       { images.slice(0,1).map((img, idx) => (
         <div key={idx} className="">
           <Image key={img} src={img} width="700" />
         </div> ))}
-      { videoAvailable &&
         <div className="absolute align-middle p-10 self-center align-center justify-center flex cursor-pointer">
-          <PlayButton big={true}/>
-        </div> }
+          { videoAvailable && <PlayButton big={true}/> }
+          { !videoAvailable && (
+            <div className="flex items-center justify-center text-2xl p-4 rounded-md bg-white text-gray-900 group-hover:bg-pink-500 group-hover:text-gray-100">Katso finna.fi:ssä
+              <span className="ml-4"><ExtLinkIcon /></span>
+            </div>) }
+        </div>
     </div>
   );
 };
 
 const videoPage = (id, clip = 1) => `/play?id=${encodeURIComponent(id)}&clip=${clip}`;
+
+const PreviewWrapper = ({ children, record, videoAvailable }) => {
+  return videoAvailable
+    ? <Link href={videoPage(record.id)}><a>{ children }</a></Link>
+    : <a href={finnaRecordPage(record.recordPage)} target="_blank">{ children }</a>;
+};
 
 export default function View() {
   const router = useRouter();
@@ -85,7 +95,7 @@ export default function View() {
   if (!loading && !rec) return <p>error...</p>;
 
   const videoUrls = extractVideoUrls(rec);
-  const videoAvailable = videoUrls.length;
+  const videoAvailable = videoUrls.length > 0;
 
   return (
     <div className="w-auto mx-7 font-sans">
@@ -95,25 +105,25 @@ export default function View() {
       </Head>
       <div>
         { data && (
-          <>
-          <Link href={videoPage(rec.id)}><a>
             <div className="flex flex-col gap-x-10 gap-y-5 md:flex-row">
-              <div className="md:w-3/5 w-full"><Preview images={rec?.images} videoAvailable={videoAvailable} /></div>
+              <div className="md:w-3/5 w-full">
+                <PreviewWrapper record={rec} videoAvailable={videoAvailable}>
+                  <Preview images={rec?.images} videoAvailable={videoAvailable} recordUrl={finnaRecordPage(rec.recordPage)} />
+                </PreviewWrapper>
+              </div>
               <div className="flex items-center">
                 <div>
                   <Header record={rec} />
                   { videoUrls.length > 1 && <ul className="mt-5">{ videoUrls.map(({src, title}, idx) => (
                     <Link href={videoPage(rec.id, idx+1)}><a>
-                      <li className="flex my-2 items-center">
-                        <PlayButton big={false} /><div className="ml-2">{title}</div>
+                      <li className="flex my-2 items-center group text-gray-100 hover:text-white">
+                        <SmallPlayButton big={false} /><div className="ml-3">{title}</div>
                       </li>
                     </a></Link>
                   )) }</ul> }
                 </div>
               </div>
             </div>
-          </a></Link>
-          </>
         ) }
         <div className="mt-5 mb-3">
           { rec.buildings && <p className="mt-2"><span className="italic text-gray-300">Aineiston tarjoaa: </span><span className="ml-2">{rec.buildings[0].translated}</span></p> }

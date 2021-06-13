@@ -30,16 +30,16 @@ const FrontPage = () => {
   return (
     <div>
       <Head>
-        <title>SWR search</title>
+        <title>Elävät kuvat</title>
         <link rel="icon" href="/favicon.ico" />
         <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0"/>
       </Head>
       <div className="p-5">
         <div>
-          { topicFacets?.status === 'OK' && <FacetSection title="Aiheet" facet="topic_facet" facets={topicFacets.facets} /> }
+          { genreFacets?.status === 'OK' && <FacetSection title="Genre" facet="genre_facet" facets={genreFacets.facets} /> }
         </div>
         <div>
-          { genreFacets?.status === 'OK' && <FacetSection title="Genre" facet="genre_facet" facets={genreFacets.facets} /> }
+          { topicFacets?.status === 'OK' && <FacetSection title="Aiheet" facet="topic_facet" facets={topicFacets.facets} /> }
         </div>
         <div className="mt-5">
           <h2 className="text-2xl">Uusimmat:</h2>
