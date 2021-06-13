@@ -1,5 +1,5 @@
 import { FaSpinner } from 'react-icons/fa';
 
-const Spinner = ({ style }) => <FaSpinner className="ml-4 w-8 h-8 animate-spin" style={{...style}}/>;
+const Spinner = ({ style, width="8", height="8" }) => <FaSpinner className={`w-${width} h-${height} animate-spin`} style={{...style}}/>;
 
 export default Spinner;

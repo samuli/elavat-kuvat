@@ -46,7 +46,7 @@ const Pagination = ({ results, page, setPage, loading, limit = 10 }) => {
           className={clsx(
             'flex justify-center items-center w-12 h-12 p-2 cursor-pointer border border-8 border-pink-500 text-xl rounded-sm',
             !active && 'hover:bg-pink-600',
-            active && 'bg-pink-500 text-white hover:text-white')}>{ loading && active ? <Spinner /> : i+1 }</li>;
+            active && 'bg-pink-500 text-white hover:text-white')}>{ loading && active ? <Spinner width="6" height="6"/> : i+1 }</li>;
       }) }
       </ul>
       {/* <div className="align-center text-4xl p-2 fill-current stroke-current text-pink-500 cursor-pointer hover:text-pink-600"><ArrowRight/></div> */}
