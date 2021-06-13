@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import Head from 'next/head';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
@@ -11,6 +10,7 @@ import Fetcher from '@/lib/fetcher';
 import { FullscreenLayout } from '@/pages/layout';
 import ReactPlayer from 'react-player/file'
 import { FaArrowLeft as BackIcon } from 'react-icons/fa';
+import HeadTags from '@/components/Head';
 
 const Play = () => {
   const router = useRouter();
@@ -47,10 +47,7 @@ const Play = () => {
 
   return (
     <div className="w-full w-screen p-5 font-sans">
-      <Head>
-        <title>SWR search</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <HeadTags />
       <div>
         { rec && (
           <div

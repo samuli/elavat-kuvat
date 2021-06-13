@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import { useRef, useState, useEffect } from 'react';
 import { useUpdate } from 'react-use';
 import { useQuery } from 'react-query';
-import Head from 'next/head';
+import HeadTags from '@/components/Head';
 import Fetcher from '@/lib/fetcher';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -147,11 +147,7 @@ export default function Home() {
 
   return (
     <div className="w-full font-sans">
-      <Head>
-        <title>SWR search</title>
-        <link rel="icon" href="/favicon.ico" />
-        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0"/>
-      </Head>
+      <HeadTags />
       <div className="p-5 w-full">
         <div className="flex flex-col gap-y-4 flex-wrap md:flex-nowrap">
           { topicFacet && <SearchHeading title="Aihe" value={topicFacet} results={resultCount} /> }

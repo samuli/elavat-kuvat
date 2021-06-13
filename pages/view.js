@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Head from 'next/head'
+import HeadTags from '@/components/Head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
@@ -120,14 +120,10 @@ export default function View() {
 
   return (
     <div className="w-auto mx-7 font-sans">
-      <Head>
-        <title>SWR search</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-        { loading && <Spinner /> }
-        { data && (
-
-      <div>
+      <HeadTags />
+      { loading && <Spinner /> }
+      { !loading && data && (
+         <div>
             <div className="flex flex-col gap-x-10 gap-y-5 md:flex-row">
               <div className="md:w-3/5 w-full">
                 <PreviewWrapper record={rec} videoAvailable={videoAvailable}>
