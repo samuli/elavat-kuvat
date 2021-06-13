@@ -170,10 +170,10 @@ export default function Home() {
     router.push(`/view?id=${encodeURIComponent(id)}`);
   };
 
-  const resultCount = data?.resultCount || null;
+  const resultCount = data && data.resultCount || 0;
   const isFaceted = topicFacet || genreFacet;
 
-  const getPagination = (showResultCount = true) => data &&
+  const getPagination = (showResultCount = true) => data && resultCount > 0 &&
     <Pagination results={resultCount} page={page} setPage={(page) => changePage(page)}
                 loading={loading} showResultCount={showResultCount} limit={searchLimit} />;
 

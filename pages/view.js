@@ -26,7 +26,7 @@ const Copyright = ({ record }) => {
 
   return (
     <div>
-      <span className="text-gray-300 italic">Aineiston käyttöoikeudet: </span><span className="ml-2">{rightsLink}</span> <span className="text-gray-300 ml-1">(lisätietoja: <a target="_blank" href={  finnaRecordPage(record.recordPage)} className="underline hover:no-underline">Finna.fi</a>)</span>
+      <span className="text-gray-300 italic">Aineiston käyttöoikeudet: </span><span className="ml-2">{rightsLink}</span> <span className="text-gray-300 ml-1">(lisätietoja: <a target="_blank" href={  finnaRecordPage(record.recordPage)} className="hover:text-white">Finna.fi</a>)</span>
     </div>
   );
 };
@@ -127,7 +127,7 @@ export default function View() {
                   <Preview images={rec?.images} videoAvailable={videoAvailable} recordUrl={finnaRecordPage(rec.recordPage)} />
                 </PreviewWrapper>
               </div>
-              <div className="ml-5 flex items-center">
+              <div className="md:ml-8 flex items-center mt-8 md:mt-0">
                 <div>
                   <Header record={rec} />
                   { videoUrls.length > 1 && <ul className="mt-5">{ videoUrls.map(({src, title}, idx) => (
