@@ -12,7 +12,7 @@ const Header = () => {
       <Link href="/">
         <div className="flex flex-col md:flex-row items-center md:items-end mb-2 text-pink-500 stroke-current text-white hover:text-pink-600 cursor-pointer">
           <div className="text-4xl md:text-2xl font-bold whitespace-nowrap">Elävät kuvat.</div>
-          <div class="flex items-end ml-2 text-md fonts-serif text-gray-100 italic whitespace-nowrap">suomalaisia lyhytelokuvia</div>
+          <div className="flex items-end ml-2 text-md fonts-serif text-gray-100 italic whitespace-nowrap">suomalaisia lyhytelokuvia</div>
         </div>
       </Link>
       <div className="ml-6">
