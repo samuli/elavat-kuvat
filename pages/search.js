@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import useSWR from 'swr';
 import { useRef, useState, useEffect } from 'react';
 import { useUpdate } from 'react-use';
-import { useQuery } from 'react-query';
 import HeadTags from '@/components/Head';
 import Fetcher from '@/lib/fetcher';
 import { useRouter } from 'next/router';
