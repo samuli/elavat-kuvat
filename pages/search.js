@@ -173,9 +173,12 @@ export default function Home() {
   const resultCount = data && data.resultCount || 0;
   const isFaceted = topicFacet || genreFacet;
 
-  const getPagination = (showResultCount = true) => data && resultCount > 0 &&
-    <Pagination results={resultCount} page={page} setPage={(page) => changePage(page)}
-                loading={loading} showResultCount={showResultCount} limit={searchLimit} />;
+  const getPagination = (showResultCount = true) => data && resultCount > 0 && (
+    <div className="mt-4">
+        <Pagination results={resultCount} page={page} setPage={(page) => changePage(page)}
+                    loading={loading} showResultCount={showResultCount} limit={searchLimit} />
+    </div>
+  );
 
   return (
     <div className="w-full font-sans">
@@ -186,7 +189,7 @@ export default function Home() {
           { genreFacet && <SearchHeading title="Genre" value={genreFacet} results={resultCount} /> }
           { daterange && <SearchHeading title="Aikakausi" value={yearTitle(rangeYears[0])} results={resultCount} /> }
           { !isFaceted && !daterange &&
-            <div className="mb-4"><SearchHeading title="Hakusana" value={currentLookfor} results={resultCount}/></div> }
+            <div className="mb-4"><SearchHeading title="Haku" value={currentLookfor} results={resultCount}/></div> }
 
           { data && getPagination()}
         </div>

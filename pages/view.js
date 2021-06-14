@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import clsx from 'clsx';
-import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon } from 'react-icons/fa';
+import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon, FaQuestionCircle as InfoIcon } from 'react-icons/fa';
 import { recordUrl } from '@/lib/api';
 import { extractVideoUrls, finnaRecordPage } from '@/lib/record';
 import { Image, ImageGrid } from '@/components/ImageGrid';
@@ -25,8 +25,8 @@ const Copyright = ({ record }) => {
   }
 
   return (
-    <div>
-      <span className="text-gray-300 italic">Aineiston käyttöoikeudet: </span><span className="ml-2">{rightsLink}</span> <span className="text-gray-300 ml-1">(lisätietoja: <a target="_blank" href={  finnaRecordPage(record.recordPage)} className="hover:text-white">Finna.fi</a>)</span>
+    <div className="flex">
+      <span className="text-gray-300 italic">Aineiston käyttöoikeudet: </span><span className="ml-2">{rightsLink}</span> <span className="text-gray-300 ml-1 flex items-center text-xl"><a target="_blank" href={  finnaRecordPage(record.recordPage)} className="hover:text-white ml-2" title="Katso lisätiedot Finnassa"><InfoIcon /></a></span>
     </div>
   );
 };
@@ -52,7 +52,7 @@ const Header = ({ record }) => {
 
 
 const PlayButton = () => (
-  <div className="bg-white text-gray-900 group-hover:bg-pink-500 group-hover:text-gray-100 fill-current stroke-current rounded-full items-center justify-center flex w-32 h-32 text-4xl"><div className="ml-2"><PlayIcon/></div></div>
+  <div className="bg-white text-gray-900 group-hover:bg-pink-500 group-hover:text-gray-100 fill-current stroke-current rounded-full items-center justify-center flex w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 text-2xl sm:text-4xl"><div className="ml-2"><PlayIcon/></div></div>
 );
 
 const SmallPlayButton = () => (
