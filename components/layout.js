@@ -8,7 +8,7 @@ import { FaPlayCircle } from 'react-icons/fa';
 const Header = () => {
 
   return (
-    <div className="bg-gray-900 px-5 pt-5 flex flex-col md:flex-row overflow-auto items-center justify-between">
+    <div className="bg-gray-900 mb-5 px-5 pt-5 flex flex-col md:flex-row overflow-auto items-center justify-between">
       <Link href="/">
         <div className="flex flex-col md:flex-row items-center md:items-end mb-2 text-pink-500 stroke-current text-white hover:text-pink-600 cursor-pointer">
           <div className="text-4xl md:text-2xl font-bold whitespace-nowrap">Elävät kuvat.</div>
