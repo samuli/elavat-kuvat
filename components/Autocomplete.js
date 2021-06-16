@@ -22,7 +22,7 @@ const Autocomplete = () => {
   const debounced = useDebouncedCallback((l) => {
     setLookfor(l);
   }, 1000);
-  const limit = 5;
+  const limit = 20;
 
 
 
@@ -96,7 +96,7 @@ const Autocomplete = () => {
     ?  <div className="mr-4"><Spinner style={{ width: '30px', height: '30px'}} /></div>
     :  <FaSearch className="animate-spin" style={{ width: '30px', height: '30px'}} className="mr-4" />;
 
-  const menuItemClasses = active => clsx('mb-1 p-2 hover:text-gray-100', active && 'bg-pink-500');
+  const menuItemClasses = active => clsx(' p-1 hover:text-gray-100', active && 'bg-pink-500');
 
   return (
     <div>
@@ -138,7 +138,7 @@ const Autocomplete = () => {
         </div>
       </div>
 
-        <ul className={clsx("absolute z-50 right-0 mr-4 mt-4 bg-gray-900 text-gray-100 border rounded-xl border-pink-500", (!isOpen || loading || inputItems.length === 0 || onSearchResultsPage) && "hidden")} {...getMenuProps()}>
+        <ul className={clsx("absolute z-50 right-0 top-4 mr-4 overflow-y-scroll bg-gray-900 text-gray-100 border border-pink-500", (!isOpen || loading || inputItems.length === 0 || onSearchResultsPage) && "hidden")} {...getMenuProps()} style={{ height: '95vh' }}>
           {inputItems.map((item, index) => (
             <li className={ menuItemClasses(highlightedIndex === index)}
               {...getItemProps({
@@ -152,10 +152,10 @@ const Autocomplete = () => {
                 <Link href={recordUrl(item.data.id)} prefetch={false}>
                   <a>
                     <div className="flex items-center">
-                      <div className="max-h-24 overflow-hidden rounded-lg">{ item.data.images && <Image src={item.data.images[0]} width="100" height="100" /> }</div>
+                      <div className="max-h-16 overflow-hidden rounded-lg">{ item.data.images && <Image src={item.data.images[0]} width="40" height="50" /> }</div>
                       <div className="pl-2">
-                        <div className="text-2xl">{item.data.title}</div>
-                        <div>{ item.data.corporateAuthors && item.data.corporateAuthors.join(", ") }{ item.data.year && ` ${item.data.year}` }</div>
+                        <div className="text-md">{item.data.title}</div>
+                        <div className="text-sm">{ item.data.corporateAuthors && item.data.corporateAuthors.join(", ") }{ item.data.year && ` ${item.data.year}` }</div>
                       </div>
                     </div>
                   </a>
@@ -165,14 +165,14 @@ const Autocomplete = () => {
                 <Link href={searchResultsUrl(lookfor)} prefetch={false}>
                   <a>
                     <div className="pl-2">
-                      <div className="text-2xl">Näytä kaikki tulokset hakusanalla <span className="italic text-pink-500">{lookfor}</span> <span className="ml-2">({item.data})</span></div>
+                      <div className="text-md">Näytä kaikki tulokset hakusanalla <span className="italic text-pink-500">{lookfor}</span> <span className="ml-2">({item.data})</span></div>
                     </div>
                   </a>
                 </Link>
               }
               { item.type === 'NO_RESULTS' &&
                 <div className="pl-2">
-                  <div className="text-2xl">Ei tuloksia hakusanalla <span className="italic">{item.data}</span></div>
+                  <div className="text-md">Ei tuloksia hakusanalla <span className="italic">{item.data}</span></div>
                 </div>
               }
             </li>
