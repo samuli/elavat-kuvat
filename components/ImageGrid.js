@@ -5,7 +5,7 @@ import { extractVideoUrls } from '@/lib/record';
 
 const imageH = 300;
 
-export const Image = ({ src, width = 300, height = 300 }) => <img src={`https://api.finna.fi${src}&w=${width}`} className="w-auto rouded-xl overflow-hidden" style={{ }} />;
+export const Image = ({ src, width = 300, height = 300, style = {} }) => <img src={`https://api.finna.fi${src}&w=${width}`} className="w-auto rouded-xl overflow-hidden" style={style} />;
 
 export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 }) => (
   <div>
@@ -14,7 +14,7 @@ export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 })
         const playable = extractVideoUrls(rec).length > 0;
         return (
           <Link key={rec.id} href={`/view?id=${encodeURIComponent(rec.id)}`}>
-            <li className={clsx("w-1/2 md:w-1/3 mb-4 flex flex-col rounded-xl cursor-pointer group")} style={{  }}>
+            <li className={clsx("w-1/2 sm:w-1/3 md:w-1/4 mb-4 flex flex-col rounded-xl cursor-pointer group")} style={{  }}>
               <div className="flex flex-col h-full">
                   <div className="flex items-center h-full p-3">
                     { rec.images &&

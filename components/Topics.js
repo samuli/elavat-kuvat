@@ -5,12 +5,27 @@ const FacetCloud = ( { facet, facets } ) => (
   <ul className="flex flex-wrap">
     { facets.map(f => (
       <Link key={`facet-map-${f.value}`} href={`/search?${facet}=${encodeURIComponent(f.value)}`}>
-        <li className="mr-2 mb-2 px-2 py-1 rounded-lg bg-gray-200 text-sm font-bold text-gray-600 uppercase cursor-pointer hover:bg-white" key={`facet-${f.value}`}>
+        <li className="mr-2 mb-2 px-2 py-1 rounded-lg bg-gray-200 text-xs font-bold text-gray-600 uppercase cursor-pointer hover:bg-white" key={`facet-${f.value}`}>
           <a>{f.translated}{/*{f.count && <span className="text-gray-500"> ({f.count})</span>}*/}</a>
         </li>
       </Link>
     )) }
   </ul>
+);
+
+export const FacetStripe = ( { facet, facets } ) => (
+  <div className="items-center w-full overflow-x-scroll line-clamp-3">
+  <ul className="flex. flex-row.">
+    { facets.map(f => (
+      <Link key={`facet-map-${f.value}`} href={`/search?${facet}=${encodeURIComponent(f.value)}`}>
+
+        <li className="inline-flex flex-auto mr-2 mb-2 px-2 py-1 rounded-lg bg-gray-200 text-xs font-bold text-gray-600 uppercase. cursor-pointer hover:bg-white whitespace-nowrap" key={`facet-${f.value}`}>
+          <a>{f.translated}</a>
+        </li>
+</Link>
+    )) }
+  </ul>
+  </div>
 );
 
 const Facets = ({ facet, facets, collapse = false }) => {

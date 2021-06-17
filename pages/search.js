@@ -3,6 +3,7 @@ import useSWR from 'swr';
 import { useRef, useState, useEffect } from 'react';
 import { useUpdate } from 'react-use';
 import HeadTags from '@/components/Head';
+import Select from '@/components/Select';
 import Fetcher from '@/lib/fetcher';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -10,9 +11,11 @@ import { FaHourglassHalf, FaSearch } from 'react-icons/fa';
 import { FcNext } from 'react-icons/fc';
 import { FaArrowLeft as ArrowLeft, FaArrowRight as ArrowRight } from 'react-icons/fa';
 
-import { searchUrl, searchLimit } from '@/lib/api';
+import { searchUrl, searchLimit, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
 import Spinner from '@/components/Spinner';
+import DecadeFilters, { decades, getSearchUrl } from '@/components/DecadeFilter';
+import { FacetStripe } from '@/components/Topics';
 import { yearTitle } from '@/lib/util';
 
 const useStickySWR = (...args) => {
@@ -96,6 +99,8 @@ const SearchHeading = ({title, value, results}) => (
 );
 
 
+//const searchResultUrl = ({ topic = null, genre = null, lookfor = null, daterange = null }) => ();
+
 let mounted = false
 
 export default function Home() {
@@ -106,7 +111,6 @@ export default function Home() {
   const [ nextLookfor, setNextLookfor ] = useState(lookfor);
   const [ page, setPage ] = useState(Number(router.query.page));
   const [ resetScroll, setResetScroll ] = useState(false);
-
   const [ loading, setLoading ] = useState(false);
   const opt = {
     loadingTimeout: 10,
@@ -135,6 +139,11 @@ export default function Home() {
     ? searchUrl(nextLookfor, page, topicFacet, genreFacet, rangeYears) : null,
     Fetcher, opt
   );
+
+  const { data: topicFacets } = useSWR(typeof nextLookfor !== 'undefined'
+    ? topicFacetsUrl(nextLookfor, topicFacet, genreFacet, rangeYears) : null
+    , Fetcher)
+
 
   const queryUpdated = () => {
     const l = router.query.lookfor ?? '';
@@ -169,6 +178,9 @@ export default function Home() {
     router.push(`/view?id=${encodeURIComponent(id)}`);
   };
 
+  const selectDecade = startYear => {
+    router.push(getSearchUrl(startYear, topicFacet, genreFacet));
+  };
   const resultCount = data && data.resultCount || 0;
   const isFaceted = topicFacet || genreFacet;
 
@@ -190,7 +202,12 @@ export default function Home() {
           { !isFaceted && !daterange &&
             <div className="mb-4"><SearchHeading title="Haku" value={currentLookfor} results={resultCount}/></div> }
 
-          { data && getPagination()}
+          {/* { <Select items={decades} placeholder="Vuosikymmen" activeItem={rangeYears && rangeYears[0]} onSelect={(year) => selectDecade(Number(year))} /> } */}
+          <div className="h-16 min-h-32 w-full">
+    { topicFacets?.status === 'OK' && <FacetStripe facet="topic_facet" facets={topicFacets.facets.topic_facet} /> }
+    </div>
+
+
         </div>
       </div>
       <div className="p-5">

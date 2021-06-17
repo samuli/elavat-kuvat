@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import useSWR from 'swr';
 import Fetcher from '@/lib/fetcher';
-import { frontPageUrl, genreFacetsUrl, topicFacetsUrl, yearFacetsUrl } from '@/lib/api';
+import { frontPageUrl, genreFacetsUrl, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
 import Facets from '@/components/Topics';
 import HeadTags from '@/components/Head'
 import Spinner from '@/components/Spinner';
 import { yearTitle } from '@/lib/util';
+import { decades } from '@/components/DecadeFilter';
 
 const FacetSection = ({ facet, title, facets }) => {
 
@@ -31,7 +32,7 @@ const DecadeFilter = ({ title, startYear }) => {
 
 const DecadeFilters = () => (
   <ul className="flex flex-wrap mt-2">
-    { [1950, 1960, 1970, 1980, 1990, 2000].map(year => (
+    { decades.map(year => (
       <li key={`decade-${year}`} className="mr-2 mb-2">
         <DecadeFilter startYear={year} title={yearTitle(year)} />
       </li>
@@ -43,7 +44,7 @@ const FrontPage = () => {
   const { data } = useSWR(frontPageUrl('', 1, 3), Fetcher);
   const { data: topicFacets } = useSWR(topicFacetsUrl, Fetcher)
   const { data: genreFacets } = useSWR(genreFacetsUrl, Fetcher);
-  const { data: yearFacets } = useSWR(yearFacetsUrl, Fetcher);
+  //const { data: yearFacets } = useSWR(yearFacetsUrl, Fetcher);
 
   const openRecord = (id) => {
     router.push(`/view?id=${encodeURIComponent(id)}`);
