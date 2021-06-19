@@ -189,8 +189,10 @@ export default function Home() {
     router.push(`/search?${facet}=${encodeURIComponent(value)}`);
   };
 
-  const resultCount = data && data.resultCount || 0;
+  const resultCount = data && data.resultCount || null;
   const isFaceted = topicFacet || genreFacet;
+
+  const pageCount = data && data.resultCount && Math.ceil(Number(data.resultCount)/searchLimit);
 
   const getPagination = (showResultCount = true) => data && resultCount > 0 && (
     <div className="mt-4">
@@ -199,16 +201,18 @@ export default function Home() {
     </div>
   );
 
+  const getHeading = (title, value, placeholder) =>
+        <SearchHeading title={title} value={value} placeholder={placeholder} resultCount={resultCount} pageNum={page} pageCount={pageCount} />
   return (
     <div className="w-full font-sans">
       <HeadTags />
       <div className="pt-2 px-5 w-full">
         <div className="flex flex-col flex-wrap md:flex-nowrap">
-          { topicFacet && <SearchHeading title="Aihe" value={topicFacet}  /> }
-          { genreFacet && <SearchHeading title="Genre" value={genreFacet}  /> }
-          { daterange && <SearchHeading title="Aikakausi" value={yearTitle(rangeYears[0])} results={resultCount} /> }
+          { topicFacet && getHeading("Aihe", topicFacet) }
+          { genreFacet && getHeading("Genre", genreFacet) }
+          { daterange && getHeading("Aikakausi", yearTitle(rangeYears[0])) }
           { !isFaceted && !daterange &&
-            <div className=""><SearchHeading title="Haku" value={currentLookfor} placeholder={!currentLookfor} results={resultCount}/></div> }
+            <div className="">{getHeading("Haku", currentLookfor, !currentLookfor)}</div> }
 
           {/* { <Select items={decades} placeholder="Vuosikymmen" activeItem={rangeYears && rangeYears[0]} onSelect={(year) => selectDecade(Number(year))} /> } */}
           <div className="h-16 min-h-32 w-full mt-1 mb-3">
