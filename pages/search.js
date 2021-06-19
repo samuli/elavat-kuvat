@@ -16,7 +16,7 @@ import { ResultGrid } from '@/components/ImageGrid';
 import Spinner from '@/components/Spinner';
 import DecadeFilters, { decades, getSearchUrl } from '@/components/DecadeFilter';
 import { FacetStripe } from '@/components/Topics';
-import { yearTitle } from '@/lib/util';
+import { facetSearchUrl, yearTitle } from '@/lib/util';
 
 const useStickySWR = (...args) => {
   const val = useRef();
@@ -181,6 +181,11 @@ export default function Home() {
   const selectDecade = startYear => {
     router.push(getSearchUrl(startYear, topicFacet, genreFacet));
   };
+
+  const facetClick = (facet, value) => {
+    router.push(`/search?${facet}=${encodeURIComponent(value)}`);
+  };
+
   const resultCount = data && data.resultCount || 0;
   const isFaceted = topicFacet || genreFacet;
 
@@ -204,7 +209,7 @@ export default function Home() {
 
           {/* { <Select items={decades} placeholder="Vuosikymmen" activeItem={rangeYears && rangeYears[0]} onSelect={(year) => selectDecade(Number(year))} /> } */}
           <div className="h-16 min-h-32 w-full">
-    { topicFacets?.status === 'OK' && <FacetStripe facet="topic_facet" facets={topicFacets.facets.topic_facet} /> }
+            { topicFacets?.status === 'OK' && topicFacets.facets && <FacetStripe facet="topic_facet" facets={topicFacets.facets.topic_facet} facetUrl={facetSearchUrl} lines={3} /> }
     </div>
 
 

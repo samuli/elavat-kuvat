@@ -9,13 +9,13 @@ export const Image = ({ src, width = 300, height = 300, style = {} }) => <img sr
 
 export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 }) => (
   <div>
-    <ul className="flex flex-row flex-wrap">
+    <ul className="flex flex-row flex-wrap line-clamp-2.">
       {records?.map(rec => {
         const playable = extractVideoUrls(rec).length > 0;
         return (
           <Link key={rec.id} href={`/view?id=${encodeURIComponent(rec.id)}`}>
-            <li className={clsx("w-1/2 sm:w-1/3 md:w-1/4 mb-4 flex flex-col rounded-xl cursor-pointer group")} style={{  }}>
-              <div className="flex flex-col h-full">
+            <li className={clsx("w-1/2 sm:w-1/3 md:w-1/4 h-full flex flex-col rounded-xl cursor-pointer group")} style={{  }}>
+              <div className="flex flex-col h-full.">
                   <div className="flex items-center h-full p-3">
                     { rec.images &&
                       <div className="flex items-center justify-center bg-gray-900 overflow-hidden w-full" style={{ minHeight: '100px' }}>
@@ -28,7 +28,7 @@ export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 })
                         </LazyLoad>
                       </div> }
                   </div>
-                <div className="w-full bg-gray-900 px-2 text-center text-gray-200 overflow-hidden text-sm md:text-md line-clamp-2 group-hover:text-white">{rec.title}</div>
+                <div className="w-full bg-gray-900 px-2 text-center text-gray-200 overflow-hidden text-sm md:text-md line-clamp-2 group-hover:text-white -mt-2 leading-tight">{rec.title}</div>
               </div>
             </li>
           </Link>

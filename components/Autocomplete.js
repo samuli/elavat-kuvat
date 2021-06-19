@@ -24,8 +24,6 @@ const Autocomplete = () => {
   }, 1000);
   const limit = 20;
 
-
-
   const noResultsItem = () => {
     return { type: 'NO_RESULTS', data: lookfor };
   };
@@ -78,7 +76,8 @@ const Autocomplete = () => {
     highlightedIndex,
     getItemProps,
     openMenu,
-    closeMenu
+    closeMenu,
+    reset,
   } = useCombobox({
     id: 'search',
     items: inputItems,
@@ -87,7 +86,7 @@ const Autocomplete = () => {
         debounced.cancel();
         debounced(inputValue.trim());
       }
-    },
+    }
   });
 
   const searchResultsUrl = term => `/search?lookfor=${encodeURIComponent(term)}`;
@@ -117,6 +116,7 @@ const Autocomplete = () => {
                   if (highlightedIndex === -1) {
                     e.nativeEvent.preventDownshiftDefault = true;
                     router.push(searchResultsUrl(term));
+                    setLookfor("");
                   } else if (typeof inputItems[highlightedIndex] !== 'undefined') {
                     const item = inputItems[highlightedIndex];
                     if (item.type === 'RECORD') {
@@ -128,6 +128,7 @@ const Autocomplete = () => {
                   debounced.cancel();
                   setLoading(false);
                   closeMenu();
+                  reset();
                 }
               },
               placeholder: "Etsi... (Ctrl K)"
@@ -138,7 +139,7 @@ const Autocomplete = () => {
         </div>
       </div>
 
-        <ul className={clsx("absolute z-50 right-0 top-4 mr-4 overflow-y-scroll bg-gray-900 text-gray-100 border border-pink-500", (!isOpen || loading || inputItems.length === 0 || onSearchResultsPage) && "hidden")} {...getMenuProps()} style={{ height: '95vh' }}>
+        <ul className={clsx("absolute z-50 right-0 top-24 mr-4 overflow-y-scroll bg-gray-900 text-gray-100 border border-pink-500", (!isOpen || loading || inputItems.length === 0 || onSearchResultsPage) && "hidden")} {...getMenuProps()} style={{ height: '80vh' }}>
           {inputItems.map((item, index) => (
             <li className={ menuItemClasses(highlightedIndex === index)}
               {...getItemProps({
