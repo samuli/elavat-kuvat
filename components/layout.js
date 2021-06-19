@@ -26,8 +26,8 @@ const Header = () => {
 
 const Layout = ({ children }) => (
 
-  <div style={{ minHeight: "120vh"}} className="flex flex-col bg-gray-900 text-white align-center items-center">
-    <div className="w-full max-w-6xl mb-10 flex flex-col flex-start flex-inline" style={{ minHeight: "120vh"}}>
+  <div style={{ }} className="flex flex-col bg-gray-900 text-white align-center items-center">
+    <div className="w-full max-w-6xl mb-10 flex flex-col flex-start flex-inline" style={{ }}>
       <Header />
       {children}
     </div>

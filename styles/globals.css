@@ -16,3 +16,7 @@ video {
   top: 0;
   left: 0;
 }
+
+body {
+  @apply bg-gray-900;
+}
