@@ -195,7 +195,7 @@ export default function Home() {
   return (
     <div className="w-full font-sans">
       <HeadTags />
-      <div className="px-5 w-full">
+      <div className="pt-2 px-5 w-full">
         <div className="flex flex-col flex-wrap md:flex-nowrap">
           { topicFacet && <SearchHeading title="Aihe" value={topicFacet}  /> }
           { genreFacet && <SearchHeading title="Genre" value={genreFacet}  /> }

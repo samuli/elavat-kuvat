@@ -59,7 +59,7 @@ const FrontPage = () => {
         { !data && <div className="p-5"><Spinner /></div> }
         { data && (
         <div>
-            <div className="px-5 w-full">
+            <div className="pt-2 px-5 w-full">
               <div className="flex flex-col flex-wrap md:flex-nowrap">
                 <SearchHeading title="Aiheita" />
             { topicFacets?.status === 'OK' && <FacetStripe title="Aiheet" facet="topic_facet" facets={topicFacets.facets.topic_facet} facetUrl={facetSearchUrl} lines={3}/> }

@@ -9,9 +9,11 @@ import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon, FaQuestionCircle 
 import { recordUrl } from '@/lib/api';
 import { extractVideoUrls, finnaRecordPage } from '@/lib/record';
 import { Image, ImageGrid } from '@/components/ImageGrid';
-import Facets from '@/components/Topics';
+import { FacetStripe } from '@/components/Topics';
 import Spinner from '@/components/Spinner';
+import { SearchHeading } from '@/components/Typo';
 import Fetcher from '@/lib/fetcher';
+import { facetSearchUrl } from '@/lib/util';
 
 const Copyright = ({ record }) => {
   const d = record.rawData;
@@ -26,12 +28,12 @@ const Copyright = ({ record }) => {
 
   return (
     <div className="flex flex-col">
-      <span className="text-gray-300 italic mr-2">Aineiston käyttöoikeudet: </span>
-      <div className="flex flex-row items-center justify-center">
+      <span className="uppercase text-xs font-bold">Aineiston käyttöoikeudet: </span>
+      <div className="flex flex-row items-center">
         <div className="">{rightsLink}</div>
-        <div className="text-gray-300 ml-1 flex jusitfy-center items-center text-xl -flex-nowrap">
-          <a target="_blank" href={finnaRecordPage(record.recordPage)} className="hover:text-white ml-2" title="Katso lisätiedot Finnassa">
-            <InfoIcon />
+        <div className="text-gray-600 ml-1 flex jusitfy-center items-center text-xl -flex-nowrap">
+          <a target="_blank" href={finnaRecordPage(record.recordPage)} className="hover:text-gray-800 ml-2" title="Katso lisätiedot Finnassa">
+            <span className="text-sm"><InfoIcon /></span>
           </a>
         </div>
       </div>
@@ -52,7 +54,7 @@ const Header = ({ record }) => {
   const d = record.rawData;
   return (
     <div>
-      <h1 className="text-4xl font-bold mb-2">{record.title}</h1>
+      <h1 className="text-3xl font-bold">{record.title}</h1>
       <p className="text-md text-gray-100">
         {d.author_corporate && `${d.author_corporate} `}{d.main_date_str && d.main_date_str}
       </p>
@@ -99,16 +101,16 @@ const PreviewWrapper = ({ children, record, videoAvailable }) => {
 const Tags = ({ topics, genres }) => (
   <div>
     { topics.length > 0 && <div className="my-4">
-      <h2 className="text-xl mb-2">Aiheet:</h2>
-      <Facets facet="topic_facet" facets={topics.map(f => {
+      <SearchHeading title="Aiheet" />
+      <FacetStripe facet="topic_facet" facets={topics.map(f => {
         return { value: f, translated: f };
-      })} collapse={true} />
+      })} facetUrl={facetSearchUrl} />
     </div>}
     { genres.length > 0 && <div className="my-4">
-      <h2 className="text-xl mb-2">Genret:</h2>
-      <Facets facet="genre_facet" facets={genres.map(f => {
+      <SearchHeading title="Genret" />
+      <FacetStripe facet="genre_facet" facets={genres.map(f => {
         return { value: f, translated: f };
-      })} collapse={true} />
+      })} facetUrl={facetSearchUrl} />
     </div>}
   </div>
 );
@@ -169,21 +171,23 @@ export default function View() {
                   </div>
                 </div>
               </div>
-              {rec.rawData.description && <p className="mt-4 whitespace-pre-line leading-6 text-lg">{rec.rawData.description.replace(/<br( )?\/>/g, '\n')}</p>}
+              <div className="max-w-2xl">
+                {rec.rawData.description && <p className="mt-4 font-serif italic whitespace-pre-line leading-6 text-lg">{rec.rawData.description.replace(/<br( )?\/>/g, '\n')}</p>}
 
-              <div className="my-5 flex flex-row">
-                {rec.buildings && (
-                  <div className=".my-2 flex flex-col .flex-wrap">
-                    <div className="mr-2 italic text-gray-300">Aineiston tarjoaa: </div>
-                    <div className="">
-                      <a href="https://kavi.finna.fi" target="_blank">
-                        {rec.buildings[0].translated}
-                      </a>
-                    </div>
-                  </div>)}
-                <div className="ml-4 md:ml-8"><Copyright record={rec} /></div>
+                <div className="my-5 flex flex-col sm:flex-row justify-between w-auto bg-yellow-50 text-gray-900 p-3 rounded-xl">
+                  {rec.buildings && (
+                    <div className="flex flex-col">
+                      <div className="mr-2 uppercase text-xs font-bold">Aineiston tarjoaa: </div>
+                      <div className="flex">
+                        <a href="https://kavi.finna.fi" target="_blank" className="flex items-center justify-center">
+                          {rec.buildings[0].translated} <span className="ml-2 text-gray-700 text-xs"><ExtLinkIcon /></span>
+                        </a>
+                      </div>
+                    </div>)}
+                  <div className="sm:mt-0 mt-2"><Copyright record={rec} /></div>
+                </div>
+                <Tags topics={rec.rawData.topic_facet ?? []} genres={rec.rawData.genres_facet ?? []} />
               </div>
-              <Tags topics={rec.rawData.topic_facet ?? []} genres={rec.rawData.genres_facet ?? []} />
             </>
           )}
         </div>

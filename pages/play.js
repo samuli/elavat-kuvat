@@ -57,7 +57,7 @@ function Play() {
             <div className={clsx('flex absolute top-0 z-50 px-5 py-3 rounded-xl mt-5 bg-gray-900 .items-center transition transition-opacity duration-500 ease-in-out', !showUI && 'opacity-0')}>
               <div className="flex items-center">
                 <div className="flex items-center text-grey-100 hover:text-grey-200 cursor-pointer"><BackIcon /> <div class="ml-2 hover:text-gray-200"><Link href={`/view?id=${encodeURIComponent(rec.id)}`}><a>Takaisin</a></Link></div></div>
-                <h1 className="ml-10 text-3xl">{ rec.title }<span className="ml-3 text-xl text-gray-400">{ videoUrls.length > 1 ? ` (osa ${clip}/${videoUrls.length})` : '' }</span></h1>
+                <h1 className="ml-10 text-lg line-clamp-1">{ rec.title }<span className="ml-3 text-xl text-gray-400">{ videoUrls.length > 1 ? ` (osa ${clip}/${videoUrls.length})` : '' }</span></h1>
               </div>
             </div>
             <ReactPlayer
