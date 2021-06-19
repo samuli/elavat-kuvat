@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useCombobox } from 'downshift';
 import { useDebouncedCallback } from 'use-debounce';
-import { useHotkeys } from 'react-hotkeys-hook';
+//import { useHotkeys } from 'react-hotkeys-hook';
 import useSWR from 'swr';
 import clsx from 'clsx';
 import { FaSearch, FaSpinner } from 'react-icons/fa';
@@ -57,13 +57,13 @@ const Autocomplete = () => {
   ;
 
   const inputRef = useRef(null);
-  useHotkeys('ctrl+k', (e) => {
-    e.preventDefault();
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-    return false;
-  });
+  // useHotkeys('ctrl+k', (e) => {
+  //   e.preventDefault();
+  //   if (inputRef.current) {
+  //     inputRef.current.focus();
+  //   }
+  //   return false;
+  // });
 
   const onSearchResultsPage = false;
 
@@ -92,16 +92,16 @@ const Autocomplete = () => {
   const searchResultsUrl = term => `/search?lookfor=${encodeURIComponent(term)}`;
 
   const icon = loading
-    ?  <div className="mr-4"><Spinner style={{ width: '30px', height: '30px'}} /></div>
-    :  <FaSearch className="animate-spin" style={{ width: '30px', height: '30px'}} className="mr-4" />;
+    ?  <div><Spinner style={{ width: '20px', height: '20px'}} /></div>
+    :  <FaSearch className="animate-spin" style={{ width: '20px', height: '20px'}} className="text-gray-100" />;
 
   const menuItemClasses = active => clsx(' p-1 hover:text-gray-100', active && 'bg-pink-500');
 
   return (
-    <div>
-      <div className="flex justify-center items-center">
-        { icon } <label {...getLabelProps()} className="hidden">Etsi:</label>
-        <div {...getComboboxProps()}>
+    <div className="w-full md:justify-end px-5 bg-gray-900">
+      <div className="w-full flex max-w-xl justify-center items-center">
+
+        <div className="w-full" {...getComboboxProps()}>
           <input
             {...getInputProps({
               ref: inputRef,
@@ -131,15 +131,18 @@ const Autocomplete = () => {
                   reset();
                 }
               },
-              placeholder: "Etsi... (Ctrl K)"
+              placeholder: "Etsi katsottavaa..."
             })}
             style={{ }}
-            className="w-full h-12 px-4 py-4 rounded-lg text-xl text-gray-900 focus:outline-none ring-inset focus:ring-4 focus:ring-pink-500"
+            className="w-full px-4 my-2 py-1 rounded-lg text-lg text-gray-900 focus:outline-none ring-inset focus:ring-2 focus:ring-pink-500"
           />
+        </div>
+        <div className="overflow-hidden ml-2">
+          { icon } <label {...getLabelProps()} className="hidden">Etsi:</label>
         </div>
       </div>
 
-        <ul className={clsx("absolute z-50 right-0 top-24 mr-4 overflow-y-scroll bg-gray-900 text-gray-100 border border-pink-500", (!isOpen || loading || inputItems.length === 0 || onSearchResultsPage) && "hidden")} {...getMenuProps()} style={{ height: '80vh' }}>
+        <ul className={clsx("overflow-y-scroll bg-gray-900 text-gray-100 border border-pink-500", (!isOpen || loading || inputItems.length === 0 || onSearchResultsPage) && "hidden")} {...getMenuProps()} style={{ height: '80vh' }}>
           {inputItems.map((item, index) => (
             <li className={ menuItemClasses(highlightedIndex === index)}
               {...getItemProps({

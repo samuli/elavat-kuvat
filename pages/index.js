@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import Fetcher from '@/lib/fetcher';
 import { frontPageUrl, genreFacetsUrl, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
+import { SearchHeading } from '@/components/Typo';
 import { FacetList, FacetStripe } from '@/components/Topics';
 import HeadTags from '@/components/Head'
 import Spinner from '@/components/Spinner';
@@ -54,12 +55,18 @@ const FrontPage = () => {
   return (
     <div>
       <HeadTags />
-      <div className="p-5">
-        { !data && <Spinner /> }
+      <>
+        { !data && <div className="p-5"><Spinner /></div> }
         { data && (
         <div>
-          <div className="mt-8">
+            <div className="px-5 w-full">
+              <div className="flex flex-col flex-wrap md:flex-nowrap">
+                <SearchHeading title="Aiheita" />
+            { topicFacets?.status === 'OK' && <FacetStripe title="Aiheet" facet="topic_facet" facets={topicFacets.facets.topic_facet} facetUrl={facetSearchUrl} lines={3}/> }
+             </div>
+          </div>
 
+          <div className="mt-4">
             { data?.status === 'OK' && (
               <div className="flex flex-col items-center ">
                 <ResultGrid records={data.records.slice(0,8)} onOpenRecord={openRecord} width="200" height="200"/>
@@ -70,24 +77,22 @@ const FrontPage = () => {
             ) }
           </div>
 
+          <div className="px-5 w-full">
+            <div className="flex flex-col flex-wrap md:flex-nowrap">
 
-          <div>
-            <h2 className="text-2xl font-bold">Aiheet:</h2>
-            { topicFacets?.status === 'OK' && <FacetStripe title="Aiheet" facet="topic_facet" facets={topicFacets.facets.topic_facet} facetUrl={facetSearchUrl} /> }
+              <div>
+                <SearchHeading title="Aikakausi" />
+                <DecadeFilters />
+              </div>
+
+              <div className="mt-2">
+                <SearchHeading title="Genret" />
+                { genreFacets?.status === 'OK' && <FacetStripe title="Genret" facet="genre_facet" facets={genreFacets.facets.genre_facet} facetUrl={facetSearchUrl} /> }
+              </div>
+            </div>
           </div>
-
-          <div className="mb-5">
-            <h2 className="text-2xl font-bold">Aikakausi:</h2>
-            <DecadeFilters />
-          </div>
-
-          <div>
-            <h2 className="text-2xl font-bold">Genret:</h2>
-            { genreFacets?.status === 'OK' && <FacetStripe title="Genret" facet="genre_facet" facets={genreFacets.facets.genre_facet} facetUrl={facetSearchUrl} /> }
-          </div>
-
         </div> ) }
-      </div>
+      </>
     </div>
   );
 };

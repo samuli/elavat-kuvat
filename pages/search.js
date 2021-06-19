@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import { useUpdate } from 'react-use';
 import HeadTags from '@/components/Head';
 import Select from '@/components/Select';
+import { SearchHeading } from '@/components/Typo';
 import Fetcher from '@/lib/fetcher';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -92,11 +93,6 @@ const Results = ({ data }) => (
   </div>
 );
 
-const SearchHeading = ({title, value, results}) => (
-  <h1 className="text-4xl mx-text 2-500-pink font-bold">
-    {title}: <span className="ml-1 font-normal text-gray-200">{value}</span>
-  </h1>
-);
 
 
 //const searchResultUrl = ({ topic = null, genre = null, lookfor = null, daterange = null }) => ();
@@ -199,16 +195,16 @@ export default function Home() {
   return (
     <div className="w-full font-sans">
       <HeadTags />
-      <div className="p-5 w-full">
+      <div className="px-5 w-full">
         <div className="flex flex-col flex-wrap md:flex-nowrap">
-          { topicFacet && <SearchHeading title="Aihe" value={topicFacet} results={resultCount} /> }
-          { genreFacet && <SearchHeading title="Genre" value={genreFacet} results={resultCount} /> }
+          { topicFacet && <SearchHeading title="Aihe" value={topicFacet}  /> }
+          { genreFacet && <SearchHeading title="Genre" value={genreFacet}  /> }
           { daterange && <SearchHeading title="Aikakausi" value={yearTitle(rangeYears[0])} results={resultCount} /> }
           { !isFaceted && !daterange &&
-            <div className="mb-4"><SearchHeading title="Haku" value={currentLookfor} results={resultCount}/></div> }
+          <div className=""><SearchHeading title="Haku" value={currentLookfor} results={resultCount}/></div> }
 
           {/* { <Select items={decades} placeholder="Vuosikymmen" activeItem={rangeYears && rangeYears[0]} onSelect={(year) => selectDecade(Number(year))} /> } */}
-          <div className="h-16 min-h-32 w-full">
+          <div className="h-16 min-h-32 w-full mt-1 mb-3">
             { topicFacets?.status === 'OK' && topicFacets.facets && <FacetStripe facet="topic_facet" facets={topicFacets.facets.topic_facet} facetUrl={facetSearchUrl} lines={3} /> }
     </div>
 
