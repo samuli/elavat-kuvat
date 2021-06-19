@@ -38,12 +38,12 @@ export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 })
   </div>
 );
 
-export const ImageGrid = ({ images }) => (
-  <div>
-    <div className="flex flex-wrap">
-      {images.map(img => (
-          <Image className="mt-2 p-3" key={img} src={img} width="500" height="400" />
-      ))}
-    </div>
-  </div>
-);
+// export const ImageGrid = ({ images }) => (
+//   <div>
+//     <div className="flex flex-wrap">
+//       {images.map(img => (
+//           <Image className="mt-2 p-3" key={img} src={img} width="500" height="400" />
+//       ))}
+//     </div>
+//   </div>
+// );

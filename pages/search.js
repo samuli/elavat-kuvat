@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import useSWR from 'swr';
 import { useRef, useState, useEffect } from 'react';
 import { useUpdate } from 'react-use';
+import { forceCheck } from 'react-lazyload';
 import HeadTags from '@/components/Head';
 import Select from '@/components/Select';
 import { SearchHeading } from '@/components/Typo';
@@ -108,6 +109,8 @@ export default function Home() {
   const [ page, setPage ] = useState(Number(router.query.page));
   const [ resetScroll, setResetScroll ] = useState(false);
   const [ loading, setLoading ] = useState(false);
+
+  const forceCheckRef = useRef();
   const opt = {
     loadingTimeout: 10,
     onLoadingSlow: (_key, _config) => {
@@ -124,6 +127,10 @@ export default function Home() {
         window.scrollTo(0,0);
         setResetScroll(false);
       }
+      if (forceCheckRef.current) {
+        clearTimeout(forceCheckRef.current);
+      }
+      forceCheckRef.current = setTimeout(() => forceCheck(), 100);
     }
   };
   const topicFacet = router.query?.topic_facet;

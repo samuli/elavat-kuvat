@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon, FaQuestionCircle as InfoIcon } from 'react-icons/fa';
 import { recordUrl } from '@/lib/api';
 import { extractVideoUrls, finnaRecordPage } from '@/lib/record';
-import { Image, ImageGrid } from '@/components/ImageGrid';
+import { Image } from '@/components/ImageGrid';
 import { FacetStripe } from '@/components/Topics';
 import Spinner from '@/components/Spinner';
 import { SearchHeading } from '@/components/Typo';
