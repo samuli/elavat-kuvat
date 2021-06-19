@@ -14,8 +14,8 @@ import clsx from 'clsx';
 //   </ul>
 // );
 
-export const FacetStripe = ( { facet, facets, facetUrl, lines = null } ) => (
-<div className={clsx("items-center w-full", lines !== null && `line-clamp-${lines} overflow-clip`)}>
+export const FacetStripe = ( { facet, facets, facetUrl, truncate = false } ) => (
+<div className={clsx("items-center w-full", truncate && `line-clamp-3 overflow-clip`)}>
   <ul className="flex. flex-row.">
     { facets.map(f => (
       <Link key={`facet-map-${f.value}`} href={facetUrl(facet, f.value)}>
