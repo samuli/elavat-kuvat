@@ -36,12 +36,16 @@ const useStickySWR = (...args) => {
   };
 };
 
-const PageMenu = ({ items, activePage, onPageSelect }) => {
+const PageMenu = ({ items, activePage, onPageSelect, small = false }) => {
   return (
     <select
       onChange={(e) => onPageSelect(e.target.value)}
       value={activePage}
-      className="appearance-none w-auto pl-4 pr-10 py-3 border bg-gray-100 border-gray-400 rounded-md text-xl text-gray-900 cursor-pointer">
+      className={clsx(
+        "appearance-none w-auto pl-4 pr-10 border bg-gray-100 border-gray-400 rounded-md text-gray-900 cursor-pointer",
+        !small && "mx-3 py-3 text-xl",
+        small && "mx-1 py-1 text-sm"
+      )}>
       { items.map((item, idx) => {
         const active = activePage === item;
         return <option key={idx} disabled={active} value={item}>Sivu {item}</option>;
@@ -50,9 +54,11 @@ const PageMenu = ({ items, activePage, onPageSelect }) => {
   );
 };
 
-const NaviButton = ({ children, onClick, disabled }) => (
+const NaviButton = ({ children, onClick, disabled, small = false }) => (
   <div className={clsx(
-    "w-16 h-16 flex justify-center items-center text-4xl rounded-full border-gray-400",
+    "flex justify-center items-center rounded-full border-gray-400",
+    small && "text-xl",
+    !small && "text-4xl",
     disabled && " text-gray-500",
     !disabled && "cursor-pointer hover:text-pink-500 text-gray-100")}
        onClick={() => {
@@ -62,18 +68,17 @@ const NaviButton = ({ children, onClick, disabled }) => (
     {children}</div>
 );
 
-const Pagination = ({ results, page, setPage, loading, showResultCount, limit = 10 }) => {
-  const pages = Math.ceil(Number(results)/limit);
-  if (pages === 1) return null;
+const Pagination = ({ results, page, pageCount, setPage, loading, showResultCount, small = false }) => {
+  if (pageCount === 1) return null;
 
-  const pageIdxs = Array.from(Array(pages), (_el,i) => i+1);
-  const scrollButtons = pages > 1;
+  const pageIdxs = Array.from(Array(pageCount), (_el,i) => i+1);
+  const scrollButtons = pageCount > 1;
 
   return (
-    <div className="flex items-start items-center -ml-2">
-      { scrollButtons && <NaviButton disabled={page === 1} onClick={() => setPage(page-1)}><ArrowLeft /></NaviButton> }
-      <PageMenu activePage={page} items={pageIdxs} onPageSelect={(page) => setPage(page)}/>
-      { scrollButtons && <NaviButton disabled={page === pages} onClick={() => setPage(page+1)}><ArrowRight /></NaviButton> }
+    <div className="flex items-start items-center">
+      { scrollButtons && <NaviButton disabled={page === 1} onClick={() => setPage(page-1)} small={small}><ArrowLeft /></NaviButton> }
+      <PageMenu activePage={page} items={pageIdxs} onPageSelect={(page) => setPage(page)} small={small}/>
+      { scrollButtons && <NaviButton disabled={page === pageCount} onClick={() => setPage(page+1)} small={small}><ArrowRight /></NaviButton> }
       { showResultCount && <div className="ml-5 text-xl text-gray-200">({results} klippiä)</div> }
     </div>
    );
@@ -93,12 +98,6 @@ const Results = ({ data }) => (
      </>}
   </div>
 );
-
-
-
-//const searchResultUrl = ({ topic = null, genre = null, lookfor = null, daterange = null }) => ();
-
-let mounted = false
 
 export default function Home() {
   const router = useRouter();
@@ -194,15 +193,19 @@ export default function Home() {
 
   const pageCount = data && data.resultCount && Math.ceil(Number(data.resultCount)/searchLimit);
 
-  const getPagination = (showResultCount = true) => data && resultCount > 0 && (
-    <div className="mt-4">
-        <Pagination results={resultCount} page={page} setPage={(page) => changePage(page)}
-                    loading={loading} showResultCount={showResultCount} limit={searchLimit} />
+  const getPagination = (small = false, showResultCount = true) => data && resultCount > 0 && (
+    <div className="">
+      <Pagination results={resultCount} page={page} pageCount={pageCount} setPage={(page) => changePage(page)}
+                  loading={loading} showResultCount={showResultCount} limit={searchLimit} small={small} />
     </div>
   );
 
-  const getHeading = (title, value, placeholder) =>
-        <SearchHeading title={title} value={value} placeholder={placeholder} resultCount={resultCount} pageNum={page} pageCount={pageCount} />
+  const getHeading = (title, value, placeholder) => (
+    <div className="flex justify-between mb-2">
+      <SearchHeading title={title} value={value} placeholder={placeholder} resultCount={resultCount} />
+      { !loading && getPagination(true, false) }
+    </div>
+  );
   return (
     <div className="w-full font-sans">
       <HeadTags />
@@ -226,11 +229,11 @@ export default function Home() {
         { loading && <div className="ml-4 w-8 h-8"><Spinner /></div> }
         { !loading && error && <p>error...</p> }
         { !loading && data && data?.status === 'ERROR' && <p>error...</p> }
-        { !loading && data && resultCount === 0 && <p>ei tuloksia...</p> }
+        { !loading && data && Number(resultCount) === 0 && <p>ei tuloksia...</p> }
         { !loading && data?.status === 'OK' && <ResultGrid records={data.records} onOpenRecord={openRecord} width="200" height="200"/> }
       </div>
       <div className="flex justify-center">
-        { !loading && getPagination(false)}
+        { !loading && getPagination(false, false)}
       </div>
     </div>
   )

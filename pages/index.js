@@ -16,7 +16,7 @@ const DecadeFilter = ({ title, startYear }) => {
   const endYear = startYear < 2000 ? startYear+9 : "*";
   return (
     <Link href={`/search?date=${startYear}-${endYear}`}><a>
-      <div className="text-md font-semibold uppercase tracking-tighter bg-gray-100 text-gray-700 py-1 px-2 rounded-lg cursor-pointer hover:text-pink-500">
+      <div className="text-md text-gray-800 font-semibold uppercase tracking-tighterb bg-gradient-to-b from-gray-100 to-gray-300 py-1 px-2 rounded-lg cursor-pointer hover:from-white hover:to-white">
         {title}
       </div>
     </a></Link>
