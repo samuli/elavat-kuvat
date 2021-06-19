@@ -201,7 +201,7 @@ export default function Home() {
           { genreFacet && <SearchHeading title="Genre" value={genreFacet}  /> }
           { daterange && <SearchHeading title="Aikakausi" value={yearTitle(rangeYears[0])} results={resultCount} /> }
           { !isFaceted && !daterange &&
-          <div className=""><SearchHeading title="Haku" value={currentLookfor} results={resultCount}/></div> }
+            <div className=""><SearchHeading title="Haku" value={currentLookfor} placeholder={!currentLookfor} results={resultCount}/></div> }
 
           {/* { <Select items={decades} placeholder="Vuosikymmen" activeItem={rangeYears && rangeYears[0]} onSelect={(year) => selectDecade(Number(year))} /> } */}
           <div className="h-16 min-h-32 w-full mt-1 mb-3">
