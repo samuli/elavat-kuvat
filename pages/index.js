@@ -5,23 +5,12 @@ import Fetcher from '@/lib/fetcher';
 import { frontPageUrl, genreFacetsUrl, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
 import { SearchHeading } from '@/components/Typo';
-//import { PlayIcon } from '@/components/PlayIcon';
 import { FaPlay as PlayIcon } from 'react-icons/fa';
-import { FacetList, FacetStripe } from '@/components/Topics';
+import { FacetStripe } from '@/components/Topics';
 import HeadTags from '@/components/Head'
 import Spinner from '@/components/Spinner';
 import { facetSearchUrl, yearTitle } from '@/lib/util';
 import { decades } from '@/components/DecadeFilter';
-
-const FacetSection = ({ facet, title, facets }) => {
-
-      return (
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold">{title}:</h2>
-          <div className="mt-4"><FacetStripe facet={facet} facets={facets} facetUrl={(facet,value) => ""} /></div>
-        </div>
-      );
-};
 
 const DecadeFilter = ({ title, startYear }) => {
   const endYear = startYear < 2000 ? startYear+9 : "*";
@@ -34,9 +23,9 @@ const DecadeFilter = ({ title, startYear }) => {
   );
 };
 
-const DecadeFilters = () => (
+const DecadeFilters = ({ items }) => (
   <ul className="flex flex-wrap mt-2">
-    { decades.reverse().map(year => (
+    { items.map(year => (
       <li key={`decade-${year}`} className="mr-2 mb-2">
         <DecadeFilter startYear={year} title={yearTitle(year)} />
       </li>
@@ -50,6 +39,7 @@ const FrontPage = () => {
   const { data: topicFacets } = useSWR(topicFacetsUrl, Fetcher)
   const { data: genreFacets } = useSWR(genreFacetsUrl, Fetcher);
 
+  const decadesReveresed = decades.reverse();
   const openRecord = (id) => {
     router.push(`/view?id=${encodeURIComponent(id)}`);
   };
@@ -89,7 +79,7 @@ const FrontPage = () => {
 
               <div>
                 <SearchHeading title="Aikakausi" />
-                <DecadeFilters />
+                <DecadeFilters items={decadesReveresed} />
               </div>
 
               <div className="mt-2">
