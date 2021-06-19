@@ -5,12 +5,12 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import clsx from 'clsx';
+import NProgress from "nprogress";
 import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon, FaQuestionCircle as InfoIcon } from 'react-icons/fa';
 import { recordUrl } from '@/lib/api';
 import { extractVideoUrls, finnaRecordPage } from '@/lib/record';
 import { Image } from '@/components/ImageGrid';
 import { FacetStripe } from '@/components/Topics';
-import Spinner from '@/components/Spinner';
 import { SearchHeading } from '@/components/Typo';
 import Fetcher from '@/lib/fetcher';
 import { facetSearchUrl } from '@/lib/util';
@@ -123,12 +123,15 @@ export default function View() {
   const opt = {
     loadingTimeout: 1,
     onLoadingSlow: (_key, _config) => {
+      NProgress.start();
       setLoading(true);
     },
     onError: (_err, _key, config) => {
+      NProgress.done();
       setLoading(false);
     },
     onSuccess: (_data, _key, _config) => {
+      NProgress.done();
       setLoading(false);
     }
   };
@@ -147,7 +150,6 @@ export default function View() {
   return (
     <div className="w-auto mx-7 font-sans">
       <HeadTags />
-      { loading && <Spinner />}
       <div>
         <div className="mt-4">
           {!loading && data && (

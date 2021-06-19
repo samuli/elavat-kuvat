@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import useSWR from 'swr';
+import NProgress from "nprogress";
+
 import Fetcher from '@/lib/fetcher';
 import { frontPageUrl, genreFacetsUrl, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
@@ -8,7 +10,6 @@ import { SearchHeading } from '@/components/Typo';
 import { FaPlay as PlayIcon } from 'react-icons/fa';
 import { FacetStripe } from '@/components/Topics';
 import HeadTags from '@/components/Head'
-import Spinner from '@/components/Spinner';
 import { facetSearchUrl, yearTitle } from '@/lib/util';
 import { decades } from '@/components/DecadeFilter';
 
@@ -34,8 +35,21 @@ const DecadeFilters = ({ items }) => (
 );
 
 const FrontPage = () => {
+  const opt = {
+    loadingTimeout: 10,
+    onLoadingSlow: () => {
+      NProgress.start();
+    },
+    onError: () => {
+      NProgress.done();
+    },
+    onSuccess: () => {
+      NProgress.done();
+    }
+  };
+
   const [ randomClipsUrl ] = useState(frontPageUrl());
-  const { data } = useSWR(typeof randomClipsUrl !== 'undefined' ? randomClipsUrl : null, Fetcher);
+  const { data } = useSWR(typeof randomClipsUrl !== 'undefined' ? randomClipsUrl : null, Fetcher, opt);
   const { data: topicFacets } = useSWR(topicFacetsUrl, Fetcher)
   const { data: genreFacets } = useSWR(genreFacetsUrl, Fetcher);
 
@@ -48,7 +62,6 @@ const FrontPage = () => {
     <div>
       <HeadTags />
       <>
-        { !data && <div className="p-5"><Spinner /></div> }
         { data && (
         <div>
             <div className="pt-2 px-5 w-full">

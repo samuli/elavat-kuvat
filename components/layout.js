@@ -3,10 +3,7 @@ import Router from 'next/router';
 import Autocomplete from '@/components/Autocomplete';
 import { FaPlayCircle } from 'react-icons/fa';
 
-
-
 const Header = () => {
-
   return (
     <>
       <div className="bg-gray-900 px-5 pt-2 flex flex-col md:flex-row overflow-auto justify-between bg-gray-900 ">

@@ -6,6 +6,8 @@ import { useDebouncedCallback } from 'use-debounce';
 //import { useHotkeys } from 'react-hotkeys-hook';
 import useSWR from 'swr';
 import clsx from 'clsx';
+import NProgress from "nprogress";
+
 import { FaSearch, FaSpinner } from 'react-icons/fa';
 import { autocompleteUrl } from '@/lib/api';
 import Fetcher from '@/lib/fetcher';
@@ -35,9 +37,11 @@ const Autocomplete = () => {
   const opt = {
     loadingTimeout: 10,
     onLoadingSlow: (_key, _config) => {
+      NProgress.start();
       setLoading(true);
     },
     onSuccess: (data, _key, _config) => {
+      NProgress.done();
       setLoading(false);
       const cnt = data.resultCount;
       setResultCount(cnt);
@@ -52,6 +56,7 @@ const Autocomplete = () => {
       listRef.current.scrollTop = 0;
     },
     onError: () => {
+      NProgress.done();
       setResultCount(0);
       setInputItems([ noResultsItem() ]);
       setLoading(false);
@@ -96,9 +101,7 @@ const Autocomplete = () => {
 
   const searchResultsUrl = term => `/search?lookfor=${encodeURIComponent(term)}`;
 
-  const icon = loading
-    ?  <div><Spinner style={{ width: '20px', height: '20px'}} /></div>
-    :  <FaSearch className="animate-spin" style={{ width: '20px', height: '20px'}} className="text-gray-100" />;
+  const icon = <FaSearch className="animate-spin" style={{ width: '20px', height: '20px'}} className="text-gray-100" />;
 
   const menuItemClasses = active => clsx(' p-1 hover:text-gray-100', active && 'bg-gradient-to-l from-pink-500 to-red-500');
 

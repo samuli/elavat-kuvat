@@ -3,6 +3,7 @@ import useSWR from 'swr';
 import { useRef, useState, useEffect } from 'react';
 import { useUpdate } from 'react-use';
 import { forceCheck } from 'react-lazyload';
+import NProgress from "nprogress";
 import HeadTags from '@/components/Head';
 import Select from '@/components/Select';
 import { SearchHeading } from '@/components/Typo';
@@ -15,7 +16,6 @@ import { FaArrowLeft as ArrowLeft, FaArrowRight as ArrowRight } from 'react-icon
 
 import { searchUrl, searchLimit, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
-import Spinner from '@/components/Spinner';
 import DecadeFilters, { decades, getSearchUrl } from '@/components/DecadeFilter';
 import { FacetStripe } from '@/components/Topics';
 import { facetSearchUrl, yearTitle } from '@/lib/util';
@@ -44,7 +44,7 @@ const PageMenu = ({ items, activePage, onPageSelect, small = false }) => {
       className={clsx(
         "appearance-none w-auto pl-4 pr-10 border bg-gray-100 border-gray-400 rounded-md text-gray-900 cursor-pointer",
         !small && "mx-3 py-3 text-xl",
-        small && "mx-1 py-1 text-sm"
+        small && "mx-1 py-1 text-xs"
       )}>
       { items.map((item, idx) => {
         const active = activePage === item;
@@ -99,6 +99,10 @@ const Results = ({ data }) => (
   </div>
 );
 
+
+
+
+
 export default function Home() {
   const router = useRouter();
 
@@ -113,13 +117,16 @@ export default function Home() {
   const opt = {
     loadingTimeout: 10,
     onLoadingSlow: (_key, _config) => {
+      NProgress.start();
       setLoading(true);
     },
     onError: (_err, _key, config) => {
       setLoading(false);
+      NProgress.done();
       setCurrentLookfor(nextLookfor);
     },
     onSuccess: (_data, _key, _config) => {
+      NProgress.done();
       setLoading(false);
       setCurrentLookfor(nextLookfor);
       if (resetScroll) {
@@ -160,6 +167,8 @@ export default function Home() {
     }
     queryUpdated();
   }, [router.isReady, router.query]);
+
+
 
 
   const search = () => {
@@ -203,7 +212,7 @@ export default function Home() {
   const getHeading = (title, value, placeholder) => (
     <div className="flex justify-between mb-2">
       <SearchHeading title={title} value={value} placeholder={placeholder} resultCount={resultCount} />
-      { !loading && getPagination(true, false) }
+      { getPagination(true, false) }
     </div>
   );
   return (
@@ -226,11 +235,10 @@ export default function Home() {
         </div>
       </div>
       <div className="p-5">
-        { loading && <div className="ml-4 w-8 h-8"><Spinner /></div> }
         { !loading && error && <p>error...</p> }
         { !loading && data && data?.status === 'ERROR' && <p>error...</p> }
         { !loading && data && Number(resultCount) === 0 && <p>ei tuloksia...</p> }
-        { !loading && data?.status === 'OK' && <ResultGrid records={data.records} onOpenRecord={openRecord} width="200" height="200"/> }
+        { data?.status === 'OK' && <ResultGrid records={data.records} onOpenRecord={openRecord} width="200" height="200"/> }
       </div>
       <div className="flex justify-center">
         { !loading && getPagination(false, false)}
