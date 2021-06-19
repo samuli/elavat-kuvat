@@ -5,6 +5,8 @@ import Fetcher from '@/lib/fetcher';
 import { frontPageUrl, genreFacetsUrl, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
 import { SearchHeading } from '@/components/Typo';
+//import { PlayIcon } from '@/components/PlayIcon';
+import { FaPlay as PlayIcon } from 'react-icons/fa';
 import { FacetList, FacetStripe } from '@/components/Topics';
 import HeadTags from '@/components/Head'
 import Spinner from '@/components/Spinner';
@@ -70,8 +72,13 @@ const FrontPage = () => {
             { data?.status === 'OK' && (
               <div className="flex flex-col items-center ">
                 <ResultGrid records={data.records.slice(0,8)} onOpenRecord={openRecord} width="200" height="200"/>
-                <div className="flex justify-center mt-4 p-4 text-md uppercase rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer">
-                  <Link href="/search"><a>Näytä kaikki klipit</a></Link>
+                <div className="flex justify-center mt-4 py-3 px-4 text-md uppercase rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer">
+                  <Link href="/search"><a>
+                    <div className="flex justify-center items-center">
+                      <div>Näytä kaikki</div>
+              {/*                      <div className="text-xs text-white p-2 ml-2 rounded-full bg-green-500"><PlayIcon/></div> */}
+                    </div>
+                  </a></Link>
                 </div>
               </div>
             ) }
