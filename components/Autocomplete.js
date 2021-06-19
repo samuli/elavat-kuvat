@@ -28,6 +28,10 @@ const Autocomplete = () => {
     return { type: 'NO_RESULTS', data: lookfor };
   };
 
+
+  const inputRef = useRef(null);
+  const listRef = useRef(null);
+
   const opt = {
     loadingTimeout: 10,
     onLoadingSlow: (_key, _config) => {
@@ -45,6 +49,7 @@ const Autocomplete = () => {
         items = [ { type: 'RESULTS', data: cnt }, ...items ];
       }
       setInputItems(items);
+      listRef.current.scrollTop = 0;
     },
     onError: () => {
       setResultCount(0);
@@ -56,7 +61,7 @@ const Autocomplete = () => {
     lookfor ? autocompleteUrl(lookfor, limit) : null, Fetcher, opt)
   ;
 
-  const inputRef = useRef(null);
+
   // useHotkeys('ctrl+k', (e) => {
   //   e.preventDefault();
   //   if (inputRef.current) {
@@ -142,7 +147,12 @@ const Autocomplete = () => {
         </div>
       </div>
 
-        <ul className={clsx("overflow-y-scroll bg-gray-900 text-gray-100 border border-pink-500", (!isOpen || loading || inputItems.length === 0 || onSearchResultsPage) && "hidden")} {...getMenuProps()} style={{ height: '80vh' }}>
+      <ul className={clsx(
+            "absolute overflow-y-auto w-full bg-gray-900 text-gray-100 border border-pink-500",
+            (!isOpen || loading || inputItems.length === 0 || onSearchResultsPage) && "hidden")}
+          {...getMenuProps({ ref: listRef })}
+          style={{ maxWidth: '90%', height: 'auto', maxHeight: '85vh' }}
+      >
           {inputItems.map((item, index) => (
             <li className={ menuItemClasses(highlightedIndex === index)}
               {...getItemProps({

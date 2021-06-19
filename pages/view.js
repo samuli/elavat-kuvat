@@ -27,7 +27,7 @@ const Copyright = ({ record }) => {
   return (
     <div className="flex flex-col">
       <span className="text-gray-300 italic mr-2">Aineiston käyttöoikeudet: </span>
-      <div class="flex flex-row items-center justify-center">
+      <div className="flex flex-row items-center justify-center">
         <div className="">{rightsLink}</div>
         <div className="text-gray-300 ml-1 flex jusitfy-center items-center text-xl -flex-nowrap">
           <a target="_blank" href={finnaRecordPage(record.recordPage)} className="hover:text-white ml-2" title="Katso lisätiedot Finnassa">
