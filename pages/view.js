@@ -100,13 +100,13 @@ const PreviewWrapper = ({ children, record, videoAvailable }) => {
 
 const Tags = ({ topics, genres }) => (
   <div>
-    { topics.length > 0 && <div className="my-4">
+    { topics.length > 0 && <div>
       <SearchHeading title="Aiheet" />
       <FacetStripe facet="topic_facet" facets={topics.map(f => {
         return { value: f, translated: f };
       })} facetUrl={facetSearchUrl} />
     </div>}
-    { genres.length > 0 && <div className="my-4">
+    { genres.length > 0 && <div>
       <SearchHeading title="Genret" />
       <FacetStripe facet="genre_facet" facets={genres.map(f => {
         return { value: f, translated: f };
@@ -186,7 +186,7 @@ export default function View() {
                     </div>)}
                   <div className="sm:mt-0 mt-2"><Copyright record={rec} /></div>
                 </div>
-                <Tags topics={rec.rawData.topic_facet ?? []} genres={rec.rawData.genres_facet ?? []} />
+                <Tags topics={rec.rawData.topic_facet ?? []} genres={rec.rawData.genre_facet ?? []} />
               </div>
             </>
           )}
