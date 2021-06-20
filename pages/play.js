@@ -4,7 +4,9 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import AppLink from '@/components/Link';
+import { useAppState } from '@/lib/state';
 import { recordUrl } from '@/lib/api';
+import { recordUrl as recordPageUrl } from '@/lib/record';
 import { extractVideoUrls, finnaRecordPage } from '@/lib/record';
 import Fetcher from '@/lib/fetcher';
 import { FullscreenLayout } from '@/components/layout';
@@ -13,6 +15,7 @@ import { FaArrowLeft as BackIcon } from 'react-icons/fa';
 import HeadTags from '@/components/Head';
 
 function Play() {
+  const state = useAppState();
   const router = useRouter();
   const [ playerOpen, setPlayerOpen ] = useState(true);
   const [ showUI, setShowUI ] = useState(false);
@@ -44,6 +47,13 @@ function Play() {
 
   const videoUrls = extractVideoUrls(rec);
   const videoUrl = videoUrls[clip-1];
+  const goBack = () => {
+    if (state.historyEmpty) {
+      router.push(recordPageUrl(id));
+    } else {
+      router.back();
+    }
+  };
 
   return (
     <div className="w-full w-screen p-5 font-sans">
@@ -56,7 +66,7 @@ function Play() {
           >
             <div className={clsx('flex absolute top-0 z-50 px-5 py-3 rounded-xl mt-5 bg-gray-900 .items-center transition transition-opacity duration-500 ease-in-out', !showUI && 'opacity-0')}>
               <div className="flex items-center">
-                <div className="flex items-center text-grey-100 hover:text-grey-200 cursor-pointer"><BackIcon /> <div className="ml-2 hover:text-gray-200"><AppLink href={`/view?id=${encodeURIComponent(rec.id)}`}><a>Takaisin</a></AppLink></div></div>
+                <div className="flex items-center text-grey-100 hover:text-grey-200 cursor-pointer"><BackIcon /> <div className="ml-2 hover:text-gray-200"><a onClick={goBack}>Takaisin</a></div></div>
                 <h1 className="ml-10 text-lg line-clamp-1">{ rec.title }<span className="ml-3 text-xl text-gray-400">{ videoUrls.length > 1 ? ` (osa ${clip}/${videoUrls.length})` : '' }</span></h1>
               </div>
             </div>

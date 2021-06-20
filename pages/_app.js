@@ -1,7 +1,8 @@
-import {ErrorBoundary} from 'react-error-boundary'
-import { useRouter } from 'next/router'
+import {ErrorBoundary} from 'react-error-boundary';
+import { useRouter } from 'next/router';
+import { AppWrapper } from '@/lib/state';
 import Layout from '@/components/layout';
-import '../styles/globals.css'
+import '../styles/globals.css';
 
 
 function ErrorFallback({error, resetErrorBoundary}) {
@@ -24,9 +25,11 @@ function MyApp({ Component, pageProps }) {
         router.reload();
       }}
     >
-      <PageLayout>
-        <Component {...pageProps} />
-      </PageLayout>
+      <AppWrapper>
+        <PageLayout>
+          <Component {...pageProps} />
+        </PageLayout>
+      </AppWrapper>
     </ErrorBoundary>
   );
 }

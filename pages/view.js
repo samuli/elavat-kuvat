@@ -6,6 +6,7 @@ import useSWR from 'swr';
 import clsx from 'clsx';
 import NProgress from "nprogress";
 import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon } from 'react-icons/fa';
+import { useAppDispatch, CMD_PAGE_LOADED } from '@/lib/state';
 import { recordUrl } from '@/lib/api';
 import AppLink from '@/components/Link';
 
@@ -134,9 +135,14 @@ const Description = ({ text }) => {
 };
 
 export default function View() {
+  const appDispatch = useAppDispatch();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const id = router.query.id;
+
+  useEffect(() => {
+    appDispatch({ type: CMD_PAGE_LOADED });
+  }, []);
 
   const opt = {
     loadingTimeout: 1,
