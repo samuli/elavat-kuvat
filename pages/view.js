@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import useSWR from 'swr';
 import clsx from 'clsx';
 import NProgress from "nprogress";
-import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon, FaQuestionCircle as InfoIcon } from 'react-icons/fa';
+import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon } from 'react-icons/fa';
 import { recordUrl } from '@/lib/api';
 import { extractVideoUrls, finnaRecordPage } from '@/lib/record';
 import { Image } from '@/components/ImageGrid';
@@ -29,14 +29,14 @@ const Copyright = ({ record }) => {
   return (
     <div className="flex flex-col">
       <span className="uppercase text-xs font-bold">Aineiston käyttöoikeudet: </span>
-      <div className="flex flex-row items-center">
-        <div className="">{rightsLink}</div>
-        <div className="text-gray-600 ml-1 flex jusitfy-center items-center text-xl -flex-nowrap">
-          <a target="_blank" href={finnaRecordPage(record.recordPage)} className="hover:text-gray-800 ml-2" title="Katso lisätiedot Finnassa">
-            <span className="text-sm"><InfoIcon /></span>
-          </a>
+      <a target="_blank" href={finnaRecordPage(record.recordPage)} className="hover:text-gray-800" title="Katso lisätiedot Finnassa">
+        <div className="flex flex-row items-center">
+          <div className="underline">{rightsLink}</div>
+          <div className="text-gray-600 ml-1 flex jusitfy-center items-center text-xl">
+            <span className="text-sm ml-2 "><ExtLinkIcon /></span>
+          </div>
         </div>
-      </div>
+            </a>
     </div>
   );
 };
@@ -54,7 +54,7 @@ const Header = ({ record }) => {
   const d = record.rawData;
   return (
     <div>
-      <h1 className="text-3xl font-bold">{record.title}</h1>
+      <h1 className="text-xl md:text-3xl font-bold">{record.title}</h1>
       <p className="text-md text-gray-100">
         {d.author_corporate && `${d.author_corporate} `}{d.main_date_str && d.main_date_str}
       </p>
@@ -100,7 +100,7 @@ const PreviewWrapper = ({ children, record, videoAvailable }) => {
 
 const Tags = ({ topics, genres }) => (
   <div>
-    { topics.length > 0 && <div>
+    { topics.length > 0 && <div className="mb-2">
       <SearchHeading title="Aiheet" />
       <FacetStripe facet="topic_facet" facets={topics.map(f => {
         return { value: f, translated: f };
@@ -161,16 +161,14 @@ export default function View() {
                   </PreviewWrapper>
                 </div>
                 <div className="md:ml-8 flex items-center mt-8 md:mt-0">
-                  <div>
-                    <Header record={rec} />
-                    {videoUrls.length > 1 && <ul className="mt-5">{videoUrls.map(({ src, title }, idx) => (
-                      <Link href={videoPage(rec.id, idx + 1)}><a>
-                        <li className="flex my-2 items-center group text-gray-100 hover:text-white">
-                          <SmallPlayButton big={false} /><div className="ml-3">{title}</div>
-                        </li>
-                      </a></Link>
-                    ))}</ul>}
-                  </div>
+                  <Header record={rec} />
+                  {videoUrls.length > 1 && <ul className="mt-5">{videoUrls.map(({ src, title }, idx) => (
+                    <Link href={videoPage(rec.id, idx + 1)}><a>
+                      <li className="flex my-2 items-center group text-gray-100 hover:text-white">
+                        <SmallPlayButton big={false} /><div className="ml-3">{title}</div>
+                      </li>
+                    </a></Link>
+                  ))}</ul>}
                 </div>
               </div>
               <div className="max-w-2xl">
@@ -181,7 +179,7 @@ export default function View() {
                     <div className="flex flex-col">
                       <div className="mr-2 uppercase text-xs font-bold">Aineiston tarjoaa: </div>
                       <div className="flex">
-                        <a href="https://kavi.finna.fi" target="_blank" className="flex items-center justify-center">
+                        <a href="https://kavi.finna.fi" target="_blank" className="flex items-center justify-center underline hover:text-gray-700">
                           {rec.buildings[0].translated} <span className="ml-2 text-gray-700 text-xs"><ExtLinkIcon /></span>
                         </a>
                       </div>

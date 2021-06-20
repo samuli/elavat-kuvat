@@ -14,7 +14,7 @@ export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 })
         const playable = extractVideoUrls(rec).length > 0;
         return (
           <Link key={rec.id} href={`/view?id=${encodeURIComponent(rec.id)}`}>
-            <li className={clsx("w-1/2 sm:w-1/3 md:w-1/4 h-full flex flex-col rounded-xl cursor-pointer group")} style={{  }}>
+            <li role="button" className={clsx("w-1/2 sm:w-1/3 md:w-1/4 h-full flex flex-col rounded-xl cursor-pointer group")} style={{  }}>
               <div className="flex flex-col h-full.">
                   <div className="flex items-center h-full p-3">
                     { rec.images &&

@@ -17,7 +17,7 @@ const DecadeFilter = ({ title, startYear }) => {
   const endYear = startYear < 2000 ? startYear+9 : "*";
   return (
     <Link href={`/search?date=${startYear}-${endYear}`}><a>
-      <div className="text-md text-gray-800 font-semibold uppercase tracking-tighterb bg-gradient-to-b from-gray-100 to-gray-300 py-1 px-2 rounded-lg cursor-pointer hover:from-white hover:to-white">
+      <div role="button" className="text-md text-gray-800 font-semibold uppercase tracking-tighterb bg-gradient-to-b from-gray-100 to-gray-300 py-1 px-2 rounded-lg cursor-pointer hover:from-white hover:to-white">
         {title}
       </div>
     </a></Link>
@@ -67,9 +67,11 @@ const FrontPage = () => {
             <div className="pt-2 px-5 w-full">
               <div className="flex flex-col flex-wrap md:flex-nowrap">
                 <SearchHeading title="Aiheita" />
-            { topicFacets?.status === 'OK' && <FacetStripe title="Aiheet" facet="topic_facet" facets={topicFacets.facets.topic_facet} facetUrl={facetSearchUrl} truncate={true}/> }
-             </div>
-          </div>
+                <div className="h-16 min-h-32 w-full mt-1 mb-3">
+                  { topicFacets?.status === 'OK' && <FacetStripe title="Aiheet" facet="topic_facet" facets={topicFacets.facets.topic_facet} facetUrl={facetSearchUrl} truncate={true}/> }
+                </div>
+              </div>
+           </div>
 
           <div className="mt-4">
             { data?.status === 'OK' && (

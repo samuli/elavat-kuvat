@@ -137,6 +137,7 @@ const Autocomplete = () => {
                   reset();
                 }
               },
+              type: "search",
               placeholder: "Hae..."
             })}
             style={{ }}
