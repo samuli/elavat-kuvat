@@ -140,8 +140,6 @@ export default function View() {
 
   const { data, error, ...rest } = useSWR(id ? recordUrl(id) : null, Fetcher, opt);
 
-  if (!id) return "";
-
   const rec = data && !error && data.resultCount > 0 && data.records[0];
 
   if (error) return <p>error...</p>;
@@ -151,7 +149,7 @@ export default function View() {
 
   return (
     <div className="w-auto mx-7 font-sans">
-      <HeadTags title={rec && rec.title}/>
+      <HeadTags title={rec && rec.title} description={rec && rec.rawData?.description }/>
       <div className="mt-4">
         <article>
           {!loading && data && (
