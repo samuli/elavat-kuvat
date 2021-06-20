@@ -65,7 +65,7 @@ const FrontPage = () => {
         <div>
             <div className="pt-2 px-5 w-full">
               <div className="flex flex-col flex-wrap md:flex-nowrap">
-                <SearchHeading title="Aiheita" />
+                <SearchHeading title="Yleisimmät aiheet" />
                 <div className="h-16 min-h-32 w-full mt-1 mb-3">
                   { topicFacets?.status === 'OK' && <FacetStripe title="Aiheet" facet="topic_facet" facets={topicFacets.facets.topic_facet} facetUrl={facetSearchUrl} truncate={true}/> }
                 </div>
