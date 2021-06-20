@@ -31,7 +31,7 @@ const Copyright = ({ record }) => {
     <div className="flex flex-col">
       <span className="uppercase text-xs font-bold">Aineiston käyttöoikeudet: </span>
       <a target="_blank" href={finnaRecordPage(record.recordPage)} className="hover:text-gray-800" title="Katso lisätiedot Finnassa">
-        <div className="flex flex-row items-center">
+        <div className="text-sm flex flex-row items-center">
           <div className="underline">{rightsLink}</div>
           <div className="text-gray-600 ml-1 flex jusitfy-center items-center text-xl">
             <span className="text-xs ml-2 "><ExtLinkIcon /></span>
@@ -189,11 +189,11 @@ export default function View() {
               </div>
               <div className="max-w-2xl">
                 {rec.rawData.description && <Description text={rec.rawData.description} /> }
-                <div className="my-5 flex flex-col sm:flex-row justify-between w-auto bg-yellow-50 text-gray-900 p-3 rounded-xl">
+                <div className="my-5 inline-flex flex-col sm:flex-row bg-yellow-50 text-gray-900 p-3 rounded-xl">
                   {rec.buildings && (
                     <div className="flex flex-col">
                       <div className="mr-2 uppercase text-xs font-bold">Aineiston tarjoaa: </div>
-                      <div className="flex">
+                      <div className="flex text-sm">
                         <a href="https://kavi.finna.fi" target="_blank" className="flex items-center justify-center underline hover:text-gray-700">
                           {rec.buildings[0].translated} <span className="ml-2 mr-5 text-gray-700 text-xs"><ExtLinkIcon /></span>
                         </a>

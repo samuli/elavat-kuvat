@@ -11,7 +11,7 @@ const Header = () => {
           <Link href="/">
             <div className="text-4xl bg-gradient-to-t from-red-500 to-pink-500 text-transparent bg-clip-text sm:text-5xl mr-2 font-bold hover:to-pink-500 cursor-pointer">Elävät kuvat.</div>
           </Link>
-          <div className="flex items-end text-md font-serif text-gray-100 italic whitespace-nowrap -mt-1">suomalaisia lyhytelokuvia</div>
+          <div className="flex items-end text-md sm:text-xl font-serif text-gray-100 italic whitespace-nowrap -mt-1">suomalaisia lyhytelokuvia</div>
         </div>
       </div>
       <div className="z-10 sticky top-0 shadow-lg">
