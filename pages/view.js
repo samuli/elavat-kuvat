@@ -86,7 +86,7 @@ const Preview = ({ images = [], videoAvailable, recordUrl }) => {
         {videoAvailable && <PlayButton big={true} />}
         {!videoAvailable && (
           <div className="flex items-center justify-center text-2xl p-4 rounded-md bg-white text-gray-900 group-hover:bg-pink-500 group-hover:text-gray-100">
-            Katso finna.fi:ssä<span className="ml-4"><ExtLinkIcon /></span>
+            Katso finna.fi:ssä<span className="text-lg ml-4"><ExtLinkIcon /></span>
           </div>)}
       </div>
     </div>
@@ -117,6 +117,21 @@ const Tags = ({ topics, genres }) => (
     </div>}
   </div>
 );
+
+const Description = ({ text }) => {
+  const parts = text.replace(/<br( )?\/>/g, '\n').split('\n');
+  const collapse = parts.length > 1;
+  return (
+    <div className="mt-4 font-serif italic  leading-6 text-lg">
+      { collapse && (
+        <details>
+          <summary className="cursor-pointer whitespace-pre-line outline-none">{parts[0]}</summary>
+          { parts.length > 1 && <div>{parts.slice(1).map((el,idx) => <p className="pt-2" key={`detail-${idx}`}>{el}</p>)}</div> }
+        </details> ) }
+      { !collapse && <p>{parts[0]}</p> }
+    </div>
+  );
+};
 
 export default function View() {
   const router = useRouter();
@@ -173,8 +188,7 @@ export default function View() {
                 </div>
               </div>
               <div className="max-w-2xl">
-                {rec.rawData.description && <p className="mt-4 font-serif italic whitespace-pre-line leading-6 text-lg">{rec.rawData.description.replace(/<br( )?\/>/g, '\n')}</p>}
-
+                {rec.rawData.description && <Description text={rec.rawData.description} /> }
                 <div className="my-5 flex flex-col sm:flex-row justify-between w-auto bg-yellow-50 text-gray-900 p-3 rounded-xl">
                   {rec.buildings && (
                     <div className="flex flex-col">
