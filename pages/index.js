@@ -16,7 +16,7 @@ const DecadeFilter = ({ title, startYear }) => {
   const endYear = startYear < 2000 ? startYear+9 : "*";
   return (
     <AppLink href={`/search?date=${startYear}-${endYear}`}><a>
-      <div role="button" className="text-md text-gray-800 font-semibold uppercase tracking-tighterb bg-gradient-to-b from-gray-100 to-gray-300 py-1 px-2 rounded-lg cursor-pointer hover:from-white hover:to-white">
+      <div role="button" className="text-md text-gray-800  uppercase tracking-tight bg-gradient-to-b from-gray-100 to-gray-300 py-1 px-2 rounded-lg cursor-pointer hover:from-white hover:to-white">
         {title}
       </div>
     </a></AppLink>
@@ -76,14 +76,13 @@ const FrontPage = () => {
             { data?.status === 'OK' && (
               <div className="flex flex-col items-center ">
                 <ResultGrid records={data.records.slice(0,8)} onOpenRecord={openRecord} width="200" height="200"/>
-                <div className="flex justify-center mt-4 py-3 px-4 text-md uppercase rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer">
-                  <AppLink href="/search"><a>
+                <AppLink href="/search"><a>
+                  <div role="button" className="flex justify-center mt-6 py-3 px-4 text-sm font-semibold tracking-tight uppercase rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer bg-gradient-to-b from-gray-100 to-gray-300 hover:from-white hover:to-white">
                     <div className="flex justify-center items-center">
-                      <div>Näytä kaikki</div>
-              {/*                      <div className="text-xs text-white p-2 ml-2 rounded-full bg-green-500"><PlayIcon/></div> */}
+                      <div>Kaikki klipit</div>
                     </div>
-                  </a></AppLink>
-                </div>
+                  </div>
+                </a></AppLink>
               </div>
             ) }
           </div>
