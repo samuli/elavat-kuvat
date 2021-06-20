@@ -210,7 +210,7 @@ export default function Home() {
   );
 
   const getHeading = (title, value, placeholder) => (
-    <div className="flex justify-between mb-2">
+    <div className="flex items-center justify-between mb-2">
       <SearchHeading title={title} value={value} placeholder={placeholder} resultCount={resultCount} />
       { getPagination(true, false) }
     </div>

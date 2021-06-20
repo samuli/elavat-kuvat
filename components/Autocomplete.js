@@ -139,14 +139,14 @@ const Autocomplete = () => {
                   reset();
                 }
               },
-              placeholder: "Etsi katsottavaa..."
+              placeholder: "Hae..."
             })}
             style={{ }}
             className="w-full px-4 my-2 py-1 rounded-lg text-lg text-gray-900 focus:outline-none ring-inset focus:ring-2 focus:ring-pink-500"
           />
         </div>
         <div className="overflow-hidden ml-2">
-          { icon } <label {...getLabelProps()} className="hidden">Etsi:</label>
+          { icon } <label {...getLabelProps()} className="hidden">Hae lyhytelokuvia:</label>
         </div>
       </div>
 
@@ -181,8 +181,8 @@ const Autocomplete = () => {
               { item.type === 'RESULTS' &&
                 <Link href={searchResultsUrl(lookfor)} prefetch={false}>
                   <a>
-                    <div className="pl-2">
-                      <div className="text-md">Näytä kaikki tulokset hakusanalla <span className="italic text-pink-500">{lookfor}</span> <span className="ml-2">({item.data})</span></div>
+                    <div className="pl-2 my-2">
+                      <div className="text-md">Näytä kaikki haulla <span className="font-bold">{lookfor}</span> <span className="ml-1">({item.data})</span></div>
                     </div>
                   </a>
                 </Link>

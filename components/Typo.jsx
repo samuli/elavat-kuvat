@@ -8,12 +8,12 @@ const SearchHeading = ({title, value, resultCount, pageNum, pageCount, placehold
   }
   return (
     <div className="flex items-center justify-between">
-      <h2 className={clsx("text-lg font-bold", title && "mr-2")}>
-        {title} <span className="ml-1 font-normal text-gray-200">{value}</span>
+      <h2 className={clsx("text-lg font-bold leading-tight", title && "mr-2")}>
+        {title} <span className="font-normal text-gray-200">{value}</span>
       </h2>
-      {resultCount && (<span>
-        <span className="text-sm text-gray-200">({resultCount} klippiä)</span>
-      </span>) }
+      {resultCount && (<div>
+        <div className="mr-2 text-sm text-gray-200 leading-tight">({resultCount}<span className="sm:inline hidden"> klippiä</span>)</div>
+      </div>) }
     </div>
   );
 };
