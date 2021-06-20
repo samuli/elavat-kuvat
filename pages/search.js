@@ -42,9 +42,9 @@ const PageMenu = ({ items, activePage, onPageSelect, small = false }) => {
       onChange={(e) => onPageSelect(e.target.value)}
       value={activePage}
       className={clsx(
-        "appearance-none w-auto pl-4 pr-10 border bg-gray-100 border-gray-400 rounded-md text-gray-900 cursor-pointer",
-        !small && "mx-3 py-3 text-xl",
-        small && "mx-1 py-1 text-xs"
+        "-appearance-none outline-none w-auto border bg-gray-100 border-gray-400 rounded-md text-gray-900 cursor-pointer",
+        !small && "mx-3 px-3 py-3 text-xl",
+        small && "mx-1 px-1 py-1 text-xs"
       )}>
       { items.map((item, idx) => {
         const active = activePage === item;
