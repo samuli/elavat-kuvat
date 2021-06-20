@@ -82,6 +82,7 @@ function Play() {
                 setShowUI(false);
                 setVideoStarted(true);
               }}
+              onEnded={goBack}
             />
           </div>
         ) }
