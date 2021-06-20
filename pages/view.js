@@ -68,7 +68,7 @@ const PlayButton = () => (
 );
 
 const SmallPlayButton = () => (
-  <div className="text-gray-100 group-hover:text-pink-500 fill-current stroke-current items-center justify-center flex text-sm">
+  <div className="text-gray-100 group-hover:text-white fill-current stroke-current items-center justify-center flex text-sm">
     <div className="ml-1"><PlayIcon /></div>
   </div>
 );
@@ -77,7 +77,9 @@ const Preview = ({ images = [], videoAvailable, recordUrl }) => {
   return (
     <div className="flex relative justify-center bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl group cursor-pointer min-h-64">
       <div>
-        <Image key={images[0]} src={images[0]} width="700" style={{ minHeight: '200px' }} />
+        <figure>
+          <Image key={images[0]} src={images[0]} width="700" style={{ minHeight: '200px' }} />
+        </figure>
       </div>
       <div className="absolute align-middle p-10 self-center align-center justify-center flex cursor-pointer">
         {videoAvailable && <PlayButton big={true} />}
@@ -149,9 +151,9 @@ export default function View() {
 
   return (
     <div className="w-auto mx-7 font-sans">
-      <HeadTags />
-      <div>
-        <div className="mt-4">
+      <HeadTags title={rec && rec.title}/>
+      <div className="mt-4">
+        <article>
           {!loading && data && (
             <>
               <div className="flex flex-col md:flex-row">
@@ -160,7 +162,7 @@ export default function View() {
                     <Preview images={rec?.images} videoAvailable={videoAvailable} recordUrl={finnaRecordPage(rec.recordPage)} />
                   </PreviewWrapper>
                 </div>
-                <div className="md:ml-8 flex items-center mt-8 md:mt-0">
+                <div className="md:ml-8 flex flex-col justify-center mt-8 md:mt-0">
                   <Header record={rec} />
                   {videoUrls.length > 1 && <ul className="mt-5">{videoUrls.map(({ src, title }, idx) => (
                     <Link href={videoPage(rec.id, idx + 1)}><a>
@@ -190,7 +192,7 @@ export default function View() {
               </div>
             </>
           )}
-        </div>
+        </article>
       </div>
     </div>
   )

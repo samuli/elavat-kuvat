@@ -217,7 +217,7 @@ export default function Home() {
   );
   return (
     <div className="w-full font-sans">
-      <HeadTags />
+      <HeadTags title={nextLookfor || topicFacet || genreFacet || daterange}/>
       <div className="pt-2 px-5 w-full">
         <div className="flex flex-col flex-wrap md:flex-nowrap">
           { topicFacet && getHeading("Aihe", topicFacet) }

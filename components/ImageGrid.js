@@ -17,6 +17,7 @@ export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 })
             <li role="button" className={clsx("w-1/2 sm:w-1/3 md:w-1/4 h-full flex flex-col rounded-xl cursor-pointer group")} style={{  }}>
               <div className="flex flex-col h-full.">
                   <div className="flex items-center h-full p-3">
+                    <figure>
                     { rec.images &&
                       <div className="flex items-center justify-center bg-gray-900 overflow-hidden w-full" style={{ minHeight: '100px' }}>
                         <LazyLoad height={200} offset={100}>
@@ -27,6 +28,7 @@ export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 })
                           }} />
                         </LazyLoad>
                       </div> }
+                    </figure>
                   </div>
                 <div className="w-full bg-gray-900 px-2 text-center text-gray-200 overflow-hidden text-sm md:text-md line-clamp-2 group-hover:text-white -mt-2 leading-tight">{rec.title}</div>
               </div>
