@@ -14,7 +14,7 @@ const Header = () => {
           <div className="flex items-end text-md font-serif text-gray-100 italic whitespace-nowrap -mt-1">suomalaisia lyhytelokuvia</div>
         </div>
       </div>
-      <div className="z-10 sticky top-0">
+      <div className="z-10 sticky top-0 shadow-lg">
         <Autocomplete />
       </div>
     </>

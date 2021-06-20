@@ -23,7 +23,7 @@ const Autocomplete = () => {
   const router = useRouter();
   const debounced = useDebouncedCallback((l) => {
     setLookfor(l);
-  }, 1000);
+  }, 500);
   const limit = 20;
 
   const noResultsItem = () => {
@@ -31,7 +31,6 @@ const Autocomplete = () => {
   };
 
 
-  const inputRef = useRef(null);
   const listRef = useRef(null);
 
   const opt = {
@@ -103,7 +102,7 @@ const Autocomplete = () => {
 
   const icon = <FaSearch className="animate-spin" style={{ width: '20px', height: '20px'}} className="text-gray-100" />;
 
-  const menuItemClasses = active => clsx(' p-1 hover:text-gray-100', active && 'bg-gradient-to-l from-pink-500 to-red-500');
+  const menuItemClasses = active => clsx(' p-1 hover:text-gray-100', active && 'bg-gradient-to-r from-pink-500 to-pink-400');
 
   return (
     <div className="w-full md:justify-end px-5 bg-gray-900">
@@ -112,7 +111,6 @@ const Autocomplete = () => {
         <div className="w-full" {...getComboboxProps()}>
           <input
             {...getInputProps({
-              ref: inputRef,
               onFocus: () => {
                 if (!isOpen && resultCount > 0) {
                   openMenu();
@@ -189,7 +187,7 @@ const Autocomplete = () => {
               }
               { item.type === 'NO_RESULTS' &&
                 <div className="pl-2">
-                  <div className="text-md">Ei tuloksia hakusanalla <span className="italic">{item.data}</span></div>
+                  <div className="text-md">Ei tuloksia haulla <span className="font-bold">{item.data}</span></div>
                 </div>
               }
             </li>
