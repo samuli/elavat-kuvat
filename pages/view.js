@@ -34,7 +34,7 @@ const Copyright = ({ record }) => {
         <div className="flex flex-row items-center">
           <div className="underline">{rightsLink}</div>
           <div className="text-gray-600 ml-1 flex jusitfy-center items-center text-xl">
-            <span className="text-sm ml-2 "><ExtLinkIcon /></span>
+            <span className="text-xs ml-2 "><ExtLinkIcon /></span>
           </div>
         </div>
             </a>
@@ -195,7 +195,7 @@ export default function View() {
                       <div className="mr-2 uppercase text-xs font-bold">Aineiston tarjoaa: </div>
                       <div className="flex">
                         <a href="https://kavi.finna.fi" target="_blank" className="flex items-center justify-center underline hover:text-gray-700">
-                          {rec.buildings[0].translated} <span className="ml-2 text-gray-700 text-xs"><ExtLinkIcon /></span>
+                          {rec.buildings[0].translated} <span className="ml-2 mr-5 text-gray-700 text-xs"><ExtLinkIcon /></span>
                         </a>
                       </div>
                     </div>)}
