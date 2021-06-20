@@ -77,7 +77,7 @@ const FrontPage = () => {
               <div className="flex flex-col items-center ">
                 <ResultGrid records={data.records.slice(0,8)} onOpenRecord={openRecord} width="200" height="200"/>
                 <AppLink href="/search"><a>
-                  <div role="button" className="flex justify-center mt-6 py-3 px-4 text-sm font-semibold tracking-tight uppercase rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer bg-gradient-to-b from-gray-100 to-gray-300 hover:from-white hover:to-white">
+                  <div role="button" className="flex justify-center mt-6 mb-4 py-3 px-4 text-sm font-semibold tracking-tight uppercase rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer bg-gradient-to-b from-gray-100 to-gray-300 hover:from-white hover:to-white">
                     <div className="flex justify-center items-center">
                       <div>Kaikki klipit</div>
                     </div>
