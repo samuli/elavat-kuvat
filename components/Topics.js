@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import Link from 'next/link';
 import clsx from 'clsx';
+import AppLink from '@/components/Link';
 
 // const FacetCloud = ( { facet, facets } ) => (
 //   <ul className="flex flex-wrap">
@@ -18,13 +18,13 @@ export const FacetStripe = ( { facet, facets, facetUrl, truncate = false } ) => 
 <div className={clsx("mt-1 items-center w-full", truncate && `line-clamp-3 overflow-clip`)}>
   <ul className="">
     { facets.map(f => (
-      <Link key={`facet-map-${f.value}`} href={facetUrl(facet, f.value)}>
+      <AppLink prefetch={true} key={`facet-map-${f.value}`} href={facetUrl(facet, f.value)}>
         <a>
         <li role="button" className="inline-flex flex-auto mr-2 mb-1 px-2 py-1 bg-gradient-to-b from-gray-100 to-gray-200 rounded-md text-xs font-bold text-gray-600 uppercase. cursor-pointer hover:from-white hover:to-white whitespace-nowrap" key={`facet-${f.value}`}>
             {f.translated}
          </li>
         </a>
-      </Link>
+      </AppLink>
     )) }
   </ul>
   </div>

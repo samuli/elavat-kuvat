@@ -1,9 +1,7 @@
-import Link from 'next/link';
 import clsx from 'clsx';
 import LazyLoad from 'react-lazyload';
 import { extractVideoUrls } from '@/lib/record';
-
-const imageH = 300;
+import AppLink from '@/components/Link';
 
 export const Image = ({ src, width = 300, height = 300, style = {} }) => <img src={`https://api.finna.fi${src}&w=${width}`} className="w-auto rouded-xl overflow-hidden" style={style} />;
 
@@ -13,7 +11,7 @@ export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 })
       {records?.map(rec => {
         const playable = extractVideoUrls(rec).length > 0;
         return (
-          <Link key={rec.id} href={`/view?id=${encodeURIComponent(rec.id)}`}>
+          <AppLink key={rec.id} href={`/view?id=${encodeURIComponent(rec.id)}`}>
             <li role="button" className={clsx("w-1/2 sm:w-1/3 md:w-1/4 h-full flex flex-col rounded-xl cursor-pointer group")} style={{  }}>
               <div className="flex flex-col h-full.">
                   <div className="flex items-center h-full p-3">
@@ -33,7 +31,7 @@ export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 })
                 <div className="w-full bg-gray-900 px-2 text-center text-gray-200 overflow-hidden text-sm md:text-md line-clamp-2 group-hover:text-white -mt-2 leading-tight">{rec.title}</div>
               </div>
             </li>
-          </Link>
+          </AppLink>
         );
       })}
     </ul>

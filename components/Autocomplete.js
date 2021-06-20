@@ -1,14 +1,13 @@
 import { useState, useRef } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useCombobox } from 'downshift';
 import { useDebouncedCallback } from 'use-debounce';
-//import { useHotkeys } from 'react-hotkeys-hook';
 import useSWR from 'swr';
 import clsx from 'clsx';
 import NProgress from "nprogress";
 
-import { FaSearch, FaSpinner } from 'react-icons/fa';
+import { FaSearch, FaSpinner } from 'react-icons/fa'
+import AppLink from '@/components/Link';
 import { autocompleteUrl } from '@/lib/api';
 import Fetcher from '@/lib/fetcher';
 import { recordUrl } from '@/lib/record';
@@ -165,7 +164,7 @@ const Autocomplete = () => {
               onClick={() => closeMenu()}
               >
               { item.type === 'RECORD' &&
-                <Link href={recordUrl(item.data.id)} prefetch={false}>
+                <AppLink href={recordUrl(item.data.id)} prefetch={false}>
                   <a>
                     <div className="flex items-center">
                       <div className="max-h-16 overflow-hidden rounded-lg">{ item.data.images && <Image src={item.data.images[0]} width="40" height="50" /> }</div>
@@ -175,16 +174,16 @@ const Autocomplete = () => {
                       </div>
                     </div>
                   </a>
-                </Link>
+                </AppLink>
               }
               { item.type === 'RESULTS' &&
-                <Link href={searchResultsUrl(lookfor)} prefetch={false}>
+                <AppLink href={searchResultsUrl(lookfor)} prefetch={false}>
                   <a>
                     <div className="pl-2 my-2">
                       <div className="text-md">Näytä kaikki haulla <span className="font-bold">{lookfor}</span> <span className="ml-1">({item.data})</span></div>
                     </div>
                   </a>
-                </Link>
+                </AppLink>
               }
               { item.type === 'NO_RESULTS' &&
                 <div className="pl-2">

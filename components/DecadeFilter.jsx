@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import AppLink from '@/components/Link';
 import { yearTitle } from '@/lib/util';
 import { getFilter } from '@/lib/api';
 
@@ -17,11 +17,11 @@ const DecadeFilter = ({ title, startYear, filters = ''}) => {
   const endYear = startYear < 2000 ? startYear+9 : "*";
   const queryFilters = filters ? `&${filters}` : '';
   return (
-    <Link href={`/search?date=${startYear}-${endYear}${queryFilters}`}><a>
+    <AppLink href={`/search?date=${startYear}-${endYear}${queryFilters}`}><a>
       <div className="text-lg font-semibold uppercase bg-gray-100 text-gray-700 py-2 px-4 first:rounded-xl cursor-pointer hover:text-pink-500">
         {title}
       </div>
-    </a></Link>
+    </a></AppLink>
 );
 };
 

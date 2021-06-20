@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import HeadTags from '@/components/Head';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
@@ -8,6 +7,8 @@ import clsx from 'clsx';
 import NProgress from "nprogress";
 import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon } from 'react-icons/fa';
 import { recordUrl } from '@/lib/api';
+import AppLink from '@/components/Link';
+
 import { extractVideoUrls, finnaRecordPage } from '@/lib/record';
 import { Image } from '@/components/ImageGrid';
 import { FacetStripe } from '@/components/Topics';
@@ -96,7 +97,7 @@ const videoPage = (id, clip = 1) => `/play?id=${encodeURIComponent(id)}&clip=${c
 
 const PreviewWrapper = ({ children, record, videoAvailable }) => {
   return videoAvailable
-    ? <Link href={videoPage(record.id)}><a>{children}</a></Link>
+    ? <AppLink href={videoPage(record.id)}><a>{children}</a></AppLink>
     : <a href={finnaRecordPage(record.recordPage)} target="_blank">{children}</a>;
 };
 
@@ -163,11 +164,11 @@ export default function View() {
                 <div className="md:ml-8 flex flex-col justify-center mt-8 md:mt-0">
                   <Header record={rec} />
                   {videoUrls.length > 1 && <ul className="mt-5">{videoUrls.map(({ src, title }, idx) => (
-                    <Link href={videoPage(rec.id, idx + 1)}><a>
+                    <AppLink href={videoPage(rec.id, idx + 1)}><a>
                       <li className="flex my-2 items-center group text-gray-100 hover:text-white">
                         <SmallPlayButton big={false} /><div className="ml-3">{title}</div>
                       </li>
-                    </a></Link>
+                    </a></AppLink>
                   ))}</ul>}
                 </div>
               </div>

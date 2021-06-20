@@ -1,13 +1,12 @@
 import { useState } from 'react';
-import Link from 'next/link';
 import useSWR from 'swr';
 import NProgress from "nprogress";
 
+import AppLink from '@/components/Link';
 import Fetcher from '@/lib/fetcher';
 import { frontPageUrl, genreFacetsUrl, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
 import { SearchHeading } from '@/components/Typo';
-import { FaPlay as PlayIcon } from 'react-icons/fa';
 import { FacetStripe } from '@/components/Topics';
 import HeadTags from '@/components/Head'
 import { facetSearchUrl, yearTitle } from '@/lib/util';
@@ -16,11 +15,11 @@ import { decades } from '@/components/DecadeFilter';
 const DecadeFilter = ({ title, startYear }) => {
   const endYear = startYear < 2000 ? startYear+9 : "*";
   return (
-    <Link href={`/search?date=${startYear}-${endYear}`}><a>
+    <AppLink href={`/search?date=${startYear}-${endYear}`}><a>
       <div role="button" className="text-md text-gray-800 font-semibold uppercase tracking-tighterb bg-gradient-to-b from-gray-100 to-gray-300 py-1 px-2 rounded-lg cursor-pointer hover:from-white hover:to-white">
         {title}
       </div>
-    </a></Link>
+    </a></AppLink>
   );
 };
 
@@ -78,12 +77,12 @@ const FrontPage = () => {
               <div className="flex flex-col items-center ">
                 <ResultGrid records={data.records.slice(0,8)} onOpenRecord={openRecord} width="200" height="200"/>
                 <div className="flex justify-center mt-4 py-3 px-4 text-md uppercase rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer">
-                  <Link href="/search"><a>
+                  <AppLink href="/search"><a>
                     <div className="flex justify-center items-center">
                       <div>Näytä kaikki</div>
               {/*                      <div className="text-xs text-white p-2 ml-2 rounded-full bg-green-500"><PlayIcon/></div> */}
                     </div>
-                  </a></Link>
+                  </a></AppLink>
                 </div>
               </div>
             ) }
