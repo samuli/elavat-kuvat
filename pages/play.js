@@ -23,16 +23,18 @@ function Play() {
   const timerRef = useRef(null);
   const mouseListenerRef = useRef(null);
 
+  const timeRef = useRef();
+
   useEffect(() => {
-    mouseListenerRef.current = window.addEventListener("mousemove", _e => {
-      if (showUI) return;
+    const mouseMove = () => {
       setShowUI(true);
-      timerRef.current && clearTimeout(timerRef.current);
+      clearTimeout(timerRef.current);
       timerRef.current = setTimeout(() => setShowUI(false), 2000);
-    });
+    }
+    window.addEventListener("mousemove", mouseMove);
     return () => {
-      timerRef.current && clearTimeout(timerRef.current);
-      window.removeEventListener("mousemove", mouseListenerRef.current);
+      clearTimeout(timerRef.current);
+      window.removeEventListener("mousemove", mouseMove);
     }
   }, []);
 
