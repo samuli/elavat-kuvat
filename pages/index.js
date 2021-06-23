@@ -49,6 +49,7 @@ const FrontPage = ({ randomClips, topics, genres }) => {
     initialData: randomClips,
     loadingTimeout: 10,
     onLoadingSlow: () => {
+
       NProgress.start();
     },
     onError: () => {
