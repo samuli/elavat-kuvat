@@ -33,8 +33,20 @@ const DecadeFilters = ({ items }) => (
   </ul>
 );
 
-const FrontPage = () => {
+export async function getStaticProps(context) {
+  const randomClips = await Fetcher(frontPageUrl());
+  console.log([topicFacetsUrl, genreFacetsUrl]);
+  const topics = await Fetcher(topicFacetsUrl());
+  const genres = await Fetcher(genreFacetsUrl);
+
+  return {
+    props: { randomClips, topics, genres }
+  }
+}
+
+const FrontPage = ({ randomClips, topics, genres }) => {
   const opt = {
+    initialData: randomClips,
     loadingTimeout: 10,
     onLoadingSlow: () => {
       NProgress.start();
@@ -49,8 +61,8 @@ const FrontPage = () => {
 
   const [ randomClipsUrl ] = useState(frontPageUrl());
   const { data } = useSWR(typeof randomClipsUrl !== 'undefined' ? randomClipsUrl : null, Fetcher, opt);
-  const { data: topicFacets } = useSWR(topicFacetsUrl, Fetcher)
-  const { data: genreFacets } = useSWR(genreFacetsUrl, Fetcher);
+  const { data: topicFacets } = useSWR(topicFacetsUrl, Fetcher, { initialData: topics })
+  const { data: genreFacets } = useSWR(genreFacetsUrl, Fetcher, { initialData: genres });
 
   const decadesReveresed = decades.reverse();
   const openRecord = (id) => {
