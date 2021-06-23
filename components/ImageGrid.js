@@ -18,11 +18,13 @@ export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 })
                     <figure>
                     { rec.images &&
                       <div className="flex items-center justify-center bg-gray-900 overflow-hidden w-full" style={{ minHeight: '100px' }}>
-                        <LazyLoad height={200} offset={100}>
-                          <img src={`https://api.finna.fi${rec.images[0]}&w=400`} width="300"
+                        <LazyLoad height={300} offset={100}>
+                          <img className=""
+                            src={`https://api.finna.fi${rec.images[0]}&w=400`} width="300"
                              style={{
                                  width: '100%',
                                  height: 'auto',
+                                 maxHeight: '300px',
                           }} />
                         </LazyLoad>
                       </div> }
