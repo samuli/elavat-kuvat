@@ -2,7 +2,7 @@ import AppLink from '@/components/Link';
 import { yearTitle } from '@/lib/util';
 import { getFilter } from '@/lib/api';
 
-export const decades = [1900, 1910, 1920, 1930, 1940, 1950, 1960, 1970, 1980, 1990, 2000];
+export const decades = [2000,1990,1980,1970,1960,1950,1940,1930,1920,1910,1900];
 
 export const getSearchUrl = (startYear, topic, genre) => {
   const filters =

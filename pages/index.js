@@ -9,7 +9,7 @@ import { ResultGrid } from '@/components/ImageGrid';
 import { SearchHeading } from '@/components/Typo';
 import { FacetStripe } from '@/components/Topics';
 import HeadTags from '@/components/Head'
-import { facetSearchUrl, yearTitle } from '@/lib/util';
+import { facetSearchUrl, filterFacetFields, yearTitle } from '@/lib/util';
 import { decades } from '@/components/DecadeFilter';
 
 const DecadeFilter = ({ title, startYear }) => {
@@ -35,16 +35,16 @@ const DecadeFilters = ({ items }) => (
 
 export async function getStaticProps(context) {
   const randomClips = await Fetcher(frontPageUrl());
-  console.log([topicFacetsUrl, genreFacetsUrl]);
   const topics = await Fetcher(topicFacetsUrl());
+  const topicsFiltered = { facets: { topic_facet: filterFacetFields(topics.facets.topic_facet) }};
   const genres = await Fetcher(genreFacetsUrl);
-
+  const genresFiltered = { facets: { genre_facet: filterFacetFields(genres.facets.genre_facet) }};
   return {
-    props: { randomClips, topics, genres }
+    props: { randomClips, topics: topicsFiltered, genres: genresFiltered, decades: decades }
   }
 }
 
-const FrontPage = ({ randomClips, topics, genres }) => {
+const FrontPage = ({ randomClips, topics, genres, decades }) => {
   const opt = {
     initialData: randomClips,
     loadingTimeout: 10,
@@ -62,10 +62,9 @@ const FrontPage = ({ randomClips, topics, genres }) => {
 
   const [ randomClipsUrl ] = useState(frontPageUrl());
   const { data } = useSWR(typeof randomClipsUrl !== 'undefined' ? randomClipsUrl : null, Fetcher, opt);
-  const { data: topicFacets } = useSWR(topicFacetsUrl, Fetcher, { initialData: topics })
+  const { data: topicFacets } = useSWR(topicFacetsUrl, Fetcher, { initialData: topics }  )
   const { data: genreFacets } = useSWR(genreFacetsUrl, Fetcher, { initialData: genres });
 
-  const decadesReveresed = decades.reverse();
   const openRecord = (id) => {
     router.push(`/view?id=${encodeURIComponent(id)}`);
   };
@@ -80,7 +79,7 @@ const FrontPage = ({ randomClips, topics, genres }) => {
               <div className="flex flex-col flex-wrap md:flex-nowrap">
                 <SearchHeading title="Yleisimmät aiheet" />
                 <div className="h-16 min-h-32 w-full mt-1 mb-3">
-                  { topicFacets?.status === 'OK' && <FacetStripe title="Aiheet" facet="topic_facet" facets={topicFacets.facets.topic_facet} facetUrl={facetSearchUrl} truncate={true}/> }
+                  { topicFacets && <FacetStripe title="Aiheet" facet="topic_facet" facets={topicFacets.facets.topic_facet} facetUrl={facetSearchUrl} truncate={true}/> }
                 </div>
               </div>
            </div>
@@ -105,12 +104,12 @@ const FrontPage = ({ randomClips, topics, genres }) => {
 
               <div>
                 <SearchHeading title="Aikakausi" />
-                <DecadeFilters items={decadesReveresed} />
+                <DecadeFilters items={decades} />
               </div>
 
               <div className="mt-2">
                 <SearchHeading title="Genret" />
-                { genreFacets?.status === 'OK' && <FacetStripe title="Genret" facet="genre_facet" facets={genreFacets.facets.genre_facet} facetUrl={facetSearchUrl} /> }
+                { genreFacets && <FacetStripe title="Genret" facet="genre_facet" facets={filterFacetFields(genreFacets.facets.genre_facet)} facetUrl={facetSearchUrl} /> }
               </div>
             </div>
           </div>
