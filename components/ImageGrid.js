@@ -5,7 +5,15 @@ import AppLink from '@/components/Link';
 
 export const Image = ({ src, width = 300, height = 300, style = {} }) => <img src={`https://api.finna.fi${src}&w=${width}`} className="w-auto rouded-xl overflow-hidden" style={style} />;
 
-export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 }) => (
+const imgWrapper = (lazy, children) => {
+  if (!lazy) {
+    return children;
+  } else {
+    return <LazyLoad height={300} offset={100}>{children}</LazyLoad>
+  }
+};
+
+export const ResultGrid = ({ records, onOpenRecord, lazy = true, width = 500, height = 500 }) => (
   <div>
     <ul className="flex flex-row flex-wrap line-clamp-2.">
       {records?.map(rec => {
@@ -18,7 +26,7 @@ export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 })
                     <figure>
                     { rec.images &&
                       <div className="flex items-center justify-center bg-gray-900 overflow-hidden w-full" style={{ minHeight: '100px' }}>
-                        <LazyLoad height={300} offset={100}>
+                        {imgWrapper(lazy,
                           <img className=""
                             src={`https://api.finna.fi${rec.images[0]}&w=400`} width="300"
                              style={{
@@ -26,7 +34,7 @@ export const ResultGrid = ({ records, onOpenRecord, width = 500, height = 500 })
                                  height: 'auto',
                                  maxHeight: '300px',
                           }} />
-                        </LazyLoad>
+                        )}
                       </div> }
                     </figure>
                   </div>
