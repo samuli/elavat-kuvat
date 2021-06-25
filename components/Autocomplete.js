@@ -101,7 +101,7 @@ const Autocomplete = () => {
 
   const icon = <FaSearch className="animate-spin" style={{ width: '20px', height: '20px'}} className="text-gray-100" />;
 
-  const menuItemClasses = active => clsx(' p-1 hover:text-gray-100', active && 'bg-gradient-to-r from-pink-500 to-pink-400');
+  const menuItemClasses = active => clsx('p-1 hover:text-gray-100', active && 'bg-gradient-to-r from-pink-500 to-pink-400');
 
   return (
     <div className="w-full md:justify-end px-5 bg-gray-900">
@@ -167,9 +167,9 @@ const Autocomplete = () => {
                 <AppLink href={recordUrl(item.data.id)} prefetch={false}>
                   <a>
                     <div className="flex items-center">
-                      <div className="max-h-16 overflow-hidden rounded-lg">{ item.data.images && <Image src={item.data.images[0]} width="40" height="50" /> }</div>
-                      <div className="pl-2">
-                        <div className="text-md">{item.data.title}</div>
+                      <div className="w-10 h-8 overflow-hidden rounded-md">{ item.data.images.length > 0 && <div className="mr-1"><Image src={item.data.images[0]} width="40" height="50" /></div> }</div>
+                      <div className="pl-1">
+                        <div className="text-md overflow-clip line-clamp-1">{item.data.title}</div>
                         <div className="text-sm">{ item.data.corporateAuthors && item.data.corporateAuthors.join(", ") }{ item.data.year && ` ${item.data.year}` }</div>
                       </div>
                     </div>

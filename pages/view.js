@@ -77,11 +77,12 @@ const SmallPlayButton = () => (
 
 const Preview = ({ images = [], videoAvailable, recordUrl }) => {
   return (
-    <div className="flex relative justify-center bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl group cursor-pointer min-h-64">
-      <div>
-        <figure>
-          <Image key={images[0]} src={images[0]} width="700" style={{ minHeight: '200px' }} />
-        </figure>
+    <div className="flex relative items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl group cursor-pointer min-h-64">
+      <div className="w-full h-full">
+        <div className="aspect-w-5 aspect-h-4">
+          { images.length > 0 && <img alt="" src={`https://api.finna.fi${images[0]}&w=700`} className="w-auto rouded-xl overflow-hidden object-cover object-center" /> }
+          {/* <Image key={images[0]} src={images[0]} width="700" style={{ minHeight: '200px' }} /> */}
+        </div>
       </div>
       <div className="absolute align-middle p-10 self-center align-center justify-center flex cursor-pointer">
         {videoAvailable && <PlayButton big={true} />}
@@ -170,7 +171,7 @@ export default function View() {
   const videoAvailable = videoUrls.length > 0;
 
   return (
-    <div className="w-auto mx-7 font-sans">
+    <div className="w-auto font-sans">
       <HeadTags title={rec && rec.title} description={rec && rec.rawData?.description }/>
       <div className="mt-4">
         <article>
@@ -195,7 +196,7 @@ export default function View() {
               </div>
               <div className="max-w-2xl">
                 {rec.rawData.description && <Description text={rec.rawData.description} /> }
-                <div className="my-5 inline-flex flex-col sm:flex-row bg-yellow-50 text-gray-900 p-3 rounded-xl">
+                <div className="my-5 inline-flex flex-col sm:flex-row bg-yellow-50 text-gray-900 p-3 rounded-md">
                   {rec.buildings && (
                     <div className="flex flex-col">
                       <div className="mr-2 uppercase text-xs font-bold">Aineiston tarjoaa: </div>

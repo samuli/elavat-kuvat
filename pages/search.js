@@ -39,6 +39,7 @@ const useStickySWR = (...args) => {
 const PageMenu = ({ items, activePage, onPageSelect, small = false }) => {
   return (
     <select
+      aria-label="Siirry sivulle"
       onChange={(e) => onPageSelect(e.target.value)}
       value={activePage}
       className={clsx(
@@ -98,10 +99,6 @@ const Results = ({ data }) => (
      </>}
   </div>
 );
-
-
-
-
 
 export default function Home() {
   const router = useRouter();
@@ -218,7 +215,7 @@ export default function Home() {
   return (
     <div className="w-full font-sans">
       <HeadTags title={nextLookfor || topicFacet || genreFacet || daterange}/>
-      <div className="pt-2 px-5 w-full">
+      <div className="pt-2 w-full">
         <div className="flex flex-col flex-wrap md:flex-nowrap">
           { topicFacet && getHeading("Aihe", topicFacet) }
           { genreFacet && getHeading("Genre", genreFacet) }
@@ -234,7 +231,7 @@ export default function Home() {
 
         </div>
       </div>
-      <div className="p-5">
+      <div className="mt-6">
         { !loading && error && <p>error...</p> }
         { !loading && data && data?.status === 'ERROR' && <p>error...</p> }
         { !loading && data && Number(resultCount) === 0 && <p>ei tuloksia...</p> }

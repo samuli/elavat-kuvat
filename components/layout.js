@@ -26,7 +26,7 @@ const Layout = ({ children }) => (
   <div style={{ }} className="flex flex-col bg-gray-900 text-white align-center items-center min-h-screen">
     <div className="w-full max-w-6xl mb-10 flex flex-col flex-start flex-inline" style={{ }}>
       <Header />
-      <main>{children}</main>
+      <main className="mx-5">{children}</main>
     </div>
   </div>
 );

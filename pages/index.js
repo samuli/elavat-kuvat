@@ -34,13 +34,13 @@ const DecadeFilters = ({ items }) => (
 );
 
 export async function getStaticProps(context) {
-  const randomClips = await Fetcher(frontPageUrl());
+  //const randomClips = await Fetcher(frontPageUrl());
   const topics = await Fetcher(topicFacetsUrl());
   const topicsFiltered = { facets: { topic_facet: filterFacetFields(topics.facets.topic_facet) }};
   const genres = await Fetcher(genreFacetsUrl);
   const genresFiltered = { facets: { genre_facet: filterFacetFields(genres.facets.genre_facet) }};
   return {
-    props: { randomClips, topics: topicsFiltered, genres: genresFiltered, decades: decades }
+    props: { topics: topicsFiltered, genres: genresFiltered, decades: decades }
   }
 }
 
@@ -73,9 +73,9 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
     <div>
       <HeadTags />
       <>
-        { data && (
+
         <div>
-            <div className="pt-2 px-5 w-full">
+            <div className="pt-2 w-full">
               <div className="flex flex-col flex-wrap md:flex-nowrap">
                 <SearchHeading title="Yleisimmät aiheet" />
                 <div className="h-16 min-h-32 w-full mt-1 mb-3">
@@ -84,22 +84,22 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
               </div>
            </div>
 
-          <div className="mt-4">
-            { data?.status === 'OK' && (
-              <div className="flex flex-col items-center ">
-                <ResultGrid records={data.records.slice(0,8)} onOpenRecord={openRecord} width="200" height="200"/>
+          <div className="mt-6">
+
+              <div className="flex flex-col ">
+                <ResultGrid records={data?.records ? data.records.slice(0,8) : Array.from(Array(8))} onOpenRecord={openRecord} width="200" height="200" lazy={false}/>
                 <AppLink href="/search"><a>
                   <div role="button" className="flex justify-center mt-6 mb-4 py-3 px-4 text-sm font-semibold tracking-tight uppercase rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer bg-gradient-to-b from-gray-100 to-gray-300 hover:from-white hover:to-white">
                     <div className="flex justify-center items-center">
-                      <div>Kaikki klipit</div>
+                      <div className="inline-flex">Kaikki klipit</div>
                     </div>
                   </div>
                 </a></AppLink>
               </div>
-            ) }
+
           </div>
 
-          <div className="px-5 w-full">
+          <div className="w-full">
             <div className="flex flex-col flex-wrap md:flex-nowrap">
 
               <div>
@@ -113,7 +113,7 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
               </div>
             </div>
           </div>
-        </div> ) }
+        </div>
       </>
     </div>
   );
