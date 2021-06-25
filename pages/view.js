@@ -175,7 +175,7 @@ export default function View() {
       <HeadTags title={rec && rec.title} description={rec && rec.rawData?.description }/>
       <div className="mt-4">
         <article>
-          {!loading && data && (
+          {!loading && rec && (
             <>
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-3/5 w-full">
