@@ -14,8 +14,8 @@ const wrapItem = (id, children) => {
 export const ResultGrid = ({ records, onOpenRecord, lazy = true, width = 500, height = 500 }) => (
   <div>
     <ul className="flex flex-row flex-wrap justify-between. overflow-hidden.">
-      {records?.map(rec => (
-        <li role="button" className={clsx("px-1 mb-3 w-1/2 sm:w-1/3 md:w-1/4 h-full flex flex-col group", rec?.id && "cursor-pointer")} >
+      {records?.map((rec,i) => (
+        <li key={`record-${i}`} role="button" className={clsx("px-1 mb-3 w-1/2 sm:w-1/3 md:w-1/4 h-full flex flex-col group", rec?.id && "cursor-pointer")} >
           { wrapItem(rec?.id || null, (
 
             <div className="flex flex-col">
