@@ -80,7 +80,7 @@ const Preview = ({ images = [], videoAvailable, recordUrl }) => {
     <div className="flex relative items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl group cursor-pointer min-h-64">
       <div className="w-full h-full">
         <div className="aspect-w-5 aspect-h-4">
-          { images.length > 0 && <img alt="" src={`https://api.finna.fi${images[0]}&w=700`} className="w-auto rouded-xl overflow-hidden object-cover object-center" /> }
+          { images.length > 0 && <img alt="" src={`https://api.finna.fi${images[0].replace("size=large", "size=medium")}`} className="w-auto rouded-xl overflow-hidden object-cover object-center" /> }
           {/* <Image key={images[0]} src={images[0]} width="700" style={{ minHeight: '200px' }} /> */}
         </div>
       </div>

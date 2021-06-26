@@ -20,9 +20,9 @@ export const ResultGrid = ({ records, onOpenRecord, lazy = true, width = 500, he
 
             <div className="flex flex-col">
               <div className="overflow-hidden aspect-w-5 aspect-h-4">
-                {rec?.images.length > 0 && <LazyLoad height={300} offset={100}>
+                {rec?.images.length > 0 && <LazyLoad offset={100} once>
                   <img className="object-cover object-center"
-                    src={`https://api.finna.fi${rec.images[0]}&w=400`} alt=""
+                    src={`https://api.finna.fi${rec.images[0]}&w=300`} alt=""
                   />
                 </LazyLoad>}
               </div>
