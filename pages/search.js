@@ -167,12 +167,9 @@ export default function Search() {
     queryUpdated();
   }, [router.isReady, router.query]);
 
-
-  const resultsRef = useCallback((node) => {
-    if (node) {
-      updateScroll();
-    }
-  }, [data,updateScroll]);
+  useEffect(() => {
+    updateScroll();
+  }, []);
 
   const search = () => {
     setLoading(false);
@@ -237,7 +234,7 @@ export default function Search() {
         { !loading && error && <p>error...</p> }
         { !loading && data && data?.status === 'ERROR' && <p>error...</p> }
         { !loading && data && Number(resultCount) === 0 && <p>ei tuloksia...</p> }
-        { data?.status === 'OK' && <div ref={resultsRef}><ResultGrid records={data.records} /></div> }
+        { data?.status === 'OK' && <ResultGrid records={data.records} /> }
       </div>
       <div className="flex justify-center">
         { !loading && getPagination(false, false)}
