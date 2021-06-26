@@ -11,7 +11,7 @@ const wrapItem = (id, children) => {
     : <AppLink key={id} href={`/view?id=${encodeURIComponent(id)}`}><a>{children}</a></AppLink>;
 };
 
-export const ResultGrid = ({ records, onOpenRecord, lazy = true, width = 500, height = 500 }) => (
+export const ResultGrid = ({ records }) => (
   <div>
     <ul className="flex flex-row flex-wrap justify-between. overflow-hidden.">
       {records?.map((rec,i) => (

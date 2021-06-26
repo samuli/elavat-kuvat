@@ -1,9 +1,10 @@
 import clsx from 'clsx';
 import useSWR from 'swr';
-import { useRef, useState, useEffect } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import { useUpdate } from 'react-use';
 import { forceCheck } from 'react-lazyload';
 import NProgress from "nprogress";
+import { useRouterScroll } from '@moxy/next-router-scroll';
 import HeadTags from '@/components/Head';
 import Select from '@/components/Select';
 import { SearchHeading } from '@/components/Typo';
@@ -100,8 +101,9 @@ const Results = ({ data }) => (
   </div>
 );
 
-export default function Home() {
+export default function Search() {
   const router = useRouter();
+  const { updateScroll } = useRouterScroll();
 
   const [ lookfor, setLookfor ] = useState(router.query.lookfor);
   const [ currentLookfor, setCurrentLookfor ] = useState(lookfor);
@@ -166,7 +168,11 @@ export default function Home() {
   }, [router.isReady, router.query]);
 
 
-
+  const resultsRef = useCallback((node) => {
+    if (node) {
+      updateScroll();
+    }
+  }, [data,updateScroll]);
 
   const search = () => {
     setLoading(false);
@@ -180,10 +186,6 @@ export default function Home() {
     setResetScroll(true);
     router.query.page = page;
     router.push(router);
-  };
-
-  const openRecord = (id) => {
-    router.push(`/view?id=${encodeURIComponent(id)}`);
   };
 
   const selectDecade = startYear => {
@@ -235,7 +237,7 @@ export default function Home() {
         { !loading && error && <p>error...</p> }
         { !loading && data && data?.status === 'ERROR' && <p>error...</p> }
         { !loading && data && Number(resultCount) === 0 && <p>ei tuloksia...</p> }
-        { data?.status === 'OK' && <ResultGrid records={data.records} onOpenRecord={openRecord} width="200" height="200"/> }
+        { data?.status === 'OK' && <div ref={resultsRef}><ResultGrid records={data.records} /></div> }
       </div>
       <div className="flex justify-center">
         { !loading && getPagination(false, false)}

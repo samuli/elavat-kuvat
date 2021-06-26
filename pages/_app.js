@@ -1,3 +1,4 @@
+import { RouterScrollProvider } from '@moxy/next-router-scroll';
 import {ErrorBoundary} from 'react-error-boundary';
 import { useRouter } from 'next/router';
 import { AppWrapper } from '@/lib/state';
@@ -26,9 +27,11 @@ function MyApp({ Component, pageProps }) {
       }}
     >
       <AppWrapper>
-        <PageLayout>
-          <Component {...pageProps} />
-        </PageLayout>
+        <RouterScrollProvider disableNextLinkScroll={false}>
+          <PageLayout>
+            <Component {...pageProps} />
+          </PageLayout>
+        </RouterScrollProvider>
       </AppWrapper>
     </ErrorBoundary>
   );
