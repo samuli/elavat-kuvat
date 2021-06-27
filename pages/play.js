@@ -37,7 +37,6 @@ function Play() {
   const [ videoStarted, setVideoStarted ] = useState(false);
   const timerRef = useRef(null);
   const mouseListenerRef = useRef(null);
-
   const timeRef = useRef();
 
   const id = router.query.id;
