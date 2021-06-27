@@ -186,7 +186,7 @@ export default function View() {
                 <div className="md:ml-8 flex flex-col justify-center mt-8 md:mt-0">
                   <Header record={rec} />
                   {videoUrls.length > 1 && <ul className="mt-5">{videoUrls.map(({ src, title }, idx) => (
-                    <AppLink href={videoPage(rec.id, idx + 1)}><a>
+                    <AppLink key={`video-${idx}`} href={videoPage(rec.id, idx + 1)}><a>
                       <li className="flex my-2 items-center group text-gray-100 hover:text-white">
                         <SmallPlayButton big={false} /><div className="ml-3">{title}</div>
                       </li>
