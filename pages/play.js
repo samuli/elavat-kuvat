@@ -3,6 +3,8 @@ import clsx from 'clsx';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import useSWR from 'swr';
+import { createClient } from '@supabase/supabase-js'
+
 import AppLink from '@/components/Link';
 import { useAppState } from '@/lib/state';
 import { recordUrl } from '@/lib/api';
@@ -13,6 +15,19 @@ import { FullscreenLayout } from '@/components/layout';
 import ReactPlayer from 'react-player/file'
 import { FaArrowLeft as BackIcon } from 'react-icons/fa';
 import HeadTags from '@/components/Head';
+
+const trackMovieView = async (id) => {
+  if (process.env.NEXT_PUBLIC_TRACK_MOVIE_VIEW !== '1'  ) {
+    return;
+  }
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_KEY
+  );
+  const {} = await supabase.rpc('increment_view_cnt', {
+      m_id: id
+  });
+};
 
 function Play() {
   const state = useAppState();
@@ -25,6 +40,9 @@ function Play() {
 
   const timeRef = useRef();
 
+  const id = router.query.id;
+  const clip = router.query.clip || 1;
+
   useEffect(() => {
     const mouseMove = () => {
       setShowUI(true);
@@ -32,14 +50,13 @@ function Play() {
       timerRef.current = setTimeout(() => setShowUI(false), 2000);
     }
     window.addEventListener("mousemove", mouseMove);
+    trackMovieView(id);
     return () => {
       clearTimeout(timerRef.current);
       window.removeEventListener("mousemove", mouseMove);
     }
   }, []);
 
-  const id = router.query.id;
-  const clip = router.query.clip || 1;
 
   const { data, error, loading, ...rest } = useSWR(id ? recordUrl(id) : null, Fetcher);
   const rec = data && !error && data.resultCount > 0 && data.records[0];

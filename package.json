@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@moxy/next-router-scroll": "^2.2.0",
+    "@supabase/supabase-js": "^1.15.1",
     "@tailwindcss/aspect-ratio": "^0.2.1",
     "clsx": "^1.1.1",
     "downshift": "^6.1.3",
