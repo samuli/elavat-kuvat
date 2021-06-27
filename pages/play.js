@@ -42,6 +42,14 @@ function Play() {
   const id = router.query.id;
   const clip = router.query.clip || 1;
 
+
+  useEffect(() => {
+    if (!router.isReady) {
+      return;
+    }
+    trackMovieView(id);
+  }, [router.isReady, id]);
+
   useEffect(() => {
     const mouseMove = () => {
       setShowUI(true);
@@ -49,7 +57,6 @@ function Play() {
       timerRef.current = setTimeout(() => setShowUI(false), 2000);
     }
     window.addEventListener("mousemove", mouseMove);
-    trackMovieView(id);
     return () => {
       clearTimeout(timerRef.current);
       window.removeEventListener("mousemove", mouseMove);
