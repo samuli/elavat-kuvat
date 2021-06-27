@@ -224,7 +224,7 @@ export default function Search() {
 
           {/* { <Select items={decades} placeholder="Vuosikymmen" activeItem={rangeYears && rangeYears[0]} onSelect={(year) => selectDecade(Number(year))} /> } */}
           <div className="h-16 min-h-32 w-full mt-1 mb-3">
-            { topicFacets?.status === 'OK' && topicFacets.facets && <FacetStripe facet="topic_facet" facets={topicFacets.facets.topic_facet} facetUrl={facetSearchUrl} truncate={true} /> }
+            { topicFacets?.status === 'OK' && topicFacets.facets && <FacetStripe facet="topic_facet" facets={topicFacets.facets.topic_facet.filter(f => f.value !== topicFacet)} facetUrl={facetSearchUrl} truncate={true} /> }
     </div>
 
 
