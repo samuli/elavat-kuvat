@@ -37,7 +37,7 @@ const useStickySWR = (...args) => {
   };
 };
 
-const PageMenu = ({ items, activePage, onPageSelect, small = false }) => {
+const PageMenu = ({ items, activePage = 1, onPageSelect, small = false }) => {
   return (
     <select
       aria-label="Siirry sivulle"
@@ -45,7 +45,7 @@ const PageMenu = ({ items, activePage, onPageSelect, small = false }) => {
       value={activePage}
       className={clsx(
         "-appearance-none outline-none w-auto border bg-gray-100 border-gray-400 rounded-md text-gray-900 cursor-pointer",
-        !small && "mx-3 px-3 py-3 text-xl",
+        !small && "mx-3 px-3 py-2 text-md",
         small && "mx-1 px-1 py-1 text-xs"
       )}>
       { items.map((item, idx) => {
@@ -108,7 +108,7 @@ export default function Search() {
   const [ lookfor, setLookfor ] = useState(router.query.lookfor);
   const [ currentLookfor, setCurrentLookfor ] = useState(lookfor);
   const [ nextLookfor, setNextLookfor ] = useState(lookfor);
-  const [ page, setPage ] = useState(Number(router.query.page));
+  const [ page, setPage ] = useState(Number(router.query?.page || 1));
   const [ resetScroll, setResetScroll ] = useState(false);
   const [ loading, setLoading ] = useState(false);
 

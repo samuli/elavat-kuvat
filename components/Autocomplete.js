@@ -6,7 +6,6 @@ import useSWR from 'swr';
 import clsx from 'clsx';
 import NProgress from "nprogress";
 
-import { FaSearch, FaSpinner } from 'react-icons/fa'
 import AppLink from '@/components/Link';
 import { autocompleteUrl } from '@/lib/api';
 import Fetcher from '@/lib/fetcher';
@@ -14,7 +13,7 @@ import { recordUrl } from '@/lib/record';
 import { Image } from '@/components/ImageGrid';
 import Spinner from '@/components/Spinner';
 
-const Autocomplete = () => {
+const Autocomplete = ({ ref, onSearch, onRecordSelect }) => {
   const [ inputItems, setInputItems ] = useState([]);
   const [ resultCount, setResultCount ] = useState(0);
   const [ lookfor, setLookfor ] = useState();
@@ -99,12 +98,10 @@ const Autocomplete = () => {
 
   const searchResultsUrl = term => `/search?lookfor=${encodeURIComponent(term)}`;
 
-  const icon = <FaSearch className="animate-spin" style={{ width: '20px', height: '20px'}} className="text-gray-100" />;
-
   const menuItemClasses = active => clsx('p-1 hover:text-gray-100', active && 'bg-gradient-to-r from-pink-500 to-pink-400');
 
   return (
-    <div className="w-full md:justify-end px-5 bg-gray-900">
+    <div className="w-full md:justify-end">
       <div className="w-full flex max-w-xl justify-center items-center">
 
         <div className="w-full" {...getComboboxProps()}>
@@ -122,6 +119,7 @@ const Autocomplete = () => {
                     e.nativeEvent.preventDownshiftDefault = true;
                     router.push(searchResultsUrl(term));
                     setLookfor("");
+                    onSearch();
                   } else if (typeof inputItems[highlightedIndex] !== 'undefined') {
                     const item = inputItems[highlightedIndex];
                     if (item.type === 'RECORD') {
@@ -129,6 +127,7 @@ const Autocomplete = () => {
                     } else {
                       router.push(searchResultsUrl(lookfor));
                     }
+                    onRecordSelect();
                   }
                   debounced.cancel();
                   setLoading(false);
@@ -136,15 +135,13 @@ const Autocomplete = () => {
                   reset();
                 }
               },
+              ref,
               type: "search",
               placeholder: "Hae..."
             })}
             style={{ }}
-            className="w-full px-4 my-2 py-1 rounded-lg text-lg text-gray-900 focus:outline-none ring-inset focus:ring-2 focus:ring-pink-500"
+            className="w-full px-4 py-1 rounded-lg text-lg text-gray-900 focus:outline-none ring-inset focus:ring-2 focus:ring-pink-500"
           />
-        </div>
-        <div className="overflow-hidden ml-2">
-          { icon } <label {...getLabelProps()} className="hidden">Hae lyhytelokuvia:</label>
         </div>
       </div>
 
