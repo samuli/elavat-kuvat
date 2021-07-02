@@ -11,7 +11,13 @@ const wrapItem = (id, children) => {
     : <AppLink key={id} href={`/view?id=${encodeURIComponent(id)}`}><a>{children}</a></AppLink>;
 };
 
-export const ResultGrid = ({ records }) => (
+const wrapImage = (lazy, children) => {
+  return lazy
+    ? <LazyLoad offset={100} once>{children}</LazyLoad>
+    : children;
+}
+
+export const ResultGrid = ({ records, lazy = true }) => (
   <div>
     <ul className="flex flex-row flex-wrap justify-between. overflow-hidden.">
       {records?.map((rec,i) => (
@@ -20,11 +26,11 @@ export const ResultGrid = ({ records }) => (
 
             <div className="flex flex-col">
               <div className="overflow-hidden aspect-w-5 aspect-h-4">
-                {rec?.images.length > 0 && <LazyLoad offset={100} once>
+                {rec?.images.length > 0 && wrapImage(lazy,
                   <img className="object-cover object-center"
                     src={`https://api.finna.fi${rec.images[0]}&w=300`} alt=""
                   />
-                </LazyLoad>}
+                )}
               </div>
               <div className="w-full bg-gray-900 pt-2 px-3 text-center text-gray-200 overflow-hidden text-sm md:text-md line-clamp-2 h-10 group-hover:text-white leading-tight">{rec?.title || ""}</div>
             </div>

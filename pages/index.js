@@ -90,7 +90,7 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
           <div className="mt-6">
 
               <div className="flex flex-col ">
-                <ResultGrid records={data?.records ? data.records.slice(0,8) : Array.from(Array(8))} />
+                <ResultGrid lazy={false} records={data?.records ? data.records.slice(0,8) : Array.from(Array(8))} />
                 <AppLink href="/search"><a>
                   <div role="button" className="flex justify-center mt-6 mb-4 py-3 px-4 text-sm font-semibold tracking-tight uppercase rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer bg-gradient-to-b from-gray-100 to-gray-300 hover:from-white hover:to-white">
                     <div className="flex justify-center items-center">
