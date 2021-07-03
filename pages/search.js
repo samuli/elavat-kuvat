@@ -86,7 +86,6 @@ const Pagination = ({ results, page, pageCount, setPage, loading, showResultCoun
    );
 };
 
-
 const Results = ({ data }) => (
   <div>
     {data?.status === 'OK' &&
@@ -101,7 +100,7 @@ const Results = ({ data }) => (
   </div>
 );
 
-export default function Search() {
+export default function Search({ topicFacet = null, initialTopicFacets = null, genreFacet = null, daterange = null, records = null }) {
   const router = useRouter();
   const { updateScroll } = useRouterScroll();
 
@@ -136,12 +135,14 @@ export default function Search() {
         clearTimeout(forceCheckRef.current);
       }
       forceCheckRef.current = setTimeout(() => forceCheck(), 100);
-    }
+    },
+    initialData: records
   };
-  const topicFacet = router.query?.topic_facet;
-  const genreFacet = router.query?.genre_facet;
-  const daterange = router.query?.date;
+
+  daterange = daterange || router.query?.date;
   let rangeYears = daterange && daterange.split('-') || null;
+  topicFacet = topicFacet || router.query?.topic_facet;
+  genreFacet = genreFacet || router.query?.genre_facet;
 
   const { data, error } = useStickySWR(typeof nextLookfor !== 'undefined'
     ? searchUrl(nextLookfor, page, topicFacet, genreFacet, rangeYears) : null,
@@ -150,7 +151,7 @@ export default function Search() {
 
   const { data: topicFacets } = useSWR(typeof nextLookfor !== 'undefined'
     ? topicFacetsUrl(nextLookfor, topicFacet, genreFacet, rangeYears) : null
-    , Fetcher)
+    , Fetcher, { initialData: initialTopicFacets })
 
 
   const queryUpdated = () => {
@@ -161,11 +162,12 @@ export default function Search() {
   };
 
   useEffect(() => {
-    if (!router.isReady) {
+    if (!router.isReady && !data) {
       return;
     }
     queryUpdated();
   }, [router.isReady, router.query]);
+
 
   useEffect(() => {
     updateScroll();
@@ -182,6 +184,7 @@ export default function Search() {
     setLoading(false);
     setResetScroll(true);
     router.query.page = page;
+    router.pathname = '/search';
     router.push(router);
   };
 
@@ -193,12 +196,16 @@ export default function Search() {
     router.push(`/search?${facet}=${encodeURIComponent(value)}`);
   };
 
-  const resultCount = data && data.resultCount || null;
+  const results = data || records;
+  const _topicFacets = topicFacets || initialTopicFacets;
+
+
+  const resultCount = results && results.resultCount || null;
   const isFaceted = topicFacet || genreFacet;
 
-  const pageCount = data && data.resultCount && Math.ceil(Number(data.resultCount)/searchLimit);
+  const pageCount = results && results.resultCount && Math.ceil(Number(results.resultCount)/searchLimit);
 
-  const getPagination = (small = false, showResultCount = true) => data && resultCount > 0 && (
+  const getPagination = (small = false, showResultCount = true) => results && resultCount > 0 && (
     <div className="">
       <Pagination results={resultCount} page={page} pageCount={pageCount} setPage={(page) => changePage(page)}
                   loading={loading} showResultCount={showResultCount} limit={searchLimit} small={small} />
@@ -224,7 +231,7 @@ export default function Search() {
 
           {/* { <Select items={decades} placeholder="Vuosikymmen" activeItem={rangeYears && rangeYears[0]} onSelect={(year) => selectDecade(Number(year))} /> } */}
           <div className="h-16 min-h-32 w-full mt-1 mb-3">
-            { topicFacets?.status === 'OK' && topicFacets.facets && <FacetStripe facet="topic_facet" facets={topicFacets.facets.topic_facet.filter(f => f.value !== topicFacet)} facetUrl={facetSearchUrl} truncate={true} /> }
+            { _topicFacets?.status === 'OK' && _topicFacets.facets && <FacetStripe facet="topic_facet" facets={_topicFacets.facets.topic_facet.filter(f => f.value !== topicFacet)} facetUrl={facetSearchUrl} truncate={true} /> }
     </div>
 
 
@@ -232,9 +239,9 @@ export default function Search() {
       </div>
       <div className="mt-6">
         { !loading && error && <p>error...</p> }
-        { !loading && data && data?.status === 'ERROR' && <p>error...</p> }
-        { !loading && data && Number(resultCount) === 0 && <p>ei tuloksia...</p> }
-        { data?.status === 'OK' && <ResultGrid records={data.records} /> }
+        { !loading && results && results?.status === 'ERROR' && <p>error...</p> }
+        { !loading && results && Number(resultCount) === 0 && <p>ei tuloksia...</p> }
+        { results?.status === 'OK' && <ResultGrid records={results.records} /> }
       </div>
       <div className="flex justify-center">
         { !loading && getPagination(false, false)}

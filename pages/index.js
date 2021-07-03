@@ -10,13 +10,13 @@ import { ResultGrid } from '@/components/ImageGrid';
 import { SearchHeading } from '@/components/Typo';
 import { FacetStripe } from '@/components/Topics';
 import HeadTags from '@/components/Head'
-import { facetSearchUrl, filterFacetFields, yearTitle } from '@/lib/util';
+import { facetBrowseUrl, filterFacetFields, yearTitle } from '@/lib/util';
 import { decades } from '@/components/DecadeFilter';
 
 const DecadeFilter = ({ title, startYear }) => {
   const endYear = startYear < 2000 ? startYear+9 : "*";
   return (
-    <AppLink href={`/search?date=${startYear}-${endYear}`}><a>
+    <AppLink href={`/browse/date/${startYear}-${endYear}`}><a>
       <div role="button" className="text-md text-gray-800  uppercase tracking-tight bg-gradient-to-b from-gray-100 to-gray-300 py-1 px-2 rounded-lg cursor-pointer hover:from-white hover:to-white">
         {title}
       </div>
@@ -82,7 +82,7 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
               <div className="flex flex-col flex-wrap md:flex-nowrap">
                 <SearchHeading title="Yleisimmät aiheet" />
                 <div className="h-16 min-h-32 w-full mt-1 mb-3">
-                  { topicFacets && <FacetStripe title="Aiheet" facet="topic_facet" facets={topicFacets.facets.topic_facet} facetUrl={facetSearchUrl} truncate={true}/> }
+                  { topicFacets && <FacetStripe title="Aiheet" facet="topic_facet" facets={topicFacets.facets.topic_facet} facetUrl={facetBrowseUrl} truncate={true}/> }
                 </div>
               </div>
            </div>
@@ -112,7 +112,7 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
 
               <div className="mt-2">
                 <SearchHeading title="Genret" />
-                { genreFacets && <FacetStripe title="Genret" facet="genre_facet" facets={filterFacetFields(genreFacets.facets.genre_facet)} facetUrl={facetSearchUrl} /> }
+                { genreFacets && <FacetStripe title="Genret" facet="genre_facet" facets={filterFacetFields(genreFacets.facets.genre_facet)} facetUrl={facetBrowseUrl} /> }
               </div>
             </div>
           </div>
