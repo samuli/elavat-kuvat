@@ -26,7 +26,7 @@ export const ResultGrid = ({ records, lazy = true }) => (
 
             <div className="flex flex-col">
               <div className="overflow-hidden aspect-w-5 aspect-h-4">
-                {rec?.images.length > 0 && wrapImage(lazy,
+                {rec?.images.length > 0 && wrapImage(lazy && i >= 8,
                   <img className="object-cover object-center"
                     src={`https://api.finna.fi${rec.images[0]}&w=300`} alt=""
                   />
