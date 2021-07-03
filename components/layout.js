@@ -9,6 +9,7 @@ const Autocomplete = dynamic(() => import('@/components/Autocomplete'));
 
 
 const Header = () => {
+
   const router = useRouter();
   const [ showSearch, setShowSearch ] = useState(false);
   const [ animateOn, setAnimateOn ] = useState(false);
