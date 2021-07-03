@@ -71,8 +71,6 @@ const NaviButton = ({ children, onClick, disabled, small = false }) => (
 );
 
 const Pagination = ({ results, page, pageCount, setPage, loading, showResultCount, small = false }) => {
-  if (pageCount === 1) return null;
-
   const pageIdxs = Array.from(Array(pageCount), (_el,i) => i+1);
   const scrollButtons = pageCount > 1;
 
@@ -100,6 +98,8 @@ const Results = ({ data }) => (
   </div>
 );
 
+const getPageCount = (results) => Math.ceil(Number(results)/searchLimit);
+
 export default function Search({ topicFacet = null, initialTopicFacets = null, genreFacet = null, daterange = null, records = null }) {
   const router = useRouter();
   const { updateScroll } = useRouterScroll();
@@ -110,6 +110,8 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
   const [ page, setPage ] = useState(Number(router.query?.page || 1));
   const [ resetScroll, setResetScroll ] = useState(false);
   const [ loading, setLoading ] = useState(false);
+  const [ resultCount, setResultCount ] = useState(records ? records.resultCount : null);
+  const [ pageCount, setPageCount ] = useState(records ? getPageCount(records.resultCount) : null);
 
   const forceCheckRef = useRef();
   const opt = {
@@ -123,10 +125,12 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
       NProgress.done();
       setCurrentLookfor(nextLookfor);
     },
-    onSuccess: (_data, _key, _config) => {
+    onSuccess: (data, _key, _config) => {
       NProgress.done();
       setLoading(false);
       setCurrentLookfor(nextLookfor);
+      setResultCount(data.resultCount || 0);
+      setPageCount(getPageCount(data.resultCount));
       if (resetScroll) {
         window.scrollTo(0,0);
         setResetScroll(false);
@@ -141,8 +145,8 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
 
   daterange = daterange || router.query?.date;
   let rangeYears = daterange && daterange.split('-') || null;
-  topicFacet = topicFacet || router.query?.topic_facet;
-  genreFacet = genreFacet || router.query?.genre_facet;
+  topicFacet = topicFacet || router.query?.topic;
+  genreFacet = genreFacet || router.query?.genre;
 
   const { data, error } = useStickySWR(typeof nextLookfor !== 'undefined'
     ? searchUrl(nextLookfor, page, topicFacet, genreFacet, rangeYears) : null,
@@ -199,13 +203,9 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
 
   const results = data || records;
   const _topicFacets = initialTopicFacets || topicFacets;
-
-  const resultCount = results && results.resultCount || null;
   const isFaceted = topicFacet || genreFacet;
 
-  const pageCount = results && results.resultCount && Math.ceil(Number(results.resultCount)/searchLimit);
-
-  const getPagination = (small = false, showResultCount = true) => results && resultCount > 0 && (
+  const getPagination = (small = false, showResultCount = true) => pageCount > 1 && (
     <div className="">
       <Pagination results={resultCount} page={page} pageCount={pageCount} setPage={(page) => changePage(page)}
                   loading={loading} showResultCount={showResultCount} limit={searchLimit} small={small} />
