@@ -149,10 +149,11 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
     Fetcher, opt
   );
 
-  const { data: topicFacets } = useSWR(typeof nextLookfor !== 'undefined'
-    ? topicFacetsUrl(nextLookfor, topicFacet, genreFacet, rangeYears) : null
-    , Fetcher, { initialData: initialTopicFacets })
-
+  const { data: topicFacets } = !initialTopicFacets
+    ? useSWR(typeof nextLookfor !== 'undefined'
+      ? topicFacetsUrl(nextLookfor, topicFacet, genreFacet, rangeYears) : null
+      , Fetcher, { initialData: initialTopicFacets })
+    : { data: null }
 
   const queryUpdated = () => {
     const l = router.query.lookfor ?? '';
@@ -197,8 +198,7 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
   };
 
   const results = data || records;
-  const _topicFacets = topicFacets || initialTopicFacets;
-
+  const _topicFacets = initialTopicFacets || topicFacets;
 
   const resultCount = results && results.resultCount || null;
   const isFaceted = topicFacet || genreFacet;
