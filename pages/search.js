@@ -140,8 +140,10 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
       }
       forceCheckRef.current = setTimeout(() => forceCheck(), 100);
     },
-    initialData: records
   };
+  if (records) {
+    opt.initialData = records;
+  }
 
   daterange = daterange || router.query?.date;
   let rangeYears = daterange && daterange.split('-') || null;
@@ -201,7 +203,7 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
     router.push(`/search?${facet}=${encodeURIComponent(value)}`);
   };
 
-  const results = data || records;
+  const results = data;
   const _topicFacets = initialTopicFacets || topicFacets;
   const isFaceted = topicFacet || genreFacet;
 
@@ -228,8 +230,6 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
           { daterange && getHeading("Aikakausi", yearTitle(rangeYears[0])) }
           { !isFaceted && !daterange &&
             <div className="">{getHeading("Haku", currentLookfor, !currentLookfor)}</div> }
-
-          {/* { <Select items={decades} placeholder="Vuosikymmen" activeItem={rangeYears && rangeYears[0]} onSelect={(year) => selectDecade(Number(year))} /> } */}
           <div className="h-16 min-h-32 w-full mt-1 mb-3">
             { _topicFacets?.status === 'OK' && _topicFacets.facets && <FacetStripe facet="topic_facet" facets={_topicFacets.facets.topic_facet.filter(f => f.value !== topicFacet)} facetUrl={facetSearchUrl} truncate={true} /> }
     </div>
