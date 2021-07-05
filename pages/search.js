@@ -141,7 +141,7 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
       forceCheckRef.current = setTimeout(() => forceCheck(), 100);
     },
   };
-  if (records) {
+  if (records && page === 1) {
     opt.initialData = records;
   }
 
@@ -191,7 +191,6 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
     setLoading(false);
     setResetScroll(true);
     router.query.page = page;
-    router.pathname = '/search';
     router.push(router);
   };
 
