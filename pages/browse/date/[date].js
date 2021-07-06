@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router';
 import Search from '@/pages/search';
 import Fetcher from '@/lib/fetcher';
 import { searchUrl, topicFacetsUrl } from '@/lib/api';
@@ -15,7 +14,8 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  const rangeYears = params.date.split('-');
+  const daterange = params.date;
+  const rangeYears = daterange.split('-');
   const records = await Fetcher(searchUrl('', 1, null, null, rangeYears));
   const topics = await Fetcher(topicFacetsUrl('', null, null, rangeYears));
   const topicsFiltered = {
@@ -26,14 +26,9 @@ export async function getStaticProps({ params }) {
         : []
     }
   };
-  return { props: { records, topics: topicsFiltered } };
+  return { props: { daterange, records, topics: topicsFiltered } };
 }
 
-export default function Date({ records, topics }) {
-  const router = useRouter();
-  const daterange = router.query?.date;
-  if (typeof router.query !== 'undefined' && router.query.page && Number(router.query.page) !== 1) {
-    records = null;
-  }
-  return <Search daterange={daterange} initialTopicFacets={topics} records={records} />;
+export default function Date({ daterange, records, topics }) {
+  return <Search daterange={daterange} initialTopicFacets={topics} records={records}  queryKey="date" queryValue={daterange} />;
 };

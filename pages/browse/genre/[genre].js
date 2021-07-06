@@ -1,5 +1,3 @@
-import { useRouter } from 'next/router';
-
 import Search from '@/pages/search';
 import Fetcher from '@/lib/fetcher';
 import { searchUrl, genreFacetsUrl, topicFacetsUrl } from '@/lib/api';
@@ -32,9 +30,5 @@ export async function getStaticProps({ params }) {
 }
 
 export default function Genre({ genre, topics, records }) {
-  const router = useRouter();
-  if (typeof router.query !== 'undefined' && router.query.page && Number(router.query.page) !== 1) {
-    records = null;
-  }
-  return <Search genreFacet={genre} initialTopicFacets={topics} records={records} />;
+  return <Search genreFacet={genre} initialTopicFacets={topics} records={records}  queryKey="genre" queryValue={genre} />;
 };

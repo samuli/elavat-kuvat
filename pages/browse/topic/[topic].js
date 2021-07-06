@@ -1,5 +1,3 @@
-import { useRouter } from 'next/router';
-
 import Search from '@/pages/search';
 import Fetcher from '@/lib/fetcher';
 import { searchUrl, topicFacetsUrl } from '@/lib/api';
@@ -10,7 +8,7 @@ export async function getStaticPaths() {
 
   return {
     paths: topics?.facets.topic_facet.map((topic) => {
-      return { params: { topic: topic.value } };
+      return { params: { topic: topic.value} };
     }),
     fallback: false
   }
@@ -28,13 +26,11 @@ export async function getStaticProps({ params }) {
         : []
     }
   };
+
+
   return { props: { topic, records, topics: topicsFiltered } };
 }
 
 export default function Topic({ topic, topics, records }) {
-  const router = useRouter();
-  if (typeof router.query !== 'undefined' && router.query.page && Number(router.query.page) !== 1) {
-    records = null;
-  }
-  return <Search topicFacet={topic} initialTopicFacets={topics} records={records} />;
+  return <Search topicFacet={topic} initialTopicFacets={topics} records={records} queryKey="topic" queryValue={topic} />;
 };

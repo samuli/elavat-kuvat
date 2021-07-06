@@ -84,7 +84,10 @@ const Results = ({ data }) => (
 
 const getPageCount = (results) => Math.ceil(Number(results)/searchLimit);
 
-export default function Search({ topicFacet = null, initialTopicFacets = null, genreFacet = null, daterange = null, records = null }) {
+export default function Search({
+  topicFacet = null, initialTopicFacets = null, genreFacet = null, daterange = null, records = null,
+  queryKey = null, queryValue = null
+}) {
   const router = useRouter();
   const { updateScroll } = useRouterScroll();
 
@@ -176,6 +179,10 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
     setLoading(false);
     setResetScroll(true);
     setPage(idx);
+    router.pathname = '/search';
+    if (queryKey && queryValue) {
+      router.query[queryKey] = queryValue;
+    }
     router.query.page = idx;
     router.push(router);
   };
