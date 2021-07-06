@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { useQuery } from 'react-query';
 import { createClient } from '@supabase/supabase-js'
 
+
 import AppLink from '@/components/Link';
 import { useAppState } from '@/lib/state';
 import { recordUrl } from '@/lib/api';
