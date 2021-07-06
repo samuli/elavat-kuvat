@@ -32,5 +32,8 @@ export async function getStaticProps({ params }) {
 export default function Date({ records, topics }) {
   const router = useRouter();
   const daterange = router.query?.date;
+  if (typeof router.query !== 'undefined' && router.query.page && Number(router.query.page) !== 1) {
+    records = null;
+  }
   return <Search daterange={daterange} initialTopicFacets={topics} records={records} />;
 };

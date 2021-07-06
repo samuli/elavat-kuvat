@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import HeadTags from '@/components/Head';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
-import useSWR from 'swr';
+import { useQuery } from 'react-query';
+import { useDebouncedCallback } from 'use-debounce';
 import clsx from 'clsx';
-import NProgress from "nprogress";
 import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon } from 'react-icons/fa';
 import { useAppDispatch, CMD_PAGE_LOADED } from '@/lib/state';
 import { recordUrl } from '@/lib/api';
@@ -15,7 +15,7 @@ import { Image } from '@/components/ImageGrid';
 import { FacetStripe } from '@/components/Topics';
 import { SearchHeading } from '@/components/Typo';
 import Fetcher from '@/lib/fetcher';
-import { facetSearchUrl } from '@/lib/util';
+import { facetSearchUrl, useProgress } from '@/lib/util';
 
 const Copyright = ({ record }) => {
   const d = record.rawData;
@@ -138,30 +138,15 @@ const Description = ({ text }) => {
 export default function View() {
   const appDispatch = useAppDispatch();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
   const id = router.query.id;
 
   useEffect(() => {
     appDispatch({ type: CMD_PAGE_LOADED });
   }, []);
 
-  const opt = {
-    loadingTimeout: 1,
-    onLoadingSlow: (_key, _config) => {
-      NProgress.start();
-      setLoading(true);
-    },
-    onError: (_err, _key, config) => {
-      NProgress.done();
-      setLoading(false);
-    },
-    onSuccess: (_data, _key, _config) => {
-      NProgress.done();
-      setLoading(false);
-    }
-  };
+  const { data, status, error, isFetching } = useQuery(recordUrl(id), { enabled: !!id} );
 
-  const { data, error, ...rest } = useSWR(id ? recordUrl(id) : null, Fetcher, opt);
+  useProgress(isFetching);
 
   const rec = data && !error && data.resultCount > 0 && data.records[0];
 
@@ -175,7 +160,7 @@ export default function View() {
       <HeadTags title={rec && rec.title} description={rec && rec.rawData?.description }/>
       <div className="mt-4">
         <article>
-          {!loading && rec && (
+          {!isFetching && rec && (
             <>
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-3/5 w-full">

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
-import useSWR from 'swr';
+import { useQuery } from 'react-query';
 import { createClient } from '@supabase/supabase-js'
 
 import AppLink from '@/components/Link';
@@ -64,11 +64,10 @@ function Play() {
   }, []);
 
 
-  const { data, error, loading, ...rest } = useSWR(id ? recordUrl(id) : null, Fetcher);
+  const { data, error, isFetching } = useQuery(recordUrl(id), { enabled: router.isReady });
   const rec = data && !error && data.resultCount > 0 && data.records[0];
 
-  if (loading) return <p>loading...</p>;
-  if (!loading && data && !rec) return <p>error...</p>;
+  if (!isFetching && data && !rec) return <p>error...</p>;
 
   const videoUrls = extractVideoUrls(rec);
   const videoUrl = videoUrls[clip-1];

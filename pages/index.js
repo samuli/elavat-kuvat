@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import useSWR from 'swr';
-import NProgress from "nprogress";
+import { useQuery } from 'react-query';
 import { useRouterScroll } from '@moxy/next-router-scroll';
 
 import AppLink from '@/components/Link';
@@ -10,7 +9,7 @@ import { ResultGrid } from '@/components/ImageGrid';
 import { SearchHeading } from '@/components/Typo';
 import { FacetStripe } from '@/components/Topics';
 import HeadTags from '@/components/Head'
-import { facetBrowseUrl, filterFacetFields, yearTitle } from '@/lib/util';
+import { facetBrowseUrl, filterFacetFields, yearTitle, useProgress } from '@/lib/util';
 import { decades } from '@/components/DecadeFilter';
 
 const DecadeFilter = ({ title, startYear }) => {
@@ -35,7 +34,6 @@ const DecadeFilters = ({ items }) => (
 );
 
 export async function getStaticProps(context) {
-  //const randomClips = await Fetcher(frontPageUrl());
   const topics = await Fetcher(topicFacetsUrl());
   const topicsFiltered = { facets: { topic_facet: filterFacetFields(topics.facets.topic_facet) }};
   const genres = await Fetcher(genreFacetsUrl);
@@ -48,25 +46,12 @@ export async function getStaticProps(context) {
 const FrontPage = ({ randomClips, topics, genres, decades }) => {
   const { updateScroll } = useRouterScroll();
 
-  const opt = {
-    initialData: randomClips,
-    loadingTimeout: 10,
-    onLoadingSlow: () => {
-
-      NProgress.start();
-    },
-    onError: () => {
-      NProgress.done();
-    },
-    onSuccess: () => {
-      NProgress.done();
-    }
-  };
-
   const [ randomClipsUrl ] = useState(frontPageUrl());
-  const { data } = useSWR(typeof randomClipsUrl !== 'undefined' ? randomClipsUrl : null, Fetcher, opt);
-  const { data: topicFacets } = useSWR(topicFacetsUrl, Fetcher, { initialData: topics }  )
-  const { data: genreFacets } = useSWR(genreFacetsUrl, Fetcher, { initialData: genres });
+  const { data, isFetching } = useQuery(randomClipsUrl, { initialData: randomClips });
+  const { data: topicFacets } = useQuery(topicFacetsUrl(), { initialData: topics, refetchOnMount: false } )
+  const { data: genreFacets } = useQuery(genreFacetsUrl, { initialData: genres, refetchOnMount: false });
+
+  useProgress(isFetching);
 
   useEffect(() => {
     updateScroll();
@@ -76,7 +61,6 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
     <div>
       <HeadTags />
       <>
-
         <div>
             <div className="pt-2 w-full">
               <div className="flex flex-col flex-wrap md:flex-nowrap">

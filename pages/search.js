@@ -1,12 +1,12 @@
 import clsx from 'clsx';
-import useSWR from 'swr';
+import { useQuery } from 'react-query';
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { useUpdate } from 'react-use';
 import { forceCheck } from 'react-lazyload';
-import NProgress from "nprogress";
 import { useRouterScroll } from '@moxy/next-router-scroll';
 import HeadTags from '@/components/Head';
 import Select from '@/components/Select';
+
 import { SearchHeading } from '@/components/Typo';
 import Fetcher from '@/lib/fetcher';
 import { useRouter } from 'next/router';
@@ -19,23 +19,7 @@ import { searchUrl, searchLimit, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
 import DecadeFilters, { decades, getSearchUrl } from '@/components/DecadeFilter';
 import { FacetStripe } from '@/components/Topics';
-import { facetSearchUrl, yearTitle } from '@/lib/util';
-
-const useStickySWR = (...args) => {
-  const val = useRef();
-  const { data, error, loading, ...rest } = useSWR(...args);
-
-  if (data !== undefined) {
-    val.current = data;
-  }
-
-  return {
-    ...rest,
-    loading,
-    error,
-    data: val.current,
-  };
-};
+import { facetSearchUrl, yearTitle, useProgress } from '@/lib/util';
 
 const PageMenu = ({ items, activePage = 1, onPageSelect, small = false }) => {
   return (
@@ -104,62 +88,62 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
   const router = useRouter();
   const { updateScroll } = useRouterScroll();
 
+
   const [ lookfor, setLookfor ] = useState(router.query.lookfor);
   const [ currentLookfor, setCurrentLookfor ] = useState(lookfor);
   const [ nextLookfor, setNextLookfor ] = useState(lookfor);
-  const [ page, setPage ] = useState(Number(router.query?.page || 1));
+  const [ page, setPage ] = useState(router.isReady ? Number(router.query?.page || 1) : null);
   const [ resetScroll, setResetScroll ] = useState(false);
   const [ loading, setLoading ] = useState(false);
   const [ resultCount, setResultCount ] = useState(records ? records.resultCount : null);
   const [ pageCount, setPageCount ] = useState(records ? getPageCount(records.resultCount) : null);
 
   const forceCheckRef = useRef();
-  const opt = {
-    loadingTimeout: 10,
-    onLoadingSlow: (_key, _config) => {
-      NProgress.start();
-      setLoading(true);
-    },
-    onError: (_err, _key, config) => {
-      setLoading(false);
-      NProgress.done();
-      setCurrentLookfor(nextLookfor);
-    },
-    onSuccess: (data, _key, _config) => {
-      NProgress.done();
-      setLoading(false);
-      setCurrentLookfor(nextLookfor);
-      setResultCount(data.resultCount || 0);
-      setPageCount(getPageCount(data.resultCount));
-      if (resetScroll) {
-        window.scrollTo(0,0);
-        setResetScroll(false);
-      }
-      if (forceCheckRef.current) {
-        clearTimeout(forceCheckRef.current);
-      }
-      forceCheckRef.current = setTimeout(() => forceCheck(), 100);
-    },
+
+  const onError = (_e) => {
+    setLoading(false);
+    setCurrentLookfor(nextLookfor);
   };
-  if (records && page === 1) {
-    opt.initialData = records;
-  }
+  const onSuccess = (data) => {
+    setLoading(false);
+    setCurrentLookfor(nextLookfor);
+    setResultCount(data.resultCount || 0);
+    setPageCount(getPageCount(data.resultCount));
+    if (resetScroll) {
+      window.scrollTo(0,0);
+      setResetScroll(false);
+    }
+    if (forceCheckRef.current) {
+      clearTimeout(forceCheckRef.current);
+    }
+    forceCheckRef.current = setTimeout(() => forceCheck(), 100);
+  };
 
   daterange = daterange || router.query?.date;
   let rangeYears = daterange && daterange.split('-') || null;
   topicFacet = topicFacet || router.query?.topic;
   genreFacet = genreFacet || router.query?.genre;
 
-  const { data, error } = useStickySWR(typeof nextLookfor !== 'undefined'
-    ? searchUrl(nextLookfor, page, topicFacet, genreFacet, rangeYears) : null,
-    Fetcher, opt
+  const { data, status, error, isFetching } = useQuery(
+    searchUrl(nextLookfor || "", page, topicFacet, genreFacet, rangeYears),
+    { enabled: (!!page && router.isReady),
+      onError, onSuccess, keepPreviousData: true,
+      refetchOnMount: records === null,
+      initialData: records
+    }
   );
 
-  const { data: topicFacets } = !initialTopicFacets
-    ? useSWR(typeof nextLookfor !== 'undefined'
-      ? topicFacetsUrl(nextLookfor, topicFacet, genreFacet, rangeYears) : null
-      , Fetcher, { initialData: initialTopicFacets })
-    : { data: null }
+  useEffect(() => setLoading(isFetching), [isFetching]);
+  useProgress(isFetching);
+
+  const { data: topicFacets } = useQuery(
+    topicFacetsUrl(nextLookfor || "", topicFacet, genreFacet, rangeYears),
+    {
+      enabled: typeof page !== 'undefined',
+      initialData: initialTopicFacets,
+      refetchOnMount: initialTopicFacets === null
+    }
+  );
 
   const queryUpdated = () => {
     const l = router.query.lookfor ?? '';
@@ -167,6 +151,7 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
     setNextLookfor(l);
     setPage(Number(router.query.page ?? 1));
   };
+
 
   useEffect(() => {
     if (!router.isReady && !data) {
@@ -187,10 +172,11 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
     router.push(router);
   };
 
-  const changePage = (page) => {
+  const changePage = (idx) => {
     setLoading(false);
     setResetScroll(true);
-    router.query.page = page;
+    setPage(idx);
+    router.query.page = idx;
     router.push(router);
   };
 
@@ -202,7 +188,6 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
     router.push(`/search?${facet}=${encodeURIComponent(value)}`);
   };
 
-  const results = data;
   const _topicFacets = initialTopicFacets || topicFacets;
   const isFaceted = topicFacet || genreFacet;
 
@@ -237,13 +222,13 @@ export default function Search({ topicFacet = null, initialTopicFacets = null, g
         </div>
       </div>
       <div className="mt-6">
-        { !loading && error && <p>error...</p> }
-        { !loading && results && results?.status === 'ERROR' && <p>error...</p> }
-        { !loading && results && Number(resultCount) === 0 && <p>ei tuloksia...</p> }
-        { results?.status === 'OK' && <ResultGrid records={results.records} /> }
+        { !isFetching && error && <p>error...</p> }
+        { !isFetching && data && data?.status === 'ERROR' && <p>error...</p> }
+        { !isFetching && data && Number(resultCount) === 0 && <p>ei tuloksia...</p> }
+        { data?.status === 'OK' && <ResultGrid records={data.records} /> }
       </div>
       <div className="flex justify-center">
-        { !loading && getPagination(false, false)}
+        { !isFetching && getPagination(false, false)}
       </div>
     </div>
   )
