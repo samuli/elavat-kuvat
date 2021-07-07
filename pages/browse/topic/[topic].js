@@ -32,5 +32,6 @@ export async function getStaticProps({ params }) {
 }
 
 export default function Topic({ topic, topics, records }) {
+  records.static = true;
   return <Search topicFacet={topic} initialTopicFacets={topics} records={records} queryKey="topic" queryValue={topic} />;
 };

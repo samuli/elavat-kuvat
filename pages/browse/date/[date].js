@@ -30,5 +30,6 @@ export async function getStaticProps({ params }) {
 }
 
 export default function Date({ daterange, records, topics }) {
+  records.static = true;
   return <Search daterange={daterange} initialTopicFacets={topics} records={records}  queryKey="date" queryValue={daterange} />;
 };

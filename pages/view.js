@@ -135,16 +135,19 @@ const Description = ({ text }) => {
   );
 };
 
-export default function View() {
+export default function View({ id = null, recordData = null }) {
   const appDispatch = useAppDispatch();
   const router = useRouter();
-  const id = router.query.id;
+  id = id || router.query.id;
 
   useEffect(() => {
     appDispatch({ type: CMD_PAGE_LOADED });
   }, []);
 
-  const { data, status, error, isFetching } = useQuery(recordUrl(id), { enabled: !!id} );
+  const { data, status, error, isFetching } = useQuery(
+    recordUrl(id),
+    { enabled: !!id, initialData: recordData, refetchOnMount: recordData === null }
+  );
 
   useProgress(isFetching);
 

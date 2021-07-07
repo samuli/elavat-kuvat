@@ -1,6 +1,6 @@
 import Search from '@/pages/search';
 import Fetcher from '@/lib/fetcher';
-import { searchUrl, genreFacetsUrl, topicFacetsUrl } from '@/lib/api';
+import { searchLimit, searchUrl, genreFacetsUrl, topicFacetsUrl } from '@/lib/api';
 import { filterFacetFields } from '@/lib/util';
 
 export async function getStaticPaths() {
@@ -30,5 +30,6 @@ export async function getStaticProps({ params }) {
 }
 
 export default function Genre({ genre, topics, records }) {
+  records.static = true;
   return <Search genreFacet={genre} initialTopicFacets={topics} records={records}  queryKey="genre" queryValue={genre} />;
 };

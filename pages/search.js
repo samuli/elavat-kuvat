@@ -232,7 +232,7 @@ export default function Search({
         { !isFetching && error && <p>error...</p> }
         { !isFetching && data && data?.status === 'ERROR' && <p>error...</p> }
         { !isFetching && data && Number(resultCount) === 0 && <p>ei tuloksia...</p> }
-        { data?.status === 'OK' && <ResultGrid records={data.records} /> }
+        { data?.status === 'OK' && <ResultGrid isStatic={data?.static} records={data.records} /> }
       </div>
       <div className="flex justify-center">
         { !isFetching && getPagination(false, false)}
