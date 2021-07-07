@@ -85,7 +85,7 @@ const Results = ({ data }) => (
 const getPageCount = (results) => Math.ceil(Number(results)/searchLimit);
 
 export default function Search({
-  topicFacet = null, initialTopicFacets = null, genreFacet = null, daterange = null, records = null,
+  topicFacet = null, initialTopicFacets = null, genreFacet = null, daterange = null, records = null, initialPage = null,
   queryKey = null, queryValue = null
 }) {
   const router = useRouter();
@@ -95,7 +95,7 @@ export default function Search({
   const [ lookfor, setLookfor ] = useState(router.query.lookfor);
   const [ currentLookfor, setCurrentLookfor ] = useState(lookfor);
   const [ nextLookfor, setNextLookfor ] = useState(lookfor);
-  const [ page, setPage ] = useState(router.isReady ? Number(router.query?.page || 1) : null);
+  const [ page, setPage ] = useState(initialPage || (router.isReady ? Number(router.query?.page || 1) : null));
   const [ resetScroll, setResetScroll ] = useState(false);
   const [ loading, setLoading ] = useState(false);
   const [ resultCount, setResultCount ] = useState(records ? records.resultCount : null);
@@ -112,6 +112,7 @@ export default function Search({
     setCurrentLookfor(nextLookfor);
     setResultCount(data.resultCount || 0);
     setPageCount(getPageCount(data.resultCount));
+
     if (resetScroll) {
       window.scrollTo(0,0);
       setResetScroll(false);
@@ -127,14 +128,16 @@ export default function Search({
   topicFacet = topicFacet || router.query?.topic;
   genreFacet = genreFacet || router.query?.genre;
 
-  const { data, status, error, isFetching } = useQuery(
+  let { data, status, error, isFetching } = useQuery(
     searchUrl(nextLookfor || "", page, topicFacet, genreFacet, rangeYears),
-    { enabled: (!!page && router.isReady),
+    { enabled: records === null,
       onError, onSuccess, keepPreviousData: true,
-      refetchOnMount: records === null,
-      initialData: records
+      initialData: records,
     }
   );
+  if (records !== null) {
+    data = records;
+  }
 
   useEffect(() => setLoading(isFetching), [isFetching]);
   useProgress(isFetching);
@@ -148,20 +151,20 @@ export default function Search({
     }
   );
 
-  const queryUpdated = () => {
-    const l = router.query.lookfor ?? '';
-    setLookfor(l);
-    setNextLookfor(l);
-    setPage(Number(router.query.page ?? 1));
-  };
+  // const queryUpdated = () => {
+  //   const l = router.query.lookfor ?? '';
+  //   setLookfor(l);
+  //   setNextLookfor(l);
+  //   setPage(Number(initialPage || router.query.page || 1));
+  // };
 
 
-  useEffect(() => {
-    if (!router.isReady && !data) {
-      return;
-    }
-    queryUpdated();
-  }, [router.isReady, router.query]);
+  // useEffect(() => {
+  //   if (!router.isReady && !data) {
+  //     return;
+  //   }
+  //   queryUpdated();
+  // }, [router.isReady, router.query]);
 
 
   useEffect(() => {
@@ -178,12 +181,15 @@ export default function Search({
   const changePage = (idx) => {
     setLoading(false);
     setResetScroll(true);
+
     setPage(idx);
-    router.pathname = '/search';
     if (queryKey && queryValue) {
-      router.query[queryKey] = queryValue;
+      router.query[queryKey] = [queryValue, idx];
+    } else {
+      router.pathname = '/search';
+      router.query.page = idx;
     }
-    router.query.page = idx;
+
     router.push(router);
   };
 
