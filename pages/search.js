@@ -185,6 +185,8 @@ export default function Search({
     setPage(idx);
     if (queryKey && queryValue) {
       router.query[queryKey] = [queryValue, idx];
+    } else if (queryKey === 'clips') {
+      router.query.page = idx;
     } else {
       router.pathname = '/search';
       router.query.page = idx;

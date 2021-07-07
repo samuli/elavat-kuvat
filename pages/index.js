@@ -75,7 +75,7 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
 
               <div className="flex flex-col ">
                 <ResultGrid lazy={false} records={data?.records ? data.records.slice(0,8) : Array.from(Array(8))} />
-                <AppLink href="/search"><a>
+                <AppLink href="/browse/clips/1"><a>
                   <div role="button" className="flex justify-center mt-6 mb-4 py-3 px-4 text-sm font-semibold tracking-tight uppercase rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer bg-gradient-to-b from-gray-100 to-gray-300 hover:from-white hover:to-white">
                     <div className="flex justify-center items-center">
                       <div className="inline-flex">Kaikki klipit</div>
