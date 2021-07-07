@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "NODE_ENV=production; next build",
     "start": "next start",
-    "export": "NODE_ENV=production; next build; next export"
+    "export": "NODE_ENV=production; next build; next export",
+    "download": "node .next/server/download.js",
+    "_download": "dotenv -c -- node .next/server/download.js",
+    "_dev:download": "wait-on .next/server/download.js && dotenv -c -- nodemon .next/server/download.js -w lib"
   },
   "dependencies": {
     "@moxy/next-router-scroll": "^2.2.0",
@@ -24,16 +27,19 @@
     "react-player": "^2.9.0",
     "react-query": "^3.18.1",
     "react-use": "^17.2.4",
-    "use-debounce": "^6.0.1",
-    "video-react": "^0.14.1"
+    "use-debounce": "^6.0.1"
   },
   "devDependencies": {
     "@tailwindcss/line-clamp": "^0.2.1",
+    "Onodemon": "^2.0.9",
     "autoprefixer": "^10.2.6",
+    "dotenv": "^10.0.0",
     "next": "^11.0.0",
+    "node-fetch": "^2.6.1",
     "postcss": "^8.3.5",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "tailwindcss": "^2.2.4"
+    "tailwindcss": "^2.2.4",
+    "wait-on": "^6.0.0"
   }
 }
