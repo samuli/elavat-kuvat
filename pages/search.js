@@ -91,11 +91,11 @@ export default function Search({
   const router = useRouter();
   const { updateScroll } = useRouterScroll();
 
-
   const [ lookfor, setLookfor ] = useState(router.query.lookfor);
   const [ currentLookfor, setCurrentLookfor ] = useState(lookfor);
   const [ nextLookfor, setNextLookfor ] = useState(lookfor);
-  const [ page, setPage ] = useState(initialPage || (router.isReady ? Number(router.query?.page || 1) : null));
+
+  const [ page, setPage ] = useState(initialPage || (typeof router.query.page !== 'undefined' ? Number(router.query.page) : 1));
   const [ resetScroll, setResetScroll ] = useState(false);
   const [ loading, setLoading ] = useState(false);
   const [ resultCount, setResultCount ] = useState(records ? records.resultCount : null);
@@ -184,12 +184,12 @@ export default function Search({
 
     setPage(idx);
     if (queryKey && queryValue) {
-      router.query[queryKey] = [queryValue, idx];
+      router.query[queryKey] = [queryValue, String(idx)];
     } else if (queryKey === 'clips') {
-      router.query.page = idx;
+      router.query.page = String(idx);
     } else {
       router.pathname = '/search';
-      router.query.page = idx;
+      router.query.page = String(idx);
     }
 
     router.push(router);

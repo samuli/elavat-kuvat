@@ -127,7 +127,7 @@ const Autocomplete = ({ ref, onSearch, onRecordSelect }) => {
               placeholder: "Hae..."
             })}
             style={{ }}
-            className="w-full px-4 py-1 rounded-lg text-lg text-gray-900 focus:outline-none ring-inset focus:ring-2 focus:ring-pink-500"
+            className="w-full px-4 py-1 rounded-lg text-lg text-gray-900 placeholder-gray-500 focus:outline-none ring-inset focus:ring-2 focus:ring-pink-500"
           />
         </div>
       </div>

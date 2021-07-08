@@ -16,7 +16,7 @@ const DecadeFilter = ({ title, startYear }) => {
   const endYear = startYear < 2000 ? startYear+9 : "*";
   return (
     <AppLink href={`/browse/date/${startYear}-${endYear}`}><a>
-      <div role="button" className="text-md text-gray-800  uppercase tracking-tight bg-gradient-to-b from-gray-100 to-gray-300 py-1 px-2 rounded-lg cursor-pointer hover:from-white hover:to-white">
+      <div role="button" className="text-md subpixel-antialiased text-gray-800  uppercase tracking-tight bg-gradient-to-b from-gray-100 to-gray-300 py-1 px-2 rounded-lg cursor-pointer ripple-bg-white">
         {title}
       </div>
     </a></AppLink>
@@ -73,12 +73,12 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
 
           <div className="mt-6">
 
-              <div className="flex flex-col ">
+              <div className="flex flex-col text-center">
                 <ResultGrid lazy={false} records={data?.records ? data.records.slice(0,8) : Array.from(Array(8))} />
                 <AppLink href="/browse/clips/1"><a>
-                  <div role="button" className="flex justify-center mt-6 mb-4 py-3 px-4 text-sm font-semibold tracking-tight uppercase rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer bg-gradient-to-b from-gray-100 to-gray-300 hover:from-white hover:to-white">
+                  <div role="button" className="inline-flex mt-6 mb-4 py-3 px-4 text-md subpixel-antialiased font-medium tracking-tight rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer bg-gradient-to-b from-gray-100 to-gray-300 ripple-bg-white">
                     <div className="flex justify-center items-center">
-                      <div className="inline-flex">Kaikki klipit</div>
+                      <div className="inline-flex">Näytä kaikki klipit</div>
                     </div>
                   </div>
                 </a></AppLink>

@@ -124,7 +124,7 @@ const Description = ({ text }) => {
   const parts = text.replace(/<br( )?\/>/g, '\n').split('\n');
   const collapse = parts.length > 1;
   return (
-    <div className="mt-4 font-serif italic  leading-6 text-lg">
+    <div className="mt-4 leading-snug text-md">
       { collapse && (
         <details>
           <summary className="cursor-pointer whitespace-pre-line outline-none">{parts[0]}</summary>
