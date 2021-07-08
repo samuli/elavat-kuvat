@@ -1,10 +1,12 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import HeadTags from '@/components/Head';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { useQuery } from 'react-query';
 import { useDebouncedCallback } from 'use-debounce';
 import clsx from 'clsx';
+import ReactPlayer from 'react-player/file'
+
 import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon } from 'react-icons/fa';
 import { useAppDispatch, CMD_PAGE_LOADED } from '@/lib/state';
 import { recordUrl } from '@/lib/api';
@@ -21,7 +23,6 @@ const Copyright = ({ record }) => {
   const d = record.rawData;
   const copyright = record.imageRights?.copyright;
   const url = record.imageRights?.link;
-
 
   let rightsLink = copyright;
   if (copyright && url) {
@@ -75,33 +76,24 @@ const SmallPlayButton = () => (
   </div>
 );
 
-const Preview = ({ images = [], videoAvailable, recordUrl }) => {
+const Preview = ({ imageUrl }) => {
   return (
     <div className="flex relative items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl group cursor-pointer min-h-64">
       <div className="w-full h-full">
         <div className="aspect-w-5 aspect-h-4">
-          { images.length > 0 && <img alt="" src={`https://api.finna.fi${images[0].replace("size=large", "size=medium")}`} className="w-auto rouded-xl overflow-hidden object-cover object-center" /> }
-          {/* <Image key={images[0]} src={images[0]} width="700" style={{ minHeight: '200px' }} /> */}
+          { imageUrl && <img alt="" src={imageUrl} className="w-auto rouded-xl overflow-hidden object-cover object-center" /> }
         </div>
       </div>
       <div className="absolute align-middle p-10 self-center align-center justify-center flex cursor-pointer">
-        {videoAvailable && <PlayButton big={true} />}
-        {!videoAvailable && (
-          <div className="flex items-center justify-center text-2xl p-4 rounded-md bg-white text-gray-900 group-hover:bg-pink-500 group-hover:text-gray-100">
-            Katso finna.fi:ssä<span className="text-lg ml-4"><ExtLinkIcon /></span>
-          </div>)}
+        <div className="flex items-center justify-center text-2xl p-4 rounded-md bg-white text-gray-900 group-hover:bg-pink-500 group-hover:text-gray-100">
+          Katso finna.fi:ssä<span className="text-lg ml-4"><ExtLinkIcon /></span>
+        </div>
       </div>
     </div>
   );
 };
 
-const videoPage = (id, clip = 1) => `/play?id=${encodeURIComponent(id)}&clip=${clip}`;
-
-const PreviewWrapper = ({ children, record, videoAvailable }) => {
-  return videoAvailable
-    ? <AppLink href={videoPage(record.id)}><a>{children}</a></AppLink>
-    : <a href={finnaRecordPage(record.recordPage)} target="_blank">{children}</a>;
-};
+//const videoPage = (id, clip = 1) => `/play?id=${encodeURIComponent(id)}&clip=${clip}`;
 
 const Tags = ({ topics, genres }) => (
   <div>
@@ -138,6 +130,10 @@ const Description = ({ text }) => {
 export default function View({ id = null, recordData = null }) {
   const appDispatch = useAppDispatch();
   const router = useRouter();
+  const [videoUrl, setVideoUrl] = useState(null);
+  const [pauseVideo, setPauseVideo] = useState(true);
+  const videoRef = useRef(null);
+
   id = id || router.query.id;
 
   useEffect(() => {
@@ -156,29 +152,48 @@ export default function View({ id = null, recordData = null }) {
   if (error) return <p>error...</p>;
 
   const videoUrls = rec ? extractVideoUrls(rec) : [];
-  const videoAvailable = videoUrls.length > 0;
+  useEffect(() => setVideoUrl(videoUrls[0]), [rec])
 
+  const videoAvailable = videoUrls.length > 0;
+  const imageUrl = rec && rec.images ? `https://api.finna.fi${rec.images[0]}` : null;
   return (
     <div className="w-auto font-sans">
       <HeadTags title={rec && rec.title} description={rec && rec.rawData?.description }/>
-      <div className="mt-4">
+      <div className="mt-3">
         <article>
           {!isFetching && rec && (
             <>
-              <div className="flex flex-col md:flex-row">
-                <div className="md:w-3/5 w-full">
-                  <PreviewWrapper record={rec} videoAvailable={videoAvailable}>
-                    <Preview images={rec?.images} videoAvailable={videoAvailable} recordUrl={finnaRecordPage(rec.recordPage)} />
-                  </PreviewWrapper>
+              <div className="flex flex-col w-full max-w-2xl">
+                <div className="aspect-w-4 aspect-h-3">
+                  {videoUrl && <ReactPlayer
+                    ref={videoRef}
+                    className="react-player -mt-2"
+                    url={videoUrl.src}
+                    width='100%'
+                    height='100%'
+                    playing={true}
+                    controls
+                    muted
+                    pip={false}
+                    playIcon={<PlayButton />}
+                    light={pauseVideo ? `https://api.finna.fi${rec.images[0]}` : false}
+                  /> }
+                  { !videoAvailable &&
+                   <a href={finnaRecordPage(rec.recordPage)} target="_blank">
+                     <Preview imageUrl={imageUrl ? imageUrl : null} />
+                   </a>
+                  }
                 </div>
-                <div className="md:ml-8 flex flex-col justify-center mt-8 md:mt-0">
+                <div className="flex flex-col justify-center mt-2">
                   <Header record={rec} />
-                  {videoUrls.length > 1 && <ul className="mt-5">{videoUrls.map(({ src, title }, idx) => (
-                    <AppLink key={`video-${idx}`} href={videoPage(rec.id, idx + 1)}><a>
-                      <li className="flex my-2 items-center group text-gray-100 hover:text-white">
-                        <SmallPlayButton big={false} /><div className="ml-3">{title}</div>
-                      </li>
-                    </a></AppLink>
+                  {videoUrls.length > 1 && <ul className="mt-5">{videoUrls.map((url, idx) => (
+                    <li key={url.src} onClick={e => {
+                      setVideoUrl(url);
+                      setPauseVideo(false);
+                      videoRef.current.seekTo(0);
+                    }} className="flex my-2 items-center group text-md text-gray-200 hover:text-white cursor-pointer">
+                      <SmallPlayButton big={false} /><div className="ml-3">{url.title}</div>
+                    </li>
                   ))}</ul>}
                 </div>
               </div>
