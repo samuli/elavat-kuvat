@@ -10,7 +10,9 @@ jobs:
           ref: static-paths-record-route
       - name: Install
         run: npm i
+      - name: Build site
+        run: npm build; npm export
       - name: Download
         run: node .next/server/download.js
-      - name: Build site
+      - name: Build site with static pages
         run: npm build; npm export
