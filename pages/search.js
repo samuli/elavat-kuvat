@@ -17,7 +17,7 @@ import { FaArrowLeft as ArrowLeft, FaArrowRight as ArrowRight } from 'react-icon
 
 import { searchUrl, searchLimit, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
-import DecadeFilters, { decades, getSearchUrl } from '@/components/DecadeFilter';
+import DecadeFilters, { decades } from '@/components/DecadeFilter';
 import { FacetStripe } from '@/components/Topics';
 import { facetSearchUrl, yearTitle, useProgress } from '@/lib/util';
 
@@ -193,10 +193,6 @@ export default function Search({
     }
 
     router.push(router);
-  };
-
-  const selectDecade = startYear => {
-    router.push(getSearchUrl(startYear, topicFacet, genreFacet));
   };
 
   const facetClick = (facet, value) => {
