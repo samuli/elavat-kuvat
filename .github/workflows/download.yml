@@ -1,4 +1,4 @@
-name: Download static data
+name: Download static data 
 on: workflow_dispatch
 jobs:
   Download:
