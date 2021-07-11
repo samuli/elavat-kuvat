@@ -11,7 +11,7 @@ jobs:
       - name: Install
         run: npm i
       - name: Delete record data
-        run: rm data/*.json
+        run: rm data/records/*.json
       - name: Build site
         run: npm run build; npm run export
         env:
@@ -24,4 +24,4 @@ jobs:
         uses: EndBug/add-and-commit@v7
         with:
           message: 'Add downloaded /data files'
-          add: 'data/*.json'
+          add: 'data/records/*.json'
