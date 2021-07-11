@@ -10,8 +10,12 @@ jobs:
           ref: static-paths-record-route
       - name: Install
         run: npm i
+      - name: Delete record data
+        run: rm data/*.json
       - name: Build site
         run: npm run build; npm run export
+        env:
+          NEXT_PUBLIC_API_BASE: ${{ secrets.NEXT_PUBLIC_API_BASE }}
       - name: Download
         run: node .next/server/download.js
         env:
