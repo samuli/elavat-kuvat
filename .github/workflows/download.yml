@@ -11,7 +11,7 @@ jobs:
       - name: Install
         run: npm i
       - name: Build site
-        run: npm build; npm export
+        run: npm run build; npm run export
       - name: Download
         run: node .next/server/download.js
       - name: Build site with static pages
