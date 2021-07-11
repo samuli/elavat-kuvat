@@ -14,5 +14,8 @@ jobs:
         run: npm run build; npm run export
       - name: Download
         run: node .next/server/download.js
-      - name: Build site with static pages
-        run: npm run build; npm run export
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v7
+        with:
+          message: 'Add downloaded /data files'
+          add: 'data/*.json'
