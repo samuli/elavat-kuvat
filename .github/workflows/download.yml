@@ -10,8 +10,6 @@ jobs:
           ref: static-paths-record-route
       - name: Install
         run: npm i
-      - name: Delete record data
-        run: rm data/records/*.json
       - name: Build site
         run: npm run build; npm run export
         env:
