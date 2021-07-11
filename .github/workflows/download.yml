@@ -14,6 +14,7 @@ jobs:
         run: npm run build; npm run export
         env:
           NEXT_PUBLIC_API_BASE: https://api.finna.fi
+          NO_STATIC_EXPORT: 1
       - name: Download
         run: node .next/server/download.js
         env:
