@@ -4,6 +4,10 @@ import { searchUrl, searchLimit, topicFacetsUrl } from '@/lib/api';
 import { filterFacetFields } from '@/lib/util';
 
 export async function getStaticPaths() {
+  if (Boolean(process.env.NO_STATIC_EXPORT)) {
+    return { paths: [], fallback: false };
+  }
+
   const records = await Fetcher(searchUrl('', 1));
   const recordPages = Math.ceil(records.resultCount/searchLimit);
   const base = '/browse/clips';

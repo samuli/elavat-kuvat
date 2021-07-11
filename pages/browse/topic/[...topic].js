@@ -4,6 +4,10 @@ import { searchUrl, topicFacetsUrl } from '@/lib/api';
 import { filterFacetFields, getStaticFacetPaths } from '@/lib/util';
 
 export async function getStaticPaths() {
+  if (Boolean(process.env.NO_STATIC_EXPORT)) {
+    return { paths: [], fallback: false };
+  }
+
   const paths = await getStaticFacetPaths(
     topicFacetsUrl(),
     topic => searchUrl('', 1, topic),

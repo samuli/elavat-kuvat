@@ -5,6 +5,10 @@ import { decades, dateRange } from '@/components/DecadeFilter';
 import { filterFacetFields, getStaticFacetPaths } from '@/lib/util';
 
 export async function getStaticPaths() {
+  if (Boolean(process.env.NO_STATIC_EXPORT)) {
+    return { paths: [], fallback: false };
+  }
+
   const facets = decades.map(startYear => {
     return { value: dateRange(startYear) };
   });
