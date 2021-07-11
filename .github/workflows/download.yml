@@ -15,4 +15,4 @@ jobs:
       - name: Download
         run: node .next/server/download.js
       - name: Build site with static pages
-        run: npm build; npm export
+        run: npm run build; npm run export
