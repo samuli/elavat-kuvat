@@ -1,1 +1,0 @@
-self.__SSG_MANIFEST=new Set(["\u002F","\u002Frecord\u002F[id]","\u002Fbrowse\u002Fdate\u002F[...date]","\u002Fbrowse\u002Fgenre\u002F[...genre]","\u002Fbrowse\u002Fclips\u002F[page]","\u002Fbrowse\u002Ftopic\u002F[...topic]"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()
