@@ -5,6 +5,10 @@ import View from '@/pages/view';
 const getDataDir = () => path.join(process.cwd(), 'data/records');
 
 export async function getStaticPaths() {
+  if (Boolean(process.env.NO_STATIC_EXPORT)) {
+    return { paths: [], fallback: false };
+  }
+
   const dataDir = getDataDir();
   const filenames = fs.readdirSync(dataDir);
   const recIds = filenames.map(name => name.split('.json')[0]);
