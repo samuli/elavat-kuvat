@@ -1,8 +1,10 @@
+import { useRouter } from 'next/router';
+
 import Search from '@/pages/search';
 import Fetcher from '@/lib/fetcher';
 import { searchUrl, topicFacetsUrl } from '@/lib/api';
 import { decades, dateRange } from '@/components/DecadeFilter';
-import { filterFacetFields, getStaticFacetPaths } from '@/lib/util';
+import { filterFacetFields, getStaticFacetPaths, isServer } from '@/lib/util';
 
 export async function getStaticPaths() {
   if (Boolean(process.env.NO_STATIC_EXPORT)) {
@@ -26,9 +28,7 @@ export async function getStaticPaths() {
 export async function getStaticProps({ params }) {
   const daterange = params.date[0];
   const rangeYears = daterange.split('-');
-  const page = Number(params.date[1] || 1);
-
-  const records = await Fetcher(searchUrl('', page, null, null, rangeYears));
+  const records = await Fetcher(searchUrl('', 1, null, null, rangeYears));
   const topics = await Fetcher(topicFacetsUrl('', null, null, rangeYears));
   const topicsFiltered = {
     ...topics,
@@ -38,10 +38,17 @@ export async function getStaticProps({ params }) {
         : []
     }
   };
-  return { props: { page, daterange, records, topics: topicsFiltered } };
+  return { props: { daterange, records, topics: topicsFiltered } };
 }
 
-export default function Date({ page, daterange, records, topics }) {
-  records.static = true;
-  return <Search daterange={daterange} initialPage={page} initialTopicFacets={topics} records={records}  queryKey="date" queryValue={daterange} />;
+export default function Date({ daterange, records, topics }) {
+  const router = useRouter();
+  if (!isServer && !router.isReady) {
+    return '';
+  }
+  const page = Number(router.query.page || 1);
+  if (page > 1) {
+    records = null;
+  }
+  return <Search daterange={daterange} initialPage={page} records={records} initialTopicFacets={topics} queryKey="date" />;
 };

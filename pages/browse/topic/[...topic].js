@@ -1,7 +1,9 @@
+import { useRouter } from 'next/router';
+
 import Search from '@/pages/search';
 import Fetcher from '@/lib/fetcher';
 import { searchUrl, topicFacetsUrl } from '@/lib/api';
-import { filterFacetFields, getStaticFacetPaths } from '@/lib/util';
+import { filterFacetFields, getStaticFacetPaths, isServer } from '@/lib/util';
 
 export async function getStaticPaths() {
   if (Boolean(process.env.NO_STATIC_EXPORT)) {
@@ -18,8 +20,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   const topic = params.topic[0];
-  const page = Number(params.topic[1] || 1);
-  const records = await Fetcher(searchUrl('', page, topic, null, null));
+  const records = await Fetcher(searchUrl('', 1, topic, null, null));
   const topics = await Fetcher(topicFacetsUrl('', topic, null, null));
   const topicsFiltered = {
     ...topics,
@@ -30,11 +31,17 @@ export async function getStaticProps({ params }) {
     }
   };
 
-
-  return { props: { page, topic, records, topics: topicsFiltered } };
+  return { props: { topic, records, topics: topicsFiltered } };
 }
 
-export default function Topic({ topic, topics, records, page }) {
-  records.static = true;
-  return <Search topicFacet={topic} initialPage={page} initialTopicFacets={topics} records={records} queryKey="topic" queryValue={topic} />;
+export default function Topic({ topic, records, topics }) {
+  const router = useRouter();
+  if (!isServer && !router.isReady) {
+    return '';
+  }
+  const page = Number(router.query.page || 1);
+  if (page > 1) {
+    records = null;
+  }
+  return <Search topicFacet={topic} initialPage={page} records={records} initialTopicFacets={topics} queryKey="topic"/>;
 };

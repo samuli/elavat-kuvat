@@ -4,7 +4,7 @@ const withPreact = require('next-plugin-preact');
 module.exports = withPreact({
   webpack5: true,
   experimental: {
-    optimizeCss: true,
+//    optimizeCss: true,
   },
 
   webpack: (config, { dev, webpack, buildId, isServer }) => {

@@ -19,7 +19,7 @@ import { searchUrl, searchLimit, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
 import DecadeFilters, { decades } from '@/components/DecadeFilter';
 import { FacetStripe } from '@/components/Topics';
-import { facetSearchUrl, yearTitle, useProgress } from '@/lib/util';
+import { facetSearchUrl, yearTitle, useProgress, isServer } from '@/lib/util';
 
 const PageMenu = ({ items, activePage = 1, onPageSelect, small = false }) => {
   return (
@@ -88,20 +88,33 @@ export default function Search({
   topicFacet = null, initialTopicFacets = null, genreFacet = null, daterange = null, records = null, initialPage = null,
   queryKey = null, queryValue = null
 }) {
+
   const router = useRouter();
   const { updateScroll } = useRouterScroll();
 
-  const [ lookfor, setLookfor ] = useState(router.query.lookfor);
-  const [ currentLookfor, setCurrentLookfor ] = useState(lookfor);
-  const [ nextLookfor, setNextLookfor ] = useState(lookfor);
+  const [ lookfor, setLookfor ] = useState(null);
+  const [ currentLookfor, setCurrentLookfor ] = useState(null);
+  const [ nextLookfor, setNextLookfor ] = useState(null);
 
-  const [ page, setPage ] = useState(initialPage || (typeof router.query.page !== 'undefined' ? Number(router.query.page) : 1));
+  const [ page, setPage ] = useState(null);
+  // (typeof router.query.page !== 'undefined' ? Number(router.query.page) : initialPage || 1));
   const [ resetScroll, setResetScroll ] = useState(false);
   const [ loading, setLoading ] = useState(false);
   const [ resultCount, setResultCount ] = useState(records ? records.resultCount : null);
   const [ pageCount, setPageCount ] = useState(records ? getPageCount(records.resultCount) : null);
 
   const forceCheckRef = useRef();
+
+  if (!isServer && !router.isReady) {
+    return '';
+  }
+
+  const currentPage = typeof router.query.page !== 'undefined' ? Number(router.query.page) : initialPage || 1;
+  setPage(currentPage);
+  const queryLookfor = router.query.lookfor;
+  setLookfor(queryLookfor);
+  setCurrentLookfor(queryLookfor);
+  setNextLookfor(queryLookfor);
 
   const onError = (_e) => {
     setLoading(false);
@@ -129,7 +142,7 @@ export default function Search({
   genreFacet = genreFacet || router.query?.genre;
 
   let { data, status, error, isFetching } = useQuery(
-    searchUrl(nextLookfor || "", page, topicFacet, genreFacet, rangeYears),
+    searchUrl(queryLookfor || "", currentPage, topicFacet, genreFacet, rangeYears),
     { enabled: records === null,
       onError, onSuccess, keepPreviousData: true,
       initialData: records,
@@ -143,28 +156,13 @@ export default function Search({
   useProgress(isFetching);
 
   const { data: topicFacets } = useQuery(
-    topicFacetsUrl(nextLookfor || "", topicFacet, genreFacet, rangeYears),
+    topicFacetsUrl(queryLookfor || "", topicFacet, genreFacet, rangeYears),
     {
       enabled: typeof page !== 'undefined',
       initialData: initialTopicFacets,
       refetchOnMount: initialTopicFacets === null
     }
   );
-
-  // const queryUpdated = () => {
-  //   const l = router.query.lookfor ?? '';
-  //   setLookfor(l);
-  //   setNextLookfor(l);
-  //   setPage(Number(initialPage || router.query.page || 1));
-  // };
-
-
-  // useEffect(() => {
-  //   if (!router.isReady && !data) {
-  //     return;
-  //   }
-  //   queryUpdated();
-  // }, [router.isReady, router.query]);
 
 
   useEffect(() => {
@@ -181,18 +179,27 @@ export default function Search({
   const changePage = (idx) => {
     setLoading(false);
     setResetScroll(true);
+    setPage(Number(idx));
 
-    setPage(idx);
+    //router.query.page = String(idx);
+    //router.pathname = `/search?genre=dokumentti`; //`${queryKey}=${queryValue}&page=${page}`;
+    let path = null;
     if (queryKey && queryValue) {
-      router.query[queryKey] = [queryValue, String(idx)];
-    } else if (queryKey === 'clips') {
-      router.query.page = String(idx);
-    } else {
-      router.pathname = '/search';
-      router.query.page = String(idx);
+      path = `/search?${queryKey}=${encodeURIComponent(queryValue)}&page=${idx}`;
+    } else if (topicFacet) {
+      path = `/search?topic=${encodeURIComponent(topicFacet)}&page=${idx}`;
+    } else if (genreFacet) {
+      path = `/search?genre=${encodeURIComponent(genreFacet)}&page=${idx}`;
+    } else if (daterange) {
+      path = `/search?date=${encodeURIComponent(daterange)}&page=${idx}`;
     }
 
-    router.push(router);
+    if (path) {
+      router.push(path);
+    } else {
+      router.query.page = idx;
+      router.push(router);
+    }
   };
 
   const facetClick = (facet, value) => {
@@ -236,7 +243,7 @@ export default function Search({
         { !isFetching && error && <p>error...</p> }
         { !isFetching && data && data?.status === 'ERROR' && <p>error...</p> }
         { !isFetching && data && Number(resultCount) === 0 && <p>ei tuloksia...</p> }
-        { data?.status === 'OK' && <ResultGrid isStatic={data?.static} records={data.records} /> }
+        { data?.status === 'OK' && <ResultGrid records={data.records} /> }
       </div>
       <div className="flex justify-center">
         { !isFetching && getPagination(false, false)}
