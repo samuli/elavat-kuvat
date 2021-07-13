@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  margin-left: calc(100vw - 100%);
+  margin-right: 0;
+}
+
 video {
   outline: 0;
 }
@@ -54,4 +59,12 @@ body {
 
 .nprogress-custom-parent #nprogress .bar {
   position: absolute;
+}
+
+h1 {
+  @apply text-2xl font-bold my-2;
+}
+
+h2 {
+  @apply text-xl;
 }

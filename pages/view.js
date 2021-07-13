@@ -11,7 +11,7 @@ import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon } from 'react-icon
 import { useAppDispatch, CMD_PAGE_LOADED } from '@/lib/state';
 import { recordUrl } from '@/lib/api';
 import AppLink from '@/components/Link';
-
+import AppError from '@/components/AppError';
 import { extractVideoUrls, finnaRecordPage } from '@/lib/record';
 import { Image } from '@/components/ImageGrid';
 import { FacetStripe } from '@/components/Topics';
@@ -149,7 +149,7 @@ export default function View({ id = null, recordData = null }) {
 
   const rec = data && !error && data.resultCount > 0 && data.records[0];
 
-  if (error) return <p>error...</p>;
+  if (error || (!isFetching && data && data.status === 'ERROR')) return <AppError />;
 
   const videoUrls = rec ? extractVideoUrls(rec) : [];
   useEffect(() => setVideoUrl(videoUrls[0]), [rec])
@@ -164,7 +164,7 @@ export default function View({ id = null, recordData = null }) {
           {!isFetching && rec && (
             <>
               <div className="flex flex-col w-full max-w-2xl">
-                <div className="aspect-w-4 aspect-h-3">
+                <div className="aspect-w-4 aspect-h-3 overflow-hidden">
                   {videoUrl && <ReactPlayer
                     ref={videoRef}
                     className="react-player -mt-2"

@@ -8,6 +8,7 @@ import HeadTags from '@/components/Head';
 import Select from '@/components/Select';
 
 import { SearchHeading } from '@/components/Typo';
+import AppError from '@/components/AppError';
 import Fetcher from '@/lib/fetcher';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -181,8 +182,6 @@ export default function Search({
     setResetScroll(true);
     setPage(Number(idx));
 
-    //router.query.page = String(idx);
-    //router.pathname = `/search?genre=dokumentti`; //`${queryKey}=${queryValue}&page=${page}`;
     let path = null;
     if (queryKey && queryValue) {
       path = `/search?${queryKey}=${encodeURIComponent(queryValue)}&page=${idx}`;
@@ -216,12 +215,16 @@ export default function Search({
     </div>
   );
 
-  const getHeading = (title, value, placeholder) => (
-    <div className="flex items-center justify-between">
-      <SearchHeading title={title} value={value} placeholder={placeholder} resultCount={resultCount} />
-      { getPagination(true, false) }
-    </div>
-  );
+  const getHeading = (title, value, placeholder) => {
+    if (resultCount === 0) return "";
+    return (
+      <div className="flex items-center justify-between">
+        <SearchHeading title={title} value={value} placeholder={placeholder} resultCount={resultCount} />
+        { getPagination(true, false) }
+      </div>
+    );
+  };
+
   return (
     <div className="w-full font-sans">
       <HeadTags title={nextLookfor || topicFacet || genreFacet || daterange}/>
@@ -232,17 +235,17 @@ export default function Search({
           { daterange && getHeading("Aikakausi", yearTitle(rangeYears[0])) }
           { !isFaceted && !daterange &&
             <div className="">{getHeading("Haku", currentLookfor, !currentLookfor)}</div> }
-          <div className="h-16 min-h-32 w-full mt-1 mb-3">
-            { _topicFacets?.status === 'OK' && _topicFacets.facets && <FacetStripe facet="topic_facet" facets={_topicFacets.facets.topic_facet.filter(f => f.value !== topicFacet)} facetUrl={facetSearchUrl} truncate={true} /> }
-    </div>
-
+          { resultCount > 0 &&
+            <div className="h-16 min-h-32 w-full mt-1 mb-3">
+              { _topicFacets?.status === 'OK' && <FacetStripe facet="topic_facet" facets={_topicFacets.facets.topic_facet.filter(f => f.value !== topicFacet)} facetUrl={facetSearchUrl} truncate={true} /> }
+            </div>
+          }
 
         </div>
       </div>
       <div className="mt-6">
-        { !isFetching && error && <p>error...</p> }
-        { !isFetching && data && data?.status === 'ERROR' && <p>error...</p> }
-        { !isFetching && data && Number(resultCount) === 0 && <p>ei tuloksia...</p> }
+        { !isFetching && (error || data && data?.status === 'ERROR') && <AppError /> }
+        { !isFetching && data && Number(resultCount) === 0 && <h1>Ei tuloksia haulla <span className="font-normal">{queryLookfor}</span></h1> }
         { data?.status === 'OK' && <ResultGrid records={data.records} /> }
       </div>
       <div className="flex justify-center">
