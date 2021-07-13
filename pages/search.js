@@ -47,7 +47,7 @@ const NaviButton = ({ children, onClick, disabled, small = false }) => (
     small && "text-xl",
     !small && "text-4xl",
     disabled && " text-gray-500",
-    !disabled && "cursor-pointer hover:text-pink-500 text-gray-100")}
+    !disabled && "cursor-pointer active:text-pink-500 text-gray-100")}
        onClick={() => {
          if (disabled) return;
          onClick()

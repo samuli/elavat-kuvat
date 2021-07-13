@@ -10,7 +10,6 @@ import { autocompleteUrl } from '@/lib/api';
 import Fetcher from '@/lib/fetcher';
 import { recordUrl } from '@/lib/record';
 import { Image } from '@/components/ImageGrid';
-import Spinner from '@/components/Spinner';
 import { useProgress } from '@/lib/util';
 
 const Autocomplete = ({ ref, onSearch, onRecordSelect }) => {
