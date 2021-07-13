@@ -98,7 +98,6 @@ export default function Search({
   const [ nextLookfor, setNextLookfor ] = useState(null);
 
   const [ page, setPage ] = useState(null);
-  // (typeof router.query.page !== 'undefined' ? Number(router.query.page) : initialPage || 1));
   const [ resetScroll, setResetScroll ] = useState(false);
   const [ loading, setLoading ] = useState(false);
   const [ resultCount, setResultCount ] = useState(records ? records.resultCount : null);
@@ -177,11 +176,7 @@ export default function Search({
     router.push(router);
   };
 
-  const changePage = (idx) => {
-    setLoading(false);
-    setResetScroll(true);
-    setPage(Number(idx));
-
+  const getResultPageUrl = (idx) => {
     let path = null;
     if (queryKey && queryValue) {
       path = `/search?${queryKey}=${encodeURIComponent(queryValue)}&page=${idx}`;
@@ -192,14 +187,29 @@ export default function Search({
     } else if (daterange) {
       path = `/search?date=${encodeURIComponent(daterange)}&page=${idx}`;
     }
+    return path;
+  }
+  const changePage = (idx) => {
+    setLoading(false);
+    setResetScroll(true);
 
-    if (path) {
-      router.push(path);
-    } else {
+    const path = getResultPageUrl(idx);
+
+    // if (path) {
+    //   router.push(path);
+    // } else {
       router.query.page = idx;
       router.push(router);
-    }
+//    }
   };
+
+  useEffect(() => {
+    if (!isFetching && page+1 > 1 && page < pageCount-1) {
+      console.log("pre", getResultPageUrl(page+1));
+      router.prefetch(getResultPageUrl(page+1));
+    }
+  }, [page, isFetching]);
+  useEffect(() => setPage(Number(router.query.page)), [router.query.page]);
 
   const facetClick = (facet, value) => {
     router.push(`/search?${facet}=${encodeURIComponent(value)}`);
@@ -235,7 +245,7 @@ export default function Search({
           { daterange && getHeading("Aikakausi", yearTitle(rangeYears[0])) }
           { !isFaceted && !daterange &&
             <div className="">{getHeading("Haku", currentLookfor, !currentLookfor)}</div> }
-          { resultCount > 0 &&
+          { (isFetching || resultCount > 0) &&
             <div className="h-16 min-h-32 w-full mt-1 mb-3">
               { _topicFacets?.status === 'OK' && <FacetStripe facet="topic_facet" facets={_topicFacets.facets.topic_facet.filter(f => f.value !== topicFacet)} facetUrl={facetSearchUrl} truncate={true} /> }
             </div>

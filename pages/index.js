@@ -102,7 +102,7 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
                   </div>
                 </div>
                 <ResultGrid lazy={false} records={selectedRandomClips || Array.from(Array(8))} />
-                <AppLink href="/browse/clips/1"><a>
+                <AppLink href="/browse/clips"><a>
                   <div role="button" className="inline-flex mt-6 mb-4 py-3 px-4 text-md subpixel-antialiased font-medium tracking-tight rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer bg-gradient-to-b from-gray-100 to-gray-300 ripple-bg-white">
                     <div className="flex justify-center items-center">
                       <div className="inline-flex">Näytä kaikki klipit</div>
