@@ -50,18 +50,12 @@ const getRandomClips = (records, cnt) => {
   }
   const set = new Set();
   const max = records.length-1;
-  while (set.size <= cnt) {
+  while (set.size < cnt) {
     set.add(Math.floor(Math.random() * max));
   }
 
   const order = Array.from(set);
-  const randomClips = records.filter((rec, idx) => set.has(idx));
-
-  let orderedClips = [];
-  for (let i=0; i<order.length; i++) {
-    orderedClips.push(randomClips[order[i]]);
-  }
-  return orderedClips;
+  return records.filter((rec, idx) => set.has(idx));
 };
 
 const FrontPage = ({ randomClips, topics, genres, decades }) => {
