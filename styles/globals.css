@@ -68,5 +68,5 @@ h1 {
 }
 
 h2 {
-  @apply text-xl;
+  @apply text-base sm:text-xl;
 }
