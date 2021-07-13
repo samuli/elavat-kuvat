@@ -65,9 +65,14 @@ const Header = ({ record }) => {
   );
 };
 
+const PlayButtonWrapper = ({ children }) => (
+  <div className="flex items-center justify-center font-semibold text-lg px-4 py-3 rounded-xl bg-gradient-to-b from-pink-500 to-red-500 text-gray-100 border-2 border-red-500">{children}</div>
+);
 
-const PlayButton = () => (
-  <div className="shadow-lg bg-white text-gray-900 group-hover:bg-pink-500 group-hover:text-gray-100 fill-current stroke-current rounded-full items-center justify-center flex w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 text-2xl sm:text-4xl"><div className="ml-2"><PlayIcon /></div></div>
+const PlayButton = (external = false) => (
+  <PlayButtonWrapper>
+    <div className="ml-2 flex items-center uppercase text-sm">Katso <span className="ml-2 text-xs"><PlayIcon /></span></div>
+  </PlayButtonWrapper>
 );
 
 const SmallPlayButton = () => (
@@ -85,15 +90,13 @@ const Preview = ({ imageUrl }) => {
         </div>
       </div>
       <div className="absolute align-middle p-10 self-center align-center justify-center flex cursor-pointer">
-        <div className="flex items-center justify-center text-2xl p-4 rounded-md bg-white text-gray-900 group-hover:bg-pink-500 group-hover:text-gray-100">
-          Katso finna.fi:ssä<span className="text-lg ml-4"><ExtLinkIcon /></span>
-        </div>
+        <PlayButtonWrapper>
+          Katso Finnassa<span className="text-lg ml-4"><ExtLinkIcon /></span>
+        </PlayButtonWrapper>
       </div>
     </div>
   );
 };
-
-//const videoPage = (id, clip = 1) => `/play?id=${encodeURIComponent(id)}&clip=${clip}`;
 
 const Tags = ({ topics, genres }) => (
   <div>
