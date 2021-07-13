@@ -11,6 +11,7 @@ import { FacetStripe } from '@/components/Topics';
 import HeadTags from '@/components/Head'
 import { facetBrowseUrl, filterFacetFields, yearTitle, useProgress } from '@/lib/util';
 import { decades } from '@/components/DecadeFilter';
+import { FaRedoAlt as ReloadIcon } from 'react-icons/fa';
 
 const DecadeFilter = ({ title, startYear }) => {
   const endYear = startYear < 2000 ? startYear+9 : "*";
@@ -43,10 +44,30 @@ export async function getStaticProps(context) {
   }
 }
 
+const getRandomClips = (records, cnt) => {
+  if (records.length <= cnt) {
+    return records;
+  }
+  const set = new Set();
+  const max = records.length-1;
+  while (set.size <= cnt) {
+    set.add(Math.floor(Math.random() * max));
+  }
+
+  const order = Array.from(set);
+  const randomClips = records.filter((rec, idx) => set.has(idx));
+
+  let orderedClips = [];
+  for (let i=0; i<order.length; i++) {
+    orderedClips.push(randomClips[order[i]]);
+  }
+  return orderedClips;
+};
+
 const FrontPage = ({ randomClips, topics, genres, decades }) => {
   const { updateScroll } = useRouterScroll();
-
-  const [ randomClipsUrl ] = useState(frontPageUrl());
+  const [ selectedRandomClips, setSelectedRandomClips] = useState();
+  const [ randomClipsUrl, setRandomClipsUrl ] = useState(frontPageUrl());
   const { data, isFetching } = useQuery(randomClipsUrl, { initialData: randomClips });
   const { data: topicFacets } = useQuery(topicFacetsUrl(), { initialData: topics, refetchOnMount: false } )
   const { data: genreFacets } = useQuery(genreFacetsUrl, { initialData: genres, refetchOnMount: false });
@@ -56,6 +77,12 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
   useEffect(() => {
     updateScroll();
   }, []);
+
+  useEffect(() => {
+    if (data && data.records) {
+      setSelectedRandomClips(getRandomClips(data.records, 8));
+    }
+  }, [data]);
 
   return (
     <div>
@@ -74,7 +101,13 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
           <div className="mt-6">
 
               <div className="flex flex-col text-center">
-                <ResultGrid lazy={false} records={data?.records ? data.records.slice(0,8) : Array.from(Array(8))} />
+                <div className="flex items-center">
+                  <SearchHeading title="Poimintoja" />
+                  <div className="cursor-pointer hover:text-pink-500" title="Näytä lisää" onClick={e => setRandomClipsUrl(frontPageUrl())}>
+                    <ReloadIcon />
+                  </div>
+                </div>
+                <ResultGrid lazy={false} records={selectedRandomClips || Array.from(Array(8))} />
                 <AppLink href="/browse/clips/1"><a>
                   <div role="button" className="inline-flex mt-6 mb-4 py-3 px-4 text-md subpixel-antialiased font-medium tracking-tight rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer bg-gradient-to-b from-gray-100 to-gray-300 ripple-bg-white">
                     <div className="flex justify-center items-center">
