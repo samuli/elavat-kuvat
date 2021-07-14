@@ -1,13 +1,14 @@
 import clsx from 'clsx';
-import useSWR from 'swr';
+import { useQuery } from 'react-query';
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { useUpdate } from 'react-use';
 import { forceCheck } from 'react-lazyload';
-import NProgress from "nprogress";
 import { useRouterScroll } from '@moxy/next-router-scroll';
 import HeadTags from '@/components/Head';
 import Select from '@/components/Select';
+
 import { SearchHeading } from '@/components/Typo';
+import AppError from '@/components/AppError';
 import Fetcher from '@/lib/fetcher';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
@@ -17,25 +18,9 @@ import { FaArrowLeft as ArrowLeft, FaArrowRight as ArrowRight } from 'react-icon
 
 import { searchUrl, searchLimit, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
-import DecadeFilters, { decades, getSearchUrl } from '@/components/DecadeFilter';
+import DecadeFilters, { decades } from '@/components/DecadeFilter';
 import { FacetStripe } from '@/components/Topics';
-import { facetSearchUrl, yearTitle } from '@/lib/util';
-
-const useStickySWR = (...args) => {
-  const val = useRef();
-  const { data, error, loading, ...rest } = useSWR(...args);
-
-  if (data !== undefined) {
-    val.current = data;
-  }
-
-  return {
-    ...rest,
-    loading,
-    error,
-    data: val.current,
-  };
-};
+import { facetSearchUrl, yearTitle, useProgress, isServer } from '@/lib/util';
 
 const PageMenu = ({ items, activePage = 1, onPageSelect, small = false }) => {
   return (
@@ -62,7 +47,7 @@ const NaviButton = ({ children, onClick, disabled, small = false }) => (
     small && "text-xl",
     !small && "text-4xl",
     disabled && " text-gray-500",
-    !disabled && "cursor-pointer hover:text-pink-500 text-gray-100")}
+    !disabled && "cursor-pointer active:text-pink-500 text-gray-100")}
        onClick={() => {
          if (disabled) return;
          onClick()
@@ -71,8 +56,6 @@ const NaviButton = ({ children, onClick, disabled, small = false }) => (
 );
 
 const Pagination = ({ results, page, pageCount, setPage, loading, showResultCount, small = false }) => {
-  if (pageCount === 1) return null;
-
   const pageIdxs = Array.from(Array(pageCount), (_el,i) => i+1);
   const scrollButtons = pageCount > 1;
 
@@ -85,7 +68,6 @@ const Pagination = ({ results, page, pageCount, setPage, loading, showResultCoun
     </div>
    );
 };
-
 
 const Results = ({ data }) => (
   <div>
@@ -101,71 +83,87 @@ const Results = ({ data }) => (
   </div>
 );
 
-export default function Search() {
+const getPageCount = (results) => Math.ceil(Number(results)/searchLimit);
+
+export default function Search({
+  topicFacet = null, initialTopicFacets = null, genreFacet = null, daterange = null, records = null, initialPage = null,
+  queryKey = null, queryValue = null
+}) {
+
   const router = useRouter();
   const { updateScroll } = useRouterScroll();
 
-  const [ lookfor, setLookfor ] = useState(router.query.lookfor);
-  const [ currentLookfor, setCurrentLookfor ] = useState(lookfor);
-  const [ nextLookfor, setNextLookfor ] = useState(lookfor);
-  const [ page, setPage ] = useState(Number(router.query?.page || 1));
+  const [ lookfor, setLookfor ] = useState(null);
+  const [ currentLookfor, setCurrentLookfor ] = useState(null);
+  const [ nextLookfor, setNextLookfor ] = useState(null);
+
+  const [ page, setPage ] = useState(null);
   const [ resetScroll, setResetScroll ] = useState(false);
   const [ loading, setLoading ] = useState(false);
+  const [ resultCount, setResultCount ] = useState(records ? records.resultCount : null);
+  const [ pageCount, setPageCount ] = useState(records ? getPageCount(records.resultCount) : null);
 
   const forceCheckRef = useRef();
-  const opt = {
-    loadingTimeout: 10,
-    onLoadingSlow: (_key, _config) => {
-      NProgress.start();
-      setLoading(true);
-    },
-    onError: (_err, _key, config) => {
-      setLoading(false);
-      NProgress.done();
-      setCurrentLookfor(nextLookfor);
-    },
-    onSuccess: (_data, _key, _config) => {
-      NProgress.done();
-      setLoading(false);
-      setCurrentLookfor(nextLookfor);
-      if (resetScroll) {
-        window.scrollTo(0,0);
-        setResetScroll(false);
-      }
-      if (forceCheckRef.current) {
-        clearTimeout(forceCheckRef.current);
-      }
-      forceCheckRef.current = setTimeout(() => forceCheck(), 100);
-    }
-  };
-  const topicFacet = router.query?.topic_facet;
-  const genreFacet = router.query?.genre_facet;
-  const daterange = router.query?.date;
-  let rangeYears = daterange && daterange.split('-') || null;
 
-  const { data, error } = useStickySWR(typeof nextLookfor !== 'undefined'
-    ? searchUrl(nextLookfor, page, topicFacet, genreFacet, rangeYears) : null,
-    Fetcher, opt
+  if (!isServer && !router.isReady) {
+    return '';
+  }
+
+  const currentPage = typeof router.query.page !== 'undefined' ? Number(router.query.page) : initialPage || 1;
+  setPage(currentPage);
+  const queryLookfor = router.query.lookfor;
+  setLookfor(queryLookfor);
+  setCurrentLookfor(queryLookfor);
+  setNextLookfor(queryLookfor);
+
+  const onError = (_e) => {
+    setLoading(false);
+    setCurrentLookfor(nextLookfor);
+  };
+  const onSuccess = (data) => {
+    setLoading(false);
+    setCurrentLookfor(nextLookfor);
+    setResultCount(data.resultCount || 0);
+    setPageCount(getPageCount(data.resultCount));
+
+    if (resetScroll) {
+      window.scrollTo(0,0);
+      setResetScroll(false);
+    }
+    if (forceCheckRef.current) {
+      clearTimeout(forceCheckRef.current);
+    }
+    forceCheckRef.current = setTimeout(() => forceCheck(), 100);
+  };
+
+  daterange = daterange || router.query?.date;
+  let rangeYears = daterange && daterange.split('-') || null;
+  topicFacet = topicFacet || router.query?.topic;
+  genreFacet = genreFacet || router.query?.genre;
+
+  let { data, status, error, isFetching } = useQuery(
+    searchUrl(queryLookfor || "", currentPage, topicFacet, genreFacet, rangeYears),
+    { enabled: records === null,
+      onError, onSuccess, keepPreviousData: true,
+      initialData: records,
+    }
+  );
+  if (records !== null) {
+    data = records;
+  }
+
+  useEffect(() => setLoading(isFetching), [isFetching]);
+  useProgress(isFetching);
+
+  const { data: topicFacets } = useQuery(
+    topicFacetsUrl(queryLookfor || "", topicFacet, genreFacet, rangeYears),
+    {
+      enabled: typeof page !== 'undefined',
+      initialData: initialTopicFacets,
+      refetchOnMount: initialTopicFacets === null
+    }
   );
 
-  const { data: topicFacets } = useSWR(typeof nextLookfor !== 'undefined'
-    ? topicFacetsUrl(nextLookfor, topicFacet, genreFacet, rangeYears) : null
-    , Fetcher)
-
-
-  const queryUpdated = () => {
-    const l = router.query.lookfor ?? '';
-    setLookfor(l);
-    setNextLookfor(l);
-    setPage(Number(router.query.page ?? 1));
-  };
-
-  useEffect(() => {
-    if (!router.isReady) {
-      return;
-    }
-    queryUpdated();
-  }, [router.isReady, router.query]);
 
   useEffect(() => {
     updateScroll();
@@ -178,39 +176,65 @@ export default function Search() {
     router.push(router);
   };
 
-  const changePage = (page) => {
+  const getResultPageUrl = (idx) => {
+    let path = null;
+    if (queryKey && queryValue) {
+      path = `/search?${queryKey}=${encodeURIComponent(queryValue)}&page=${idx}`;
+    } else if (topicFacet) {
+      path = `/search?topic=${encodeURIComponent(topicFacet)}&page=${idx}`;
+    } else if (genreFacet) {
+      path = `/search?genre=${encodeURIComponent(genreFacet)}&page=${idx}`;
+    } else if (daterange) {
+      path = `/search?date=${encodeURIComponent(daterange)}&page=${idx}`;
+    }
+    return path;
+  }
+  const changePage = (idx) => {
     setLoading(false);
     setResetScroll(true);
-    router.query.page = page;
-    router.push(router);
+
+    const path = getResultPageUrl(idx);
+
+    // if (path) {
+    //   router.push(path);
+    // } else {
+      router.query.page = idx;
+      router.push(router);
+//    }
   };
 
-  const selectDecade = startYear => {
-    router.push(getSearchUrl(startYear, topicFacet, genreFacet));
-  };
+  useEffect(() => {
+    if (!isFetching && page+1 > 1 && page < pageCount-1) {
+      console.log("pre", getResultPageUrl(page+1));
+      router.prefetch(getResultPageUrl(page+1));
+    }
+  }, [page, isFetching]);
+  useEffect(() => setPage(Number(router.query.page)), [router.query.page]);
 
   const facetClick = (facet, value) => {
     router.push(`/search?${facet}=${encodeURIComponent(value)}`);
   };
 
-  const resultCount = data && data.resultCount || null;
+  const _topicFacets = initialTopicFacets || topicFacets;
   const isFaceted = topicFacet || genreFacet;
 
-  const pageCount = data && data.resultCount && Math.ceil(Number(data.resultCount)/searchLimit);
-
-  const getPagination = (small = false, showResultCount = true) => data && resultCount > 0 && (
+  const getPagination = (small = false, showResultCount = true) => pageCount > 1 && (
     <div className="">
       <Pagination results={resultCount} page={page} pageCount={pageCount} setPage={(page) => changePage(page)}
                   loading={loading} showResultCount={showResultCount} limit={searchLimit} small={small} />
     </div>
   );
 
-  const getHeading = (title, value, placeholder) => (
-    <div className="flex items-center justify-between">
-      <SearchHeading title={title} value={value} placeholder={placeholder} resultCount={resultCount} />
-      { getPagination(true, false) }
-    </div>
-  );
+  const getHeading = (title, value, placeholder) => {
+    if (resultCount === 0) return "";
+    return (
+      <div className="flex items-center justify-between">
+        <SearchHeading title={title} value={value} placeholder={placeholder} resultCount={resultCount} />
+        { getPagination(true, false) }
+      </div>
+    );
+  };
+
   return (
     <div className="w-full font-sans">
       <HeadTags title={nextLookfor || topicFacet || genreFacet || daterange}/>
@@ -221,23 +245,21 @@ export default function Search() {
           { daterange && getHeading("Aikakausi", yearTitle(rangeYears[0])) }
           { !isFaceted && !daterange &&
             <div className="">{getHeading("Haku", currentLookfor, !currentLookfor)}</div> }
-
-          {/* { <Select items={decades} placeholder="Vuosikymmen" activeItem={rangeYears && rangeYears[0]} onSelect={(year) => selectDecade(Number(year))} /> } */}
-          <div className="h-16 min-h-32 w-full mt-1 mb-3">
-            { topicFacets?.status === 'OK' && topicFacets.facets && <FacetStripe facet="topic_facet" facets={topicFacets.facets.topic_facet.filter(f => f.value !== topicFacet)} facetUrl={facetSearchUrl} truncate={true} /> }
-    </div>
-
+          { (isFetching || resultCount > 0) &&
+            <div className="h-16 min-h-32 w-full mt-1 mb-3">
+              { _topicFacets?.status === 'OK' && <FacetStripe facet="topic_facet" facets={_topicFacets.facets.topic_facet.filter(f => f.value !== topicFacet)} facetUrl={facetSearchUrl} truncate={true} /> }
+            </div>
+          }
 
         </div>
       </div>
       <div className="mt-6">
-        { !loading && error && <p>error...</p> }
-        { !loading && data && data?.status === 'ERROR' && <p>error...</p> }
-        { !loading && data && Number(resultCount) === 0 && <p>ei tuloksia...</p> }
+        { !isFetching && (error || data && data?.status === 'ERROR') && <AppError /> }
+        { !isFetching && data && Number(resultCount) === 0 && <h1>Ei tuloksia haulla <span className="font-normal">{queryLookfor}</span></h1> }
         { data?.status === 'OK' && <ResultGrid records={data.records} /> }
       </div>
       <div className="flex justify-center">
-        { !loading && getPagination(false, false)}
+        { !isFetching && getPagination(false, false)}
       </div>
     </div>
   )

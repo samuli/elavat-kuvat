@@ -1,17 +1,16 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { useCombobox } from 'downshift';
 import { useDebouncedCallback } from 'use-debounce';
-import useSWR from 'swr';
+import { useQuery } from 'react-query';
 import clsx from 'clsx';
-import NProgress from "nprogress";
 
 import AppLink from '@/components/Link';
 import { autocompleteUrl } from '@/lib/api';
 import Fetcher from '@/lib/fetcher';
 import { recordUrl } from '@/lib/record';
 import { Image } from '@/components/ImageGrid';
-import Spinner from '@/components/Spinner';
+import { useProgress } from '@/lib/util';
 
 const Autocomplete = ({ ref, onSearch, onRecordSelect }) => {
   const [ inputItems, setInputItems ] = useState([]);
@@ -31,46 +30,33 @@ const Autocomplete = ({ ref, onSearch, onRecordSelect }) => {
 
   const listRef = useRef(null);
 
-  const opt = {
-    loadingTimeout: 10,
-    onLoadingSlow: (_key, _config) => {
-      NProgress.start();
-      setLoading(true);
-    },
-    onSuccess: (data, _key, _config) => {
-      NProgress.done();
-      setLoading(false);
-      const cnt = data.resultCount;
-      setResultCount(cnt);
+  const onSuccess = (data) => {
+    setLoading(false);
+    const cnt = data.resultCount;
+    setResultCount(cnt);
 
-      let items = cnt > 0 ? data.records.map(rec => {
-        return { type: 'RECORD', data: {...rec} };
-      }) : [ noResultsItem() ];
-      if (cnt > limit) {
-        items = [ { type: 'RESULTS', data: cnt }, ...items ];
-      }
-      setInputItems(items);
-      listRef.current.scrollTop = 0;
-    },
-    onError: () => {
-      NProgress.done();
-      setResultCount(0);
-      setInputItems([ noResultsItem() ]);
-      setLoading(false);
+    let items = cnt > 0 ? data.records.map(rec => {
+      return { type: 'RECORD', data: {...rec} };
+    }) : [ noResultsItem() ];
+    if (cnt > limit) {
+      items = [ { type: 'RESULTS', data: cnt }, ...items ];
     }
+    setInputItems(items);
+    listRef.current.scrollTop = 0;
   };
-  const {} = useSWR(
-    lookfor ? autocompleteUrl(lookfor, limit) : null, Fetcher, opt)
-  ;
 
+  const onError = (_e) => {
+    setResultCount(0);
+    setInputItems([ noResultsItem() ]);
+    setLoading(false);
+  };
 
-  // useHotkeys('ctrl+k', (e) => {
-  //   e.preventDefault();
-  //   if (inputRef.current) {
-  //     inputRef.current.focus();
-  //   }
-  //   return false;
-  // });
+  const { isFetching } = useQuery(
+    autocompleteUrl(lookfor, limit),
+    { onSuccess, onError, enabled: !!lookfor }
+  );
+
+  useProgress(isFetching);
 
   const onSearchResultsPage = false;
 
@@ -140,7 +126,7 @@ const Autocomplete = ({ ref, onSearch, onRecordSelect }) => {
               placeholder: "Hae..."
             })}
             style={{ }}
-            className="w-full px-4 py-1 rounded-lg text-lg text-gray-900 focus:outline-none ring-inset focus:ring-2 focus:ring-pink-500"
+            className="w-full px-4 py-1 rounded-lg text-lg text-gray-900 placeholder-gray-500 focus:outline-none ring-inset focus:ring-2 focus:ring-pink-500"
           />
         </div>
       </div>

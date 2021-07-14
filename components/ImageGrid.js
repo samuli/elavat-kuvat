@@ -23,7 +23,6 @@ export const ResultGrid = ({ records, lazy = true }) => (
       {records?.map((rec,i) => (
         <li key={`record-${i}`} role="button" className={clsx("px-1 mb-3 w-1/2 sm:w-1/3 md:w-1/4 h-full flex flex-col group", rec?.id && "cursor-pointer")} >
           { wrapItem(rec?.id || null, (
-
             <div className="flex flex-col">
               <div className="overflow-hidden aspect-w-5 aspect-h-4">
                 {rec?.images.length > 0 && wrapImage(lazy && i >= 8,

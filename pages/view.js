@@ -1,27 +1,28 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import HeadTags from '@/components/Head';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
-import useSWR from 'swr';
+import { useQuery } from 'react-query';
+import { useDebouncedCallback } from 'use-debounce';
 import clsx from 'clsx';
-import NProgress from "nprogress";
+import ReactPlayer from 'react-player/file'
+
 import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon } from 'react-icons/fa';
 import { useAppDispatch, CMD_PAGE_LOADED } from '@/lib/state';
 import { recordUrl } from '@/lib/api';
 import AppLink from '@/components/Link';
-
+import AppError from '@/components/AppError';
 import { extractVideoUrls, finnaRecordPage } from '@/lib/record';
 import { Image } from '@/components/ImageGrid';
 import { FacetStripe } from '@/components/Topics';
 import { SearchHeading } from '@/components/Typo';
 import Fetcher from '@/lib/fetcher';
-import { facetSearchUrl } from '@/lib/util';
+import { facetSearchUrl, useProgress } from '@/lib/util';
 
 const Copyright = ({ record }) => {
   const d = record.rawData;
   const copyright = record.imageRights?.copyright;
   const url = record.imageRights?.link;
-
 
   let rightsLink = copyright;
   if (copyright && url) {
@@ -64,9 +65,14 @@ const Header = ({ record }) => {
   );
 };
 
+const PlayButtonWrapper = ({ children }) => (
+  <div className="flex items-center justify-center font-semibold text-lg px-4 py-3 rounded-xl bg-gradient-to-b from-pink-500 to-red-500 text-gray-100 border-2 border-red-500">{children}</div>
+);
 
-const PlayButton = () => (
-  <div className="shadow-lg bg-white text-gray-900 group-hover:bg-pink-500 group-hover:text-gray-100 fill-current stroke-current rounded-full items-center justify-center flex w-16 h-16 sm:w-24 sm:h-24 lg:w-32 lg:h-32 text-2xl sm:text-4xl"><div className="ml-2"><PlayIcon /></div></div>
+const PlayButton = (external = false) => (
+  <PlayButtonWrapper>
+    <div className="ml-2 flex items-center uppercase text-sm">Katso <span className="ml-2 text-xs"><PlayIcon /></span></div>
+  </PlayButtonWrapper>
 );
 
 const SmallPlayButton = () => (
@@ -75,32 +81,21 @@ const SmallPlayButton = () => (
   </div>
 );
 
-const Preview = ({ images = [], videoAvailable, recordUrl }) => {
+const Preview = ({ imageUrl }) => {
   return (
     <div className="flex relative items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl group cursor-pointer min-h-64">
       <div className="w-full h-full">
         <div className="aspect-w-5 aspect-h-4">
-          { images.length > 0 && <img alt="" src={`https://api.finna.fi${images[0].replace("size=large", "size=medium")}`} className="w-auto rouded-xl overflow-hidden object-cover object-center" /> }
-          {/* <Image key={images[0]} src={images[0]} width="700" style={{ minHeight: '200px' }} /> */}
+          { imageUrl && <img alt="" src={imageUrl} className="w-auto rouded-xl overflow-hidden object-cover object-center" /> }
         </div>
       </div>
       <div className="absolute align-middle p-10 self-center align-center justify-center flex cursor-pointer">
-        {videoAvailable && <PlayButton big={true} />}
-        {!videoAvailable && (
-          <div className="flex items-center justify-center text-2xl p-4 rounded-md bg-white text-gray-900 group-hover:bg-pink-500 group-hover:text-gray-100">
-            Katso finna.fi:ssä<span className="text-lg ml-4"><ExtLinkIcon /></span>
-          </div>)}
+        <PlayButtonWrapper>
+          Katso Finnassa<span className="text-lg ml-4"><ExtLinkIcon /></span>
+        </PlayButtonWrapper>
       </div>
     </div>
   );
-};
-
-const videoPage = (id, clip = 1) => `/play?id=${encodeURIComponent(id)}&clip=${clip}`;
-
-const PreviewWrapper = ({ children, record, videoAvailable }) => {
-  return videoAvailable
-    ? <AppLink href={videoPage(record.id)}><a>{children}</a></AppLink>
-    : <a href={finnaRecordPage(record.recordPage)} target="_blank">{children}</a>;
 };
 
 const Tags = ({ topics, genres }) => (
@@ -124,7 +119,7 @@ const Description = ({ text }) => {
   const parts = text.replace(/<br( )?\/>/g, '\n').split('\n');
   const collapse = parts.length > 1;
   return (
-    <div className="mt-4 font-serif italic  leading-6 text-lg">
+    <div className="mt-4 leading-snug text-md">
       { collapse && (
         <details>
           <summary className="cursor-pointer whitespace-pre-line outline-none">{parts[0]}</summary>
@@ -135,62 +130,73 @@ const Description = ({ text }) => {
   );
 };
 
-export default function View() {
+export default function View({ id = null, recordData = null }) {
   const appDispatch = useAppDispatch();
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const id = router.query.id;
+  const [videoUrl, setVideoUrl] = useState(null);
+  const [pauseVideo, setPauseVideo] = useState(true);
+  const videoRef = useRef(null);
+
+  id = id || router.query.id;
 
   useEffect(() => {
     appDispatch({ type: CMD_PAGE_LOADED });
   }, []);
 
-  const opt = {
-    loadingTimeout: 1,
-    onLoadingSlow: (_key, _config) => {
-      NProgress.start();
-      setLoading(true);
-    },
-    onError: (_err, _key, config) => {
-      NProgress.done();
-      setLoading(false);
-    },
-    onSuccess: (_data, _key, _config) => {
-      NProgress.done();
-      setLoading(false);
-    }
-  };
+  const { data, status, error, isFetching } = useQuery(
+    recordUrl(id),
+    { enabled: !!id, initialData: recordData, refetchOnMount: recordData === null }
+  );
 
-  const { data, error, ...rest } = useSWR(id ? recordUrl(id) : null, Fetcher, opt);
+  useProgress(isFetching);
 
   const rec = data && !error && data.resultCount > 0 && data.records[0];
 
-  if (error) return <p>error...</p>;
+  if (error || (!isFetching && data && data.status === 'ERROR')) return <AppError />;
 
   const videoUrls = rec ? extractVideoUrls(rec) : [];
-  const videoAvailable = videoUrls.length > 0;
+  useEffect(() => setVideoUrl(videoUrls[0]), [rec])
 
+  const videoAvailable = videoUrls.length > 0;
+  const imageUrl = rec && rec.images ? `https://api.finna.fi${rec.images[0]}` : null;
   return (
     <div className="w-auto font-sans">
       <HeadTags title={rec && rec.title} description={rec && rec.rawData?.description }/>
-      <div className="mt-4">
+      <div className="mt-3">
         <article>
-          {!loading && rec && (
+          {!isFetching && rec && (
             <>
-              <div className="flex flex-col md:flex-row">
-                <div className="md:w-3/5 w-full">
-                  <PreviewWrapper record={rec} videoAvailable={videoAvailable}>
-                    <Preview images={rec?.images} videoAvailable={videoAvailable} recordUrl={finnaRecordPage(rec.recordPage)} />
-                  </PreviewWrapper>
+              <div className="flex flex-col w-full max-w-2xl">
+                <div className="aspect-w-4 aspect-h-3 overflow-hidden">
+                  {videoUrl && <ReactPlayer
+                    ref={videoRef}
+                    className="react-player -mt-2"
+                    url={videoUrl.src}
+                    width='100%'
+                    height='100%'
+                    playing={true}
+                    controls
+                    muted
+                    pip={false}
+                    playIcon={<PlayButton />}
+                    light={pauseVideo ? `https://api.finna.fi${rec.images[0]}` : false}
+                  /> }
+                  { !videoAvailable &&
+                   <a href={finnaRecordPage(rec.recordPage)} target="_blank">
+                     <Preview imageUrl={imageUrl ? imageUrl : null} />
+                   </a>
+                  }
                 </div>
-                <div className="md:ml-8 flex flex-col justify-center mt-8 md:mt-0">
+                <div className="flex flex-col justify-center mt-2">
                   <Header record={rec} />
-                  {videoUrls.length > 1 && <ul className="mt-5">{videoUrls.map(({ src, title }, idx) => (
-                    <AppLink key={`video-${idx}`} href={videoPage(rec.id, idx + 1)}><a>
-                      <li className="flex my-2 items-center group text-gray-100 hover:text-white">
-                        <SmallPlayButton big={false} /><div className="ml-3">{title}</div>
-                      </li>
-                    </a></AppLink>
+                  {videoUrls.length > 1 && <ul className="mt-5">{videoUrls.map((url, idx) => (
+                    <li key={url.src} onClick={e => {
+                      setVideoUrl(url);
+                      setPauseVideo(false);
+                      videoRef.current.seekTo(0);
+                    }} className="flex my-2 items-center group text-md text-gray-200 hover:text-white cursor-pointer">
+                      <SmallPlayButton big={false} /><div className="ml-3">{url.title}</div>
+                    </li>
                   ))}</ul>}
                 </div>
               </div>
