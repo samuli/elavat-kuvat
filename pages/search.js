@@ -205,7 +205,6 @@ export default function Search({
 
   useEffect(() => {
     if (!isFetching && page+1 > 1 && page < pageCount-1) {
-      console.log("pre", getResultPageUrl(page+1));
       router.prefetch(getResultPageUrl(page+1));
     }
   }, [page, isFetching]);
@@ -247,7 +246,7 @@ export default function Search({
             <div className="">{getHeading("Haku", currentLookfor, !currentLookfor)}</div> }
           { (isFetching || resultCount > 0) &&
             <div className="h-16 min-h-32 w-full mt-1 mb-3">
-              { _topicFacets?.status === 'OK' && <FacetStripe facet="topic_facet" facets={_topicFacets.facets.topic_facet.filter(f => f.value !== topicFacet)} facetUrl={facetSearchUrl} truncate={true} /> }
+              { _topicFacets?.status === 'OK' && resultCount > 0 && <FacetStripe facet="topic_facet" facets={_topicFacets.facets.topic_facet.filter(f => f.value !== topicFacet)} facetUrl={facetSearchUrl} truncate={true} /> }
             </div>
           }
 
