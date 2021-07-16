@@ -18,9 +18,8 @@ import { FaArrowLeft as ArrowLeft, FaArrowRight as ArrowRight } from 'react-icon
 
 import { searchUrl, searchLimit, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
-import DecadeFilters, { decades } from '@/components/DecadeFilter';
 import { FacetStripe } from '@/components/Topics';
-import { facetSearchUrl, yearTitle, useProgress, isServer } from '@/lib/util';
+import { facetSearchUrl, yearTitle, useProgress, isServer, getPageTitle } from '@/lib/util';
 
 const PageMenu = ({ items, activePage = 1, onPageSelect, small = false }) => {
   return (
@@ -236,7 +235,7 @@ export default function Search({
 
   return (
     <div className="w-full font-sans">
-      <HeadTags title={nextLookfor || topicFacet || genreFacet || daterange}/>
+      <HeadTags title={getPageTitle(currentLookfor, topicFacet, genreFacet, daterange)} resultPage={page}/>
       <div className="pt-2 w-full">
         <div className="flex flex-col flex-wrap md:flex-nowrap">
           { topicFacet && getHeading("Aihe", topicFacet) }
