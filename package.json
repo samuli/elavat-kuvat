@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "NODE_ENV=production; next build",
     "start": "next start",
-    "export": "NODE_ENV=production; next build; next export",
+    "export": "NODE_ENV=production; next build; npm run sitemap; next export",
     "download": "NODE_ENV=production node .next/server/download.js",
     "proxy:build-download": "NODE_ENV=production NO_STATIC_EXPORT=1 npm run build",
     "sitemap": "./node_modules/next-sitemap/bin/next-sitemap"
