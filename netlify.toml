@@ -1,0 +1,11 @@
+[[headers]]
+  for = "/*"
+
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "origin-when-cross-origin"
+    X-Content-Type-Options = "nosniff"
+    X-DNS-Prefetch-Control = "on"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-eval' *.funet.fi *.jsdelivr.net; child-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' * blob: data: https://api.finna.fi; media-src 'self' blob:; connect-src *; font-src 'none';"
