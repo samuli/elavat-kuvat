@@ -1,3 +1,6 @@
+import { DefaultSeo } from 'next-seo';
+import SEO from '../next-seo.config';
+
 import { RouterScrollProvider } from '@moxy/next-router-scroll';
 import { useRouter } from 'next/router';
 import { QueryClient, QueryClientProvider } from 'react-query'
@@ -28,6 +31,7 @@ function MyApp({ Component, pageProps }) {
       <RouterScrollProvider disableNextLinkScroll={false}>
         <QueryClientProvider client={queryClient}>
           <PageLayout>
+            <DefaultSeo {...SEO} />
             <Component {...pageProps} />
           </PageLayout>
         </QueryClientProvider>

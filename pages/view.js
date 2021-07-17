@@ -1,3 +1,4 @@
+import { NextSeo } from 'next-seo';
 import { useEffect, useState, useRef } from 'react';
 import HeadTags from '@/components/Head';
 import { useRouter } from 'next/router';
@@ -12,12 +13,12 @@ import { useAppDispatch, CMD_PAGE_LOADED } from '@/lib/state';
 import { recordUrl } from '@/lib/api';
 import AppLink from '@/components/Link';
 import AppError from '@/components/AppError';
-import { extractVideoUrls, finnaRecordPage } from '@/lib/record';
+import { extractVideoUrls, finnaRecordPage, recordUrl as recordPageUrl} from '@/lib/record';
 import { Image } from '@/components/ImageGrid';
 import { FacetStripe } from '@/components/Topics';
 import { SearchHeading } from '@/components/Typo';
 import Fetcher from '@/lib/fetcher';
-import { facetSearchUrl, useProgress } from '@/lib/util';
+import { facetSearchUrl, useProgress, getPageTitle } from '@/lib/util';
 
 const Copyright = ({ record }) => {
   const d = record.rawData;
@@ -159,9 +160,28 @@ export default function View({ id = null, recordData = null }) {
 
   const videoAvailable = videoUrls.length > 0;
   const imageUrl = rec && rec.images ? `https://api.finna.fi${rec.images[0]}` : null;
+  const recTitle = rec && rec.title;
+  const recDescription = rec && rec.rawData?.description;
+
   return (
     <div className="w-auto font-sans">
-      <HeadTags title={rec && rec.title} description={rec && rec.rawData?.description }/>
+      { <NextSeo
+        noindex={true} nofollow={true}
+        title={rec ? getPageTitle(recTitle) : null}
+        description={recDescription}
+        openGraph={{
+          title: recTitle,
+          description: recDescription,
+          url: recordPageUrl(rec && rec.id),
+          type: 'video.movie',
+          images: [
+            {
+              url: imageUrl,
+              alt: 'Preview',
+            },
+          ]
+        }} />
+      }
       <div className="mt-3">
         <article>
           {!isFetching && rec && (

@@ -2,8 +2,8 @@ import { useRouter } from 'next/router';
 
 import Search from '@/pages/search';
 import Fetcher from '@/lib/fetcher';
-import { searchUrl, searchLimit, topicFacetsUrl } from '@/lib/api';
-import { filterFacetFields, isServer } from '@/lib/util';
+import { searchUrl, topicFacetsUrl } from '@/lib/api';
+import { filterFacetFields, getSearchPageTitle } from '@/lib/util';
 
 export async function getStaticPaths() {
   if (Boolean(process.env.NO_STATIC_EXPORT)) {
@@ -39,9 +39,10 @@ export default function Clips({ records, topics }) {
     return '';
   }
   const page = router.query.page || 1;
+  let pageTitle = getSearchPageTitle();
   if (Number(page) > 1) {
     records = null;
+    pageTitle = null;
   }
-  console.log("page", page);
-  return <Search initialPage={page} initialTopicFacets={topics} records={records} queryKey="clips" />;
+  return <Search pageTitle={pageTitle} initialPage={page} initialTopicFacets={topics} records={records} queryKey="clips" />;
 };

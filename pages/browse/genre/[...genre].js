@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import Search from '@/pages/search';
 import Fetcher from '@/lib/fetcher';
 import { searchUrl, genreFacetsUrl, topicFacetsUrl } from '@/lib/api';
-import { filterFacetFields, getStaticFacetPaths, isServer, getPageTitle } from '@/lib/util';
+import { filterFacetFields, getStaticFacetPaths, isServer, getSearchPageTitle } from '@/lib/util';
 
 export async function getStaticPaths() {
   if (Boolean(process.env.NO_STATIC_EXPORT)) {
@@ -39,8 +39,10 @@ export default function Genre({ records, genre, topics }) {
     return '';
   }
   const page = Number(router.query.page || 1);
+  let pageTitle = getSearchPageTitle(null, null, genre);
   if (page > 1) {
     records = null;
+    pageTitle = null;
   }
-  return <Search pageTitle={getPageTitle(null, null, genre)} genreFacet={genre} initialPage={page} records={records} initialTopicFacets={topics}  queryKey="genre" queryValue={genre} />;
+  return <Search pageTitle={pageTitle} genreFacet={genre} initialPage={page} records={records} initialTopicFacets={topics}  queryKey="genre" queryValue={genre} />;
 };

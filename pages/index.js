@@ -1,3 +1,4 @@
+import { NextSeo } from 'next-seo';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRouterScroll } from '@moxy/next-router-scroll';
@@ -80,7 +81,6 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
 
   return (
     <div>
-      <HeadTags />
       <>
         <div>
             <div className="pt-2 w-full">

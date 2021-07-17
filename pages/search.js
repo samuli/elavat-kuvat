@@ -1,3 +1,4 @@
+import { NextSeo } from 'next-seo';
 import clsx from 'clsx';
 import { useQuery } from 'react-query';
 import { useCallback, useRef, useState, useEffect } from 'react';
@@ -19,7 +20,7 @@ import { FaArrowLeft as ArrowLeft, FaArrowRight as ArrowRight } from 'react-icon
 import { searchUrl, searchLimit, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
 import { FacetStripe } from '@/components/Topics';
-import { facetSearchUrl, yearTitle, useProgress, isServer, getPageTitle } from '@/lib/util';
+import { facetSearchUrl, yearTitle, useProgress, isServer, getSearchPageTitle } from '@/lib/util';
 
 const PageMenu = ({ items, activePage = 1, onPageSelect, small = false }) => {
   return (
@@ -193,13 +194,8 @@ export default function Search({
     setResetScroll(true);
 
     const path = getResultPageUrl(idx);
-
-    // if (path) {
-    //   router.push(path);
-    // } else {
-      router.query.page = idx;
-      router.push(router);
-//    }
+    router.query.page = idx;
+    router.push(router);
   };
 
   useEffect(() => {
@@ -215,7 +211,6 @@ export default function Search({
 
   const _topicFacets = initialTopicFacets || topicFacets;
   const isFaceted = topicFacet || genreFacet;
-
   const getPagination = (small = false, showResultCount = true) => pageCount > 1 && (
     <div className="">
       <Pagination results={resultCount} page={page} pageCount={pageCount} setPage={(page) => changePage(page)}
@@ -232,10 +227,14 @@ export default function Search({
       </div>
     );
   };
-
   return (
+    <>
+     <NextSeo
+      title={pageTitle || getSearchPageTitle(currentLookfor, topicFacet, genreFacet, daterange, currentPage)}
+      noindex={router.asPath.indexOf('/search') === 0} nofollow={true}
+     />
     <div className="w-full font-sans">
-      <HeadTags title={pageTitle || getPageTitle(currentLookfor, topicFacet, genreFacet, daterange)} resultPage={page}/>
+      {/* <HeadTags title={pageTitle || getPageTitle(currentLookfor, topicFacet, genreFacet, daterange)} resultPage={page}/> */}
       <div className="pt-2 w-full">
         <div className="flex flex-col flex-wrap md:flex-nowrap">
           { topicFacet && getHeading("Aihe", topicFacet) }
@@ -260,5 +259,6 @@ export default function Search({
         { !isFetching && getPagination(false, false)}
       </div>
     </div>
+    </>
   )
 }
