@@ -9,7 +9,6 @@ import { frontPageUrl, genreFacetsUrl, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
 import { SearchHeading } from '@/components/Typo';
 import { FacetStripe } from '@/components/Topics';
-import HeadTags from '@/components/Head'
 import { facetBrowseUrl, filterFacetFields, yearTitle, useProgress } from '@/lib/util';
 import { decades } from '@/components/DecadeFilter';
 import { FaRedoAlt as ReloadIcon } from 'react-icons/fa';
@@ -105,7 +104,7 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
                 <AppLink href="/browse/clips"><a>
                   <div role="button" className="inline-flex mt-6 mb-4 py-3 px-4 text-md subpixel-antialiased font-medium tracking-tight rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer bg-gradient-to-b from-gray-100 to-gray-300 ripple-bg-white">
                     <div className="flex justify-center items-center">
-                      <div className="inline-flex">Näytä kaikki klipit</div>
+                      <div className="inline-flex">Selaa elokuvia</div>
                     </div>
                   </div>
                 </a></AppLink>

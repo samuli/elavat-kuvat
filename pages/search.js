@@ -5,7 +5,6 @@ import { useCallback, useRef, useState, useEffect } from 'react';
 import { useUpdate } from 'react-use';
 import { forceCheck } from 'react-lazyload';
 import { useRouterScroll } from '@moxy/next-router-scroll';
-import HeadTags from '@/components/Head';
 import Select from '@/components/Select';
 
 import { SearchHeading } from '@/components/Typo';
@@ -64,7 +63,7 @@ const Pagination = ({ results, page, pageCount, setPage, loading, showResultCoun
       { scrollButtons && <NaviButton disabled={page === 1} onClick={() => setPage(page-1)} small={small}><ArrowLeft /></NaviButton> }
       <PageMenu activePage={page} items={pageIdxs} onPageSelect={(page) => setPage(page)} small={small}/>
       { scrollButtons && <NaviButton disabled={page === pageCount} onClick={() => setPage(page+1)} small={small}><ArrowRight /></NaviButton> }
-      { showResultCount && <div className="ml-5 text-xl text-gray-200">({results} klippiä)</div> }
+      { showResultCount && <div className="ml-5 text-xl text-gray-200">({results} elokuvaa)</div> }
     </div>
    );
 };
@@ -234,7 +233,6 @@ export default function Search({
       noindex={router.asPath.indexOf('/search') === 0} nofollow={true}
      />
     <div className="w-full font-sans">
-      {/* <HeadTags title={pageTitle || getPageTitle(currentLookfor, topicFacet, genreFacet, daterange)} resultPage={page}/> */}
       <div className="pt-2 w-full">
         <div className="flex flex-col flex-wrap md:flex-nowrap">
           { topicFacet && getHeading("Aihe", topicFacet) }

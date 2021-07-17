@@ -1,6 +1,5 @@
 import { NextSeo } from 'next-seo';
 import { useEffect, useState, useRef } from 'react';
-import HeadTags from '@/components/Head';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { useQuery } from 'react-query';
