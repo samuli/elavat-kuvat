@@ -8,18 +8,26 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: main
-      - name: Install
-        run: npm i
-      - name: Build site
-        run: npm run export; npm run sitemap
-        env:
-          NEXT_PUBLIC_API_BASE: https://api.finna.fi
-          NEXT_PUBLIC_API_BASE_SERVER: https://api.finna.fi
-          NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          NEXT_PUBLIC_TRACK_PAGE_VIEW: 1
-      - name: Commit changes
-        uses: EndBug/add-and-commit@v7
+#      - name: Install
+#        run: npm i
+#      - name: Build site
+#        run: npm run export; npm run sitemap
+#        env:
+#          NEXT_PUBLIC_API_BASE: https://api.finna.fi
+#          NEXT_PUBLIC_API_BASE_SERVER: https://api.finna.fi
+#          NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+#          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+#          NEXT_PUBLIC_TRACK_PAGE_VIEW: 1
+#      - name: Commit changes
+#        uses: EndBug/add-and-commit@v7
+#        with:
+#          message: 'Add build files'
+#          add: 'out'
+      - name: Deploy to Netlify
+        uses: South-Paw/action-netlify-deploy@v1.2.0
         with:
-          message: 'Add build files'
-          add: 'out'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          netlify-auth-token: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          netlify-site-id: ${{ secrets.NETLIFY_SITE_ID }}
+          build-dir: './out'
+          comment-on-commit: true
