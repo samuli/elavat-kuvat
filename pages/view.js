@@ -8,7 +8,6 @@ import clsx from 'clsx';
 import ReactPlayer from 'react-player/file'
 
 import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon } from 'react-icons/fa';
-import { useAppDispatch, CMD_PAGE_LOADED } from '@/lib/state';
 import { recordUrl } from '@/lib/api';
 import AppLink from '@/components/Link';
 import AppError from '@/components/AppError';
@@ -17,7 +16,7 @@ import { Image } from '@/components/ImageGrid';
 import { FacetStripe } from '@/components/Topics';
 import { SearchHeading } from '@/components/Typo';
 import Fetcher from '@/lib/fetcher';
-import { facetSearchUrl, useProgress, getPageTitle } from '@/lib/util';
+import { facetSearchUrl, useProgress, getPageTitle, trackPageView } from '@/lib/util';
 
 const Copyright = ({ record }) => {
   const d = record.rawData;
@@ -131,17 +130,12 @@ const Description = ({ text }) => {
 };
 
 export default function View({ id = null, recordData = null }) {
-  const appDispatch = useAppDispatch();
   const router = useRouter();
   const [videoUrl, setVideoUrl] = useState(null);
   const [pauseVideo, setPauseVideo] = useState(true);
   const videoRef = useRef(null);
 
   id = id || router.query.id;
-
-  useEffect(() => {
-    appDispatch({ type: CMD_PAGE_LOADED });
-  }, []);
 
   const { data, status, error, isFetching } = useQuery(
     recordUrl(id),
@@ -199,6 +193,7 @@ export default function View({ id = null, recordData = null }) {
                     pip={false}
                     playIcon={<PlayButton />}
                     light={pauseVideo ? `https://api.finna.fi${rec.images[0]}` : false}
+                    onStart={() => trackPageView(router.asPath.replace('/view', '/play'))}
                   /> }
                   { !videoAvailable &&
                    <a href={finnaRecordPage(rec.recordPage)} target="_blank">
