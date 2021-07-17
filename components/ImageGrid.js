@@ -3,7 +3,7 @@ import LazyLoad from 'react-lazyload';
 import { extractVideoUrls } from '@/lib/record';
 import AppLink from '@/components/Link';
 
-export const Image = ({ src, width = 300, height = 300, style = {} }) => <img src={`https://api.finna.fi${src}&w=${width}`} className="w-auto rouded-xl overflow-hidden" alt="" style={style} />;
+export const Image = ({ src, width = 300, height = 300, style = {} }) => <img src={`https://api.finna.fi${src}&w=${width}`} className="w-auto rouded-xl overflow-hidden" alt="Esikatselukuva" style={style} />;
 
 const wrapItem = (id, children) => {
   return !id
@@ -27,7 +27,7 @@ export const ResultGrid = ({ records, lazy = true }) => (
               <div className="overflow-hidden aspect-w-5 aspect-h-4">
                 {rec?.images.length > 0 && wrapImage(lazy && i >= 8,
                   <img className="object-cover object-center"
-                    src={`https://api.finna.fi${rec.images[0]}&w=300`} alt=""
+                    src={`https://api.finna.fi${rec.images[0]}&w=300`} alt="Esikatselukuva"
                   />
                 )}
               </div>

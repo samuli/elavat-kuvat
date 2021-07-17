@@ -86,7 +86,7 @@ const getPageCount = (results) => Math.ceil(Number(results)/searchLimit);
 
 export default function Search({
   topicFacet = null, initialTopicFacets = null, genreFacet = null, daterange = null, records = null, initialPage = null,
-  queryKey = null, queryValue = null
+  queryKey = null, queryValue = null, pageTitle
 }) {
 
   const router = useRouter();
@@ -235,7 +235,7 @@ export default function Search({
 
   return (
     <div className="w-full font-sans">
-      <HeadTags title={getPageTitle(currentLookfor, topicFacet, genreFacet, daterange)} resultPage={page}/>
+      <HeadTags title={pageTitle || getPageTitle(currentLookfor, topicFacet, genreFacet, daterange)} resultPage={page}/>
       <div className="pt-2 w-full">
         <div className="flex flex-col flex-wrap md:flex-nowrap">
           { topicFacet && getHeading("Aihe", topicFacet) }

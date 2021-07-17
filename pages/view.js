@@ -86,7 +86,7 @@ const Preview = ({ imageUrl }) => {
     <div className="flex relative items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl group cursor-pointer min-h-64">
       <div className="w-full h-full">
         <div className="aspect-w-5 aspect-h-4">
-          { imageUrl && <img alt="" src={imageUrl} className="w-auto rouded-xl overflow-hidden object-cover object-center" /> }
+          { imageUrl && <img alt="Esikatselukuva" src={imageUrl} className="w-auto rouded-xl overflow-hidden object-cover object-center" /> }
         </div>
       </div>
       <div className="absolute align-middle p-10 self-center align-center justify-center flex cursor-pointer">
