@@ -7,7 +7,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2
         with:
-          ref: static-paths-record-route
+          ref: main
       - name: Install
         run: npm i
       - name: Build site
