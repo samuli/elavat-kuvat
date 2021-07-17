@@ -1,4 +1,4 @@
-name: Download static data 
+name: Build site
 on: workflow_dispatch
 jobs:
   Download:
@@ -11,16 +11,14 @@ jobs:
       - name: Install
         run: npm i
       - name: Build site
-        run: npm run build; npm run export
+        run: npm run export; npm run sitemap
         env:
           NEXT_PUBLIC_API_BASE: https://api.finna.fi
-          NO_STATIC_EXPORT: 1
-      - name: Download
-        run: node .next/server/download.js
-        env:
-          NEXT_PUBLIC_API_BASE: https://api.finna.fi
+          NEXT_PUBLIC_SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NEXT_PUBLIC_TRACK_PAGE_VIEW: 1
       - name: Commit changes
         uses: EndBug/add-and-commit@v7
         with:
-          message: 'Add downloaded /data files'
-          add: 'data/records/*.json'
+          message: 'Add build files'
+          add: 'out'
