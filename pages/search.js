@@ -210,6 +210,8 @@ export default function Search({
 
   const _topicFacets = initialTopicFacets || topicFacets;
   const isFaceted = topicFacet || genreFacet;
+  const browseAll = queryKey === 'clips';
+
   const getPagination = (small = false, showResultCount = true) => pageCount > 1 && (
     <div className="">
       <Pagination results={resultCount} page={page} pageCount={pageCount} setPage={(page) => changePage(page)}
@@ -238,8 +240,10 @@ export default function Search({
           { topicFacet && getHeading("Aihe", topicFacet) }
           { genreFacet && getHeading("Genre", genreFacet) }
           { daterange && getHeading("Aikakausi", yearTitle(rangeYears[0])) }
-          { !isFaceted && !daterange &&
-            <div className="">{getHeading("Haku", currentLookfor, !currentLookfor)}</div> }
+          { browseAll && getHeading("Selaa elokuvia") }
+          { !isFaceted && !browseAll && !daterange &&
+            <div className="">{getHeading("Haku", currentLookfor, !currentLookfor)}</div>
+          }
           { (isFetching || resultCount > 0) &&
             <div className="h-16 min-h-32 w-full mt-1 mb-3">
               { _topicFacets?.status === 'OK' && resultCount > 0 && <FacetStripe facet="topic_facet" facets={_topicFacets.facets.topic_facet.filter(f => f.value !== topicFacet)} facetUrl={facetSearchUrl} truncate={true} /> }

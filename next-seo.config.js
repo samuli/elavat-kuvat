@@ -11,7 +11,7 @@ export default {
     {
       property: 'keywords',
       content: 'suoratoisto, lyhytelokuva, mainos, dokumentti, video, elokuva, tv, animaatio, fiktio, tietoisku'
-    }
+    },
   ],
   openGraph: {
     type: 'website',

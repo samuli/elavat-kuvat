@@ -4,9 +4,9 @@ import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import clsx from 'clsx';
 import { FaSearch, FaPlayCircle } from 'react-icons/fa';
+import { appTitle, appSubtitle } from '@/lib/util';
 
 const Autocomplete = dynamic(() => import('@/components/Autocomplete'));
-
 
 const Header = () => {
 
@@ -15,7 +15,7 @@ const Header = () => {
   const [ animateOn, setAnimateOn ] = useState(false);
   const inputRef = useRef(null);
   const animateRef = useRef(null);
-
+  const frontpage = router.asPath === "/";
   const clearAnimateRef = () => {
       if (animateRef.current) {
         clearInterval(animateRef.current);
@@ -42,8 +42,12 @@ const Header = () => {
       <div className="flex items-center justify-between">
         <div className="flex flex-col md:flex-row justify-between">
           <div className="flex flex-wrap items-end align-center text-pink-500 stroke-current text-white">
-            <div onClick={() => { toggleAutocomplete(false); router.push("/"); } } className="text-3xl bg-gradient-to-t from-red-500 to-pink-500 text-transparent bg-clip-text sm:text-5xl mr-2 overflow-hidden whitespace-nowrap font-bold active:from-pink-500 cursor-pointer">Elävät kuvat.</div>
-            <div className="flex items-end text-md sm:text-lg font-serif text-gray-100 italic whitespace-nowrap -mt-1">suomalaisia lyhytelokuvia</div>
+            <div onClick={() => { toggleAutocomplete(false); router.push("/"); } } className="text-3xl bg-gradient-to-t from-red-500 to-pink-500 text-transparent bg-clip-text sm:text-5xl mr-2 overflow-hidden whitespace-nowrap font-bold active:from-pink-500 cursor-pointer">
+              {frontpage ? <h1 className="brand">{`${appTitle}.`}</h1> : <h3 className="brand">{`${appTitle}.`}</h3>}
+            </div>
+            <div className="flex items-end text-md sm:text-lg font-serif text-gray-100 italic whitespace-nowrap -mt-1">
+              {frontpage ? <h1 className="brand">{`${appSubtitle}.`}</h1> : <h3 className="brand">{`${appSubtitle}.`}</h3>}
+            </div>
           </div>
         </div>
         { !showSearch && <div role="button" title="Hae..." className="cursor-pointer ml-2" onClick={() => toggleAutocomplete(true)}>
@@ -66,12 +70,6 @@ const Layout = ({ children }) => (
       <Header />
       <main className="mx-5">{children}</main>
     </div>
-  </div>
-);
-
-export const FullscreenLayout = ({ children }) => (
-  <div className="h-screen flex items-center bg-black text-white">
-    {children}
   </div>
 );
 

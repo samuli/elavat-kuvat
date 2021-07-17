@@ -13,7 +13,6 @@ class MyDocument extends Document {
         <Head>
           <link rel="preconnect" href={clientBase}/>
           <link rel="dns-prefetch" href={clientBase}/>
-          <meta name="description" content="Elävät kuvat - suomalaisia lyhytelokuvia"/>
         </Head>
         <body>
           <Main />
