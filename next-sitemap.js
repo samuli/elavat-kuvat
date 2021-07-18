@@ -1,4 +1,4 @@
 module.exports = {
-  siteUrl: 'https://pedantic-mirzakhani-ff1c3f.netlify.app',
+  siteUrl: 'https://elavat-kuvat.netlify.app',
   generateRobotsTxt: true
 }
