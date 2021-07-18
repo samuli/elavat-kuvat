@@ -7,7 +7,7 @@ const SearchHeading = ({title, value, resultCount, pageNum, pageCount, placehold
     title = `${title}:`;
   }
   return (
-    <div className="flex items-baseline justify-between h-8">
+    <div className="flex items-center justify-between h-8">
       <h2 className={clsx("leading-tight", title && "mr-2")}>
         {title} <span className="font-normal text-gray-200">{value}</span>
       </h2>

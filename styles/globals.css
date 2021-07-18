@@ -68,7 +68,7 @@ h1:not(.brand) {
 }
 
 h2:not(.brand) {
-  @apply text-base sm:text-xl;
+  @apply text-base sm:text-xl leading-none;
 }
 
 img {

@@ -92,9 +92,8 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
            </div>
 
           <div className="mt-6">
-
               <div className="flex flex-col text-center">
-                <div className="flex items-center">
+                <div className="flex items-center mb-1">
                   <SearchHeading title="Poimintoja" />
                   <div className="cursor-pointer active:text-pink-500" title="Näytä lisää" onClick={e => setRandomClipsUrl(frontPageUrl())}>
                     <ReloadIcon />
