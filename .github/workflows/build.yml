@@ -1,5 +1,9 @@
 name: Build site
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+  schedule:
+     - cron:  '0 0 * * *'
+     
 jobs:
   Download:
     runs-on: ubuntu-latest
@@ -23,3 +27,12 @@ jobs:
         with:
           message: 'Add build files'
           add: 'out'
+      - name: Deploy to Netlify
+        uses: South-Paw/action-netlify-deploy@v1.2.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          netlify-auth-token: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          netlify-site-id: ${{ secrets.NETLIFY_SITE_ID }}
+          build-dir: './out'
+          comment-on-commit: true
+          message: "Deploy from Github"
