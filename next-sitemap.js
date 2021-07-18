@@ -1,4 +1,4 @@
 module.exports = {
-  siteUrl: 'https://elavat-kuvat.netlify.app',
+  siteUrl: 'https://www.elavatkuvat.fi',
   generateRobotsTxt: true
 }
