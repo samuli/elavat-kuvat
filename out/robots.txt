@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://elavat-kuvat.netlify.app
+Host: https://www.elavatkuvat.fi
 
 # Sitemaps
-Sitemap: https://elavat-kuvat.netlify.app/sitemap.xml
+Sitemap: https://www.elavatkuvat.fi/sitemap.xml
