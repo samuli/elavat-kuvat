@@ -70,3 +70,7 @@ h1:not(.brand) {
 h2:not(.brand) {
   @apply text-base sm:text-xl;
 }
+
+img {
+  color: transparent;
+}
