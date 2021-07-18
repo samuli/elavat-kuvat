@@ -1,6 +1,8 @@
-import { appUrl } from '@/lib/util';
+import { appTitle, appSubtitle, appUrl } from '@/lib/util';
 
 export default {
+  title: appTitle,
+  description: appSubtitle,
   additionalLinkTags: [
     {
       rel: 'icon',
