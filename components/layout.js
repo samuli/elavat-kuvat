@@ -8,6 +8,16 @@ import { appTitle, appSubtitle } from '@/lib/util';
 
 const Autocomplete = dynamic(() => import('@/components/Autocomplete'));
 
+const BrandHeading = (props) => {
+  if (props.level === 1) {
+    return <h1 {...props}>{props.children}</h1>;
+  } else if (props.level === 2) {
+    return <h2 {...props}>{props.children}</h2>;
+  }
+  return <h3 {...props}>{props.children}</h3>;
+};
+
+
 const Header = () => {
 
   const router = useRouter();
@@ -42,12 +52,8 @@ const Header = () => {
       <div className="flex items-center justify-between">
         <div className="flex flex-col md:flex-row justify-between">
           <div className="flex flex-wrap items-end align-center text-pink-500 stroke-current text-white">
-            <div onClick={() => { toggleAutocomplete(false); router.push("/"); } } className="text-3xl bg-gradient-to-t from-red-500 to-pink-500 text-transparent bg-clip-text sm:text-5xl mr-2 overflow-hidden whitespace-nowrap font-bold active:from-pink-500 cursor-pointer">
-              {frontpage ? <h1 className="brand">{`${appTitle}.`}</h1> : <h3 className="brand">{`${appTitle}.`}</h3>}
-            </div>
-            <div className="flex items-end text-md sm:text-lg font-serif text-gray-100 italic whitespace-nowrap -mt-1">
-              {frontpage ? <h1 className="brand">{`${appSubtitle}.`}</h1> : <h3 className="brand">{`${appSubtitle}.`}</h3>}
-            </div>
+            <BrandHeading level={frontpage ? 1 : 3} onClick={() => { toggleAutocomplete(false); router.push("/"); } } className="text-3xl bg-gradient-to-t from-red-500 to-pink-500 text-transparent bg-clip-text sm:text-5xl mr-2 overflow-hidden whitespace-nowrap font-bold active:from-pink-500 cursor-pointer brand">{appTitle}</BrandHeading>
+            <BrandHeading level={frontpage ? 1 : 3} className="flex items-end text-md sm:text-lg font-serif text-gray-100 italic whitespace-nowrap -mt-1 brand">{appSubtitle}</BrandHeading>
           </div>
         </div>
         { !showSearch && <div role="button" title="Hae..." className="cursor-pointer ml-2" onClick={() => toggleAutocomplete(true)}>
