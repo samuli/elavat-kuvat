@@ -9,7 +9,7 @@ import { frontPageUrl, genreFacetsUrl, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
 import { SearchHeading } from '@/components/Typo';
 import { FacetStripe } from '@/components/Topics';
-import { facetBrowseUrl, filterFacetFields, yearTitle, useProgress } from '@/lib/util';
+import { facetBrowseUrl, filterFacetFields, yearTitle, useProgress, appUrl, getPageTitle } from '@/lib/util';
 import { decades } from '@/components/DecadeFilter';
 import { FaRedoAlt as ReloadIcon } from 'react-icons/fa';
 
@@ -17,7 +17,7 @@ const DecadeFilter = ({ title, startYear }) => {
   const endYear = startYear < 2000 ? startYear+9 : "*";
   return (
     <AppLink href={`/browse/date/${startYear}-${endYear}`}><a>
-      <div role="button" className="text-md subpixel-antialiased text-gray-800  uppercase tracking-tight bg-gradient-to-b from-gray-100 to-gray-300 py-1 px-2 rounded-lg cursor-pointer ripple-bg-white">
+      <div className="text-md subpixel-antialiased text-gray-800  uppercase tracking-tight bg-gradient-to-b from-gray-100 to-gray-300 py-1 px-2 rounded-lg cursor-pointer ripple-bg-white">
         {title}
       </div>
     </a></AppLink>
@@ -79,55 +79,64 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
   }, [data]);
 
   return (
-    <div>
-      <>
-        <div>
-            <div className="pt-2 w-full">
-              <div className="flex flex-col flex-wrap md:flex-nowrap">
-                <SearchHeading title="Yleisimmät aiheet" />
-                <div className="h-16 min-h-32 w-full mt-1 mb-3">
-                  { topicFacets && <FacetStripe title="Aiheet" facet="topic_facet" facets={topicFacets.facets.topic_facet} facetUrl={facetBrowseUrl} truncate={true}/> }
-                </div>
-              </div>
-           </div>
-
-          <div className="mt-6">
-              <div className="flex flex-col text-center">
-                <div className="flex items-center mb-1">
-                  <SearchHeading title="Poimintoja" />
-                  <div className="cursor-pointer active:text-pink-500" title="Näytä lisää" onClick={e => setRandomClipsUrl(frontPageUrl())}>
-                    <ReloadIcon />
+    <>
+      <NextSeo
+        title={getPageTitle()}
+        openGraph={{
+          title: getPageTitle(),
+          url: appUrl
+        }}
+      />
+      <div>
+        <>
+          <div>
+              <div className="pt-2 w-full">
+                <div className="flex flex-col flex-wrap md:flex-nowrap">
+                  <SearchHeading title="Yleisimmät aiheet" />
+                  <div className="h-16 min-h-32 w-full mt-1 mb-3">
+                    { topicFacets && <FacetStripe title="Aiheet" facet="topic_facet" facets={topicFacets.facets.topic_facet} facetUrl={facetBrowseUrl} truncate={true}/> }
                   </div>
                 </div>
-                <ResultGrid lazy={false} records={selectedRandomClips || Array.from(Array(8))} />
-                <AppLink href="/browse/clips"><a>
-                  <div role="button" className="inline-flex mt-6 mb-4 py-3 px-4 text-md subpixel-antialiased font-medium tracking-tight rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer bg-gradient-to-b from-gray-100 to-gray-300 ripple-bg-white">
-                    <div className="flex justify-center items-center">
-                      <div className="inline-flex">Selaa elokuvia</div>
+             </div>
+
+            <div className="mt-6">
+                <div className="flex flex-col text-center">
+                  <div className="flex items-center mb-1">
+                    <SearchHeading title="Poimintoja" />
+                    <div className="cursor-pointer active:text-pink-500" title="Näytä lisää" onClick={e => setRandomClipsUrl(frontPageUrl())}>
+                      <ReloadIcon />
                     </div>
                   </div>
-                </a></AppLink>
-              </div>
+                  <ResultGrid lazy={false} records={selectedRandomClips || Array.from(Array(8))} />
+                  <AppLink href="/browse/clips"><a>
+                    <div role="button" className="inline-flex mt-6 mb-4 py-3 px-4 text-md subpixel-antialiased font-medium tracking-tight rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer bg-gradient-to-b from-gray-100 to-gray-300 ripple-bg-white">
+                      <div className="flex justify-center items-center">
+                        <div className="inline-flex">Selaa elokuvia</div>
+                      </div>
+                    </div>
+                  </a></AppLink>
+                </div>
 
-          </div>
+            </div>
 
-          <div className="w-full">
-            <div className="flex flex-col flex-wrap md:flex-nowrap">
+            <div className="w-full">
+              <div className="flex flex-col flex-wrap md:flex-nowrap">
 
-              <div>
-                <SearchHeading title="Aikakausi" />
-                <DecadeFilters items={decades} />
-              </div>
+                <div>
+                  <SearchHeading title="Aikakausi" />
+                  <DecadeFilters items={decades} />
+                </div>
 
-              <div className="mt-2">
-                <SearchHeading title="Genret" />
-                { genreFacets && <FacetStripe title="Genret" facet="genre_facet" facets={filterFacetFields(genreFacets.facets.genre_facet)} facetUrl={facetBrowseUrl} /> }
+                <div className="mt-2">
+                  <SearchHeading title="Genret" />
+                  { genreFacets && <FacetStripe title="Genret" facet="genre_facet" facets={filterFacetFields(genreFacets.facets.genre_facet)} facetUrl={facetBrowseUrl} /> }
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </>
-    </div>
+        </>
+      </div>
+    </>
   );
 };
 

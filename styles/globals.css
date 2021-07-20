@@ -63,11 +63,11 @@ body {
   position: absolute;
 }
 
-h1:not(.brand) {
+h1:not(.unstyled) {
   @apply text-2xl font-bold my-2;
 }
 
-h2:not(.brand) {
+h2:not(.unstyled) {
   @apply text-base sm:text-xl leading-none;
 }
 

@@ -6,6 +6,7 @@ import { useQuery } from 'react-query';
 import { useDebouncedCallback } from 'use-debounce';
 import clsx from 'clsx';
 import ReactPlayer from 'react-player/file'
+import { FadeIn } from 'react-lazyload-fadein';
 
 import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon } from 'react-icons/fa';
 import { recordUrl } from '@/lib/api';
@@ -16,7 +17,7 @@ import { Image } from '@/components/ImageGrid';
 import { FacetStripe } from '@/components/Topics';
 import { SearchHeading } from '@/components/Typo';
 import Fetcher from '@/lib/fetcher';
-import { facetSearchUrl, useProgress, getPageTitle, trackPageView } from '@/lib/util';
+import { facetSearchUrl, useProgress, getPageTitle, trackPageView, appUrl, isServer } from '@/lib/util';
 
 const Copyright = ({ record }) => {
   const d = record.rawData;
@@ -85,7 +86,9 @@ const Preview = ({ imageUrl }) => {
     <div className="flex relative items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800 rounded-xl group cursor-pointer min-h-64">
       <div className="w-full h-full">
         <div className="aspect-w-5 aspect-h-4">
-          { imageUrl && <img alt="Esikatselukuva" src={imageUrl} className="w-auto rouded-xl overflow-hidden object-cover object-center" /> }
+          { imageUrl && <FadeIn duration={300} render={onload =>
+              <img onLoad={onload} alt="Esikatselukuva" src={imageUrl} className="w-auto rouded-xl overflow-hidden object-cover object-center" />
+          } /> }
         </div>
       </div>
       <div className="absolute align-middle p-10 self-center align-center justify-center flex cursor-pointer">
@@ -132,6 +135,7 @@ const Description = ({ text }) => {
 export default function View({ id = null, recordData = null }) {
   const router = useRouter();
   const [videoUrl, setVideoUrl] = useState(null);
+  const [videoStarted, setVideoStarted] = useState(false);
   const [pauseVideo, setPauseVideo] = useState(true);
   const videoRef = useRef(null);
 
@@ -157,15 +161,15 @@ export default function View({ id = null, recordData = null }) {
   const recDescription = rec && rec.rawData?.description;
 
   return (
-    <div className="w-auto font-sans">
-      { <NextSeo
+    <>
+      { !isServer && <NextSeo
         noindex={true} nofollow={true}
-        title={rec ? getPageTitle(recTitle) : null}
+        title={getPageTitle(recTitle)}
         description={recDescription}
         openGraph={{
-          title: recTitle,
+          title: getPageTitle(recTitle),
           description: recDescription,
-          url: recordPageUrl(rec && rec.id),
+          url: `${appUrl}${recordPageUrl(id)}`,
           type: 'video.movie',
           images: [
             {
@@ -173,67 +177,76 @@ export default function View({ id = null, recordData = null }) {
               alt: 'Preview',
             },
           ]
-        }} />
-      }
-      <div className="mt-3">
-        <article>
-          {!isFetching && rec && (
-            <>
-              <div className="flex flex-col w-full max-w-2xl">
-                <div className="aspect-w-4 aspect-h-3 overflow-hidden">
-                  {videoUrl && <ReactPlayer
-                    ref={videoRef}
-                    className="react-player -mt-2"
-                    url={videoUrl.src}
-                    width='100%'
-                    height='100%'
-                    playing={true}
-                    controls
-                    muted
-                    pip={false}
-                    playIcon={<PlayButton />}
-                    light={pauseVideo ? `https://api.finna.fi${rec.images[0]}` : false}
-                    onStart={() => trackPageView(router.asPath.replace('/view', '/play'))}
-                  /> }
-                  { !videoAvailable &&
-                   <a href={finnaRecordPage(rec.recordPage)} target="_blank">
-                     <Preview imageUrl={imageUrl ? imageUrl : null} />
-                   </a>
-                  }
+        }}
+      /> }
+      <div className="w-auto font-sans">
+        <div className="mt-3">
+          <article>
+            {!isFetching && rec && (
+              <>
+                <div className="flex flex-col w-full max-w-2xl">
+                  <div className="aspect-w-4 aspect-h-3 overflow-hidden">
+                    {videoUrl && <ReactPlayer
+                      ref={videoRef}
+                      className="react-player -mt-2"
+                      url={videoUrl.src}
+                      width='100%'
+                      height='100%'
+                      playing={true}
+                      controls
+                      muted
+                      pip={false}
+                      playIcon={<PlayButton />}
+                      light={pauseVideo && !videoStarted? `https://api.finna.fi${rec.images[0]}` : false}
+                      onStart={() => {
+                        trackPageView(router.asPath.replace('/view', '/play'));
+                        setVideoStarted(true);
+                      }}
+                      onEnded={() => {
+                        setVideoStarted(false);
+                        videoRef.current.showPreview();
+                      }}
+                    /> }
+                    { !videoAvailable &&
+                     <a href={finnaRecordPage(rec.recordPage)} target="_blank">
+                       <Preview imageUrl={imageUrl ? imageUrl : null} />
+                     </a>
+                    }
+                  </div>
+                  <div className="flex flex-col justify-center mt-2">
+                    <Header record={rec} />
+                    {videoUrls.length > 1 && <ul className="mt-5">{videoUrls.map((url, idx) => (
+                      <li key={url.src} onClick={e => {
+                        setVideoUrl(url);
+                        setPauseVideo(false);
+                        videoRef.current.seekTo(0);
+                      }} className="flex my-2 items-center group text-md text-gray-200 hover:text-white cursor-pointer">
+                        <SmallPlayButton big={false} /><div className="ml-3">{url.title}</div>
+                      </li>
+                    ))}</ul>}
+                  </div>
                 </div>
-                <div className="flex flex-col justify-center mt-2">
-                  <Header record={rec} />
-                  {videoUrls.length > 1 && <ul className="mt-5">{videoUrls.map((url, idx) => (
-                    <li key={url.src} onClick={e => {
-                      setVideoUrl(url);
-                      setPauseVideo(false);
-                      videoRef.current.seekTo(0);
-                    }} className="flex my-2 items-center group text-md text-gray-200 hover:text-white cursor-pointer">
-                      <SmallPlayButton big={false} /><div className="ml-3">{url.title}</div>
-                    </li>
-                  ))}</ul>}
+                <div className="max-w-2xl">
+                  {rec.rawData.description && <Description text={rec.rawData.description} /> }
+                  <div className="my-5 inline-flex flex-col sm:flex-row bg-yellow-50 text-gray-900 p-3 rounded-md">
+                    {rec.buildings && (
+                      <div className="flex flex-col">
+                        <div className="mr-2 uppercase text-xs font-bold">Aineiston tarjoaa: </div>
+                        <div className="flex text-sm">
+                          <a href="https://kavi.finna.fi" target="_blank" className="flex items-center justify-center underline hover:text-gray-700">
+                            {rec.buildings[0].translated} <span className="ml-2 mr-5 text-gray-700 text-xs"><ExtLinkIcon /></span>
+                          </a>
+                        </div>
+                      </div>)}
+                    <div className="sm:mt-0 mt-2"><Copyright record={rec} /></div>
+                  </div>
+                  <Tags topics={rec.rawData.topic_facet ?? []} genres={rec.rawData.genre_facet ?? []} />
                 </div>
-              </div>
-              <div className="max-w-2xl">
-                {rec.rawData.description && <Description text={rec.rawData.description} /> }
-                <div className="my-5 inline-flex flex-col sm:flex-row bg-yellow-50 text-gray-900 p-3 rounded-md">
-                  {rec.buildings && (
-                    <div className="flex flex-col">
-                      <div className="mr-2 uppercase text-xs font-bold">Aineiston tarjoaa: </div>
-                      <div className="flex text-sm">
-                        <a href="https://kavi.finna.fi" target="_blank" className="flex items-center justify-center underline hover:text-gray-700">
-                          {rec.buildings[0].translated} <span className="ml-2 mr-5 text-gray-700 text-xs"><ExtLinkIcon /></span>
-                        </a>
-                      </div>
-                    </div>)}
-                  <div className="sm:mt-0 mt-2"><Copyright record={rec} /></div>
-                </div>
-                <Tags topics={rec.rawData.topic_facet ?? []} genres={rec.rawData.genre_facet ?? []} />
-              </div>
-            </>
-          )}
-        </article>
+              </>
+            )}
+          </article>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

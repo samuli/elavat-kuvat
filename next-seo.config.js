@@ -1,7 +1,7 @@
 import { appTitle, appSubtitle, appUrl } from '@/lib/util';
 
 export default {
-  title: appTitle,
+  defaultTitle: appTitle,
   description: appSubtitle,
   additionalLinkTags: [
     {
@@ -18,7 +18,6 @@ export default {
   openGraph: {
     type: 'website',
     locale: 'fi_FI',
-    url: appUrl,
     site_name: 'Elävät kuvat',
   },
   twitter: {

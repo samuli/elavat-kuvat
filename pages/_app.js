@@ -46,8 +46,10 @@ function MyApp({ Component, pageProps }) {
     <RouterScrollProvider disableNextLinkScroll={false}>
       <QueryClientProvider client={queryClient}>
         <PageLayout>
-          <DefaultSeo {...SEO} />
-          <Component {...pageProps} />
+          <>
+            <DefaultSeo {...SEO} />
+            <Component {...pageProps} />
+          </>
         </PageLayout>
       </QueryClientProvider>
     </RouterScrollProvider>

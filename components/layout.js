@@ -48,12 +48,12 @@ const Header = () => {
   };
 
   return (
-    <div className="z-10 flex flex-col sticky top-0 px-5 pt-2 pb-1 shadow-xl bg-gray-900">
+    <header className="z-10 flex flex-col sticky top-0 px-5 pt-2 pb-1 shadow-xl bg-gray-900">
       <div className="flex items-center justify-between">
         <div className="flex flex-col md:flex-row justify-between">
           <div className="flex flex-wrap items-end align-center text-pink-500 stroke-current text-white">
-            <BrandHeading level={frontpage ? 1 : 3} onClick={() => { toggleAutocomplete(false); router.push("/"); } } className="text-3xl bg-gradient-to-t from-red-500 to-pink-500 text-transparent bg-clip-text sm:text-5xl mr-2 overflow-hidden whitespace-nowrap font-bold active:from-pink-500 cursor-pointer brand">{appTitle}</BrandHeading>
-            <BrandHeading level={frontpage ? 1 : 3} className="flex items-end text-md sm:text-lg font-serif text-gray-100 italic whitespace-nowrap -mt-1 brand">{appSubtitle}</BrandHeading>
+            <BrandHeading level={frontpage ? 1 : 3} onClick={() => { toggleAutocomplete(false); router.push("/"); } } className="text-3xl bg-gradient-to-t from-red-500 to-pink-500 text-transparent bg-clip-text sm:text-5xl mr-2 overflow-hidden whitespace-nowrap font-bold active:from-pink-500 cursor-pointer unstyled">{appTitle}</BrandHeading>
+            <BrandHeading level={frontpage ? 1 : 3} className="flex items-end text-md sm:text-lg font-serif text-gray-100 italic whitespace-nowrap -mt-1 unstyled">{appSubtitle}</BrandHeading>
           </div>
         </div>
         { !showSearch && <div role="button" title="Hae..." className="cursor-pointer ml-2" onClick={() => toggleAutocomplete(true)}>
@@ -65,7 +65,7 @@ const Header = () => {
           { showSearch && <Autocomplete ref={inputRef} onSearch={() => toggleAutocomplete(false)} onRecordSelect={() => toggleAutocomplete(false)} /> }
         </div>
       </div>
-    </div>
+    </header>
   );
 };
 

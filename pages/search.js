@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import { useQuery } from 'react-query';
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { useUpdate } from 'react-use';
-import { forceCheck } from 'react-lazyload';
 import { useRouterScroll } from '@moxy/next-router-scroll';
 import Select from '@/components/Select';
 
@@ -19,7 +18,7 @@ import { FaArrowLeft as ArrowLeft, FaArrowRight as ArrowRight } from 'react-icon
 import { searchUrl, searchLimit, topicFacetsUrl } from '@/lib/api';
 import { ResultGrid } from '@/components/ImageGrid';
 import { FacetStripe } from '@/components/Topics';
-import { facetSearchUrl, yearTitle, useProgress, isServer, getSearchPageTitle } from '@/lib/util';
+import { facetSearchUrl, yearTitle, useProgress, isServer, getSearchPageTitle, appUrl } from '@/lib/util';
 
 const PageMenu = ({ items, activePage = 1, onPageSelect, small = false }) => {
   return (
@@ -57,14 +56,15 @@ const NaviButton = ({ children, onClick, disabled, small = false }) => (
 const Pagination = ({ results, page, pageCount, setPage, loading, showResultCount, small = false }) => {
   const pageIdxs = Array.from(Array(pageCount), (_el,i) => i+1);
   const scrollButtons = pageCount > 1;
-
+  const disablePrev = page === 1;
+  const disableNext = page === pageCount;
   return (
-    <div className="flex items-start items-center">
-      { scrollButtons && <NaviButton disabled={page === 1} onClick={() => setPage(page-1)} small={small}><ArrowLeft /></NaviButton> }
+    <nav className="flex items-start items-center" aria-label={`Hakutuloksen sivutus${small ? '' : ', sivun lopussa'}`} >
+      { scrollButtons && <NaviButton disabled={disablePrev} aria-disabled={disablePrev} onClick={() => setPage(page-1)} small={small}><ArrowLeft /></NaviButton> }
       <PageMenu activePage={page} items={pageIdxs} onPageSelect={(page) => setPage(page)} small={small}/>
-      { scrollButtons && <NaviButton disabled={page === pageCount} onClick={() => setPage(page+1)} small={small}><ArrowRight /></NaviButton> }
+      { scrollButtons && <NaviButton disabled={disableNext} aria-disabled={disableNext} onClick={() => setPage(page+1)} small={small}><ArrowRight /></NaviButton> }
       { showResultCount && <div className="ml-5 text-xl text-gray-200">({results} elokuvaa)</div> }
-    </div>
+    </nav>
    );
 };
 
@@ -84,6 +84,13 @@ const Results = ({ data }) => (
 
 const getPageCount = (results) => Math.ceil(Number(results)/searchLimit);
 
+const scrollToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+};
+
 export default function Search({
   topicFacet = null, initialTopicFacets = null, genreFacet = null, daterange = null, records = null, initialPage = null,
   queryKey = null, queryValue = null, pageTitle
@@ -97,12 +104,9 @@ export default function Search({
   const [ nextLookfor, setNextLookfor ] = useState(null);
 
   const [ page, setPage ] = useState(null);
-  const [ resetScroll, setResetScroll ] = useState(false);
   const [ loading, setLoading ] = useState(false);
   const [ resultCount, setResultCount ] = useState(records ? records.resultCount : null);
   const [ pageCount, setPageCount ] = useState(records ? getPageCount(records.resultCount) : null);
-
-  const forceCheckRef = useRef();
 
   if (!isServer && !router.isReady) {
     return '';
@@ -124,15 +128,6 @@ export default function Search({
     setCurrentLookfor(nextLookfor);
     setResultCount(data.resultCount || 0);
     setPageCount(getPageCount(data.resultCount));
-
-    if (resetScroll) {
-      window.scrollTo(0,0);
-      setResetScroll(false);
-    }
-    if (forceCheckRef.current) {
-      clearTimeout(forceCheckRef.current);
-    }
-    forceCheckRef.current = setTimeout(() => forceCheck(), 100);
   };
 
   daterange = daterange || router.query?.date;
@@ -143,7 +138,7 @@ export default function Search({
   let { data, status, error, isFetching } = useQuery(
     searchUrl(queryLookfor || "", currentPage, topicFacet, genreFacet, rangeYears),
     { enabled: records === null,
-      onError, onSuccess, keepPreviousData: true,
+      onError, onSuccess, //keepPreviousData: true,
       initialData: records,
     }
   );
@@ -190,7 +185,7 @@ export default function Search({
   }
   const changePage = (idx) => {
     setLoading(false);
-    setResetScroll(true);
+    scrollToTop();
 
     const path = getResultPageUrl(idx);
     router.query.page = idx;
@@ -211,6 +206,7 @@ export default function Search({
   const _topicFacets = initialTopicFacets || topicFacets;
   const isFaceted = topicFacet || genreFacet;
   const browseAll = queryKey === 'clips';
+  const seoTitle = pageTitle || getSearchPageTitle(currentLookfor, topicFacet, genreFacet, daterange, currentPage);
 
   const getPagination = (small = false, showResultCount = true) => pageCount > 1 && (
     <div className="">
@@ -231,8 +227,12 @@ export default function Search({
   return (
     <>
      <NextSeo
-      title={pageTitle || getSearchPageTitle(currentLookfor, topicFacet, genreFacet, daterange, currentPage)}
+      title={seoTitle}
       noindex={router.asPath.indexOf('/search') === 0} nofollow={true}
+      openGraph={{
+        title: seoTitle,
+        url: `${appUrl}${router.asPath}`
+      }}
      />
     <div className="w-full font-sans">
       <div className="pt-2 w-full">
@@ -257,7 +257,7 @@ export default function Search({
         { !isFetching && data && Number(resultCount) === 0 && <h1>Ei tuloksia haulla <span className="font-normal">{queryLookfor}</span></h1> }
         { data?.status === 'OK' && <ResultGrid records={data.records} /> }
       </div>
-      <div className="flex justify-center">
+      <div className="flex justify-center mt-6">
         { !isFetching && getPagination(false, false)}
       </div>
     </div>
