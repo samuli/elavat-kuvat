@@ -1,11 +1,11 @@
 import { NextSeo } from 'next-seo';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import { useQuery } from 'react-query';
 import { useDebouncedCallback } from 'use-debounce';
 import clsx from 'clsx';
-import ReactPlayer from 'react-player/file'
+import ReactPlayer from 'react-player/file';
 import { FadeIn } from 'react-lazyload-fadein';
 
 import { FaPlay as PlayIcon, FaExternalLinkAlt as ExtLinkIcon } from 'react-icons/fa';
@@ -26,13 +26,18 @@ const Copyright = ({ record }) => {
 
   let rightsLink = copyright;
   if (copyright && url) {
-    rightsLink = <a href={url} target="_blank">{rightsLink}</a>
+    rightsLink = <a href={url} target="_blank" rel="noopener noreferrer">{rightsLink}</a>;
   }
 
   return (
     <div className="flex flex-col">
       <span className="uppercase text-xs font-bold">Aineiston käyttöoikeudet: </span>
-      <a target="_blank" href={finnaRecordPage(record.recordPage)} className="hover:text-gray-800" title="Katso lisätiedot Finnassa">
+      <a target="_blank"
+         rel="noopener noreferrer"
+         href={finnaRecordPage(record.recordPage)}
+         className="hover:text-gray-800"
+         title="Katso lisätiedot Finnassa"
+      >
         <div className="text-sm flex flex-row items-center">
           <div className="underline">{rightsLink}</div>
           <div className="text-gray-600 ml-1 flex jusitfy-center items-center text-xl">
@@ -150,10 +155,13 @@ export default function View({ id = null, recordData = null }) {
 
   const rec = data && !error && data.resultCount > 0 && data.records[0];
 
-  if (error || (!isFetching && data && data.status === 'ERROR')) return <AppError />;
+  const videoUrls = useMemo(() => {
+    return rec ? extractVideoUrls(rec) : [];
+  }, [rec]);
 
-  const videoUrls = rec ? extractVideoUrls(rec) : [];
-  useEffect(() => setVideoUrl(videoUrls[0]), [rec])
+  useEffect(() => setVideoUrl(videoUrls[0]), [rec,videoUrls]);
+
+  if (error || (!isFetching && data && data.status === 'ERROR')) return <AppError />;
 
   const videoAvailable = videoUrls.length > 0;
   const imageUrl = rec && rec.images ? `https://api.finna.fi${rec.images[0]}` : null;
@@ -208,7 +216,7 @@ export default function View({ id = null, recordData = null }) {
                       }}
                     /> }
                     { !videoAvailable &&
-                     <a href={finnaRecordPage(rec.recordPage)} target="_blank">
+                     <a href={finnaRecordPage(rec.recordPage)} target="_blank" rel="noopener noreferrer">
                        <Preview imageUrl={imageUrl ? imageUrl : null} />
                      </a>
                     }
@@ -233,7 +241,11 @@ export default function View({ id = null, recordData = null }) {
                       <div className="flex flex-col">
                         <div className="mr-2 uppercase text-xs font-bold">Aineiston tarjoaa: </div>
                         <div className="flex text-sm">
-                          <a href="https://kavi.finna.fi" target="_blank" className="flex items-center justify-center underline hover:text-gray-700">
+                          <a href="https://kavi.finna.fi"
+                             target="_blank"
+                             rel="noopener noreferrer"
+                             className="flex items-center justify-center underline hover:text-gray-700"
+                          >
                             {rec.buildings[0].translated} <span className="ml-2 mr-5 text-gray-700 text-xs"><ExtLinkIcon /></span>
                           </a>
                         </div>
@@ -248,5 +260,5 @@ export default function View({ id = null, recordData = null }) {
         </div>
       </div>
     </>
-  )
+  );
 }

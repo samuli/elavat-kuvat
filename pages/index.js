@@ -41,7 +41,7 @@ export async function getStaticProps(context) {
   const genresFiltered = { facets: { genre_facet: filterFacetFields(genres.facets.genre_facet) }};
   return {
     props: { topics: topicsFiltered, genres: genresFiltered, decades: decades }
-  }
+  };
 }
 
 const getRandomClips = (records, cnt) => {
@@ -63,14 +63,14 @@ const FrontPage = ({ randomClips, topics, genres, decades }) => {
   const [ selectedRandomClips, setSelectedRandomClips] = useState();
   const [ randomClipsUrl, setRandomClipsUrl ] = useState(frontPageUrl());
   const { data, isFetching } = useQuery(randomClipsUrl, { initialData: randomClips });
-  const { data: topicFacets } = useQuery(topicFacetsUrl(), { initialData: topics, refetchOnMount: false } )
+  const { data: topicFacets } = useQuery(topicFacetsUrl(), { initialData: topics, refetchOnMount: false } );
   const { data: genreFacets } = useQuery(genreFacetsUrl, { initialData: genres, refetchOnMount: false });
 
   useProgress(isFetching);
 
   useEffect(() => {
     updateScroll();
-  }, []);
+  }, [updateScroll]);
 
   useEffect(() => {
     if (data && data.records) {

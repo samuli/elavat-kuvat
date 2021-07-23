@@ -40,7 +40,7 @@ function MyApp({ Component, pageProps }) {
       router.events.off('routeChangeComplete', onRouteChangeComplete);
     };
 
-  }, []);
+  }, [router]);
 
   return (
     <RouterScrollProvider disableNextLinkScroll={false}>

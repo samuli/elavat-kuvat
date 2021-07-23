@@ -48,7 +48,7 @@ const NaviButton = ({ children, onClick, disabled, small = false }) => (
     !disabled && "cursor-pointer active:text-pink-500 text-gray-100")}
        onClick={() => {
          if (disabled) return;
-         onClick()
+         onClick();
        }}>
     {children}</div>
 );
@@ -74,7 +74,12 @@ const Results = ({ data }) => (
      <>
        <ul>
         {data.records?.map(rec => (
-          <a key={rec.id} className="text-blue-500 hover:text-blue-600 hover:underline" target="_blank" href={`https://finna.fi${rec.recordPage}`}>
+          <a key={rec.id}
+             className="text-blue-500 hover:text-blue-600 hover:underline"
+             target="_blank"
+             rel="noopener noreferrer"
+             href={`https://finna.fi${rec.recordPage}`}
+          >
             <li className="mt-2">{`${rec.title} - ${rec.id}`}</li>
           </a>))}
       </ul>
@@ -108,9 +113,6 @@ export default function Search({
   const [ resultCount, setResultCount ] = useState(records ? records.resultCount : null);
   const [ pageCount, setPageCount ] = useState(records ? getPageCount(records.resultCount) : null);
 
-  if (!isServer && !router.isReady) {
-    return '';
-  }
 
   const currentPage = typeof router.query.page !== 'undefined' ? Number(router.query.page) : initialPage || 1;
   setPage(currentPage);
@@ -146,6 +148,20 @@ export default function Search({
     data = records;
   }
 
+  const getResultPageUrl = useCallback((idx) => {
+    let path = '';
+    if (topicFacet) {
+      path = `/search?topic=${encodeURIComponent(topicFacet)}&page=${idx}`;
+    } else if (genreFacet) {
+      path = `/search?genre=${encodeURIComponent(genreFacet)}&page=${idx}`;
+    } else if (daterange) {
+      path = `/search?date=${encodeURIComponent(daterange)}&page=${idx}`;
+    } else {
+      path = `/search?${queryKey}=${encodeURIComponent(queryValue)}&page=${idx}`;
+    }
+    return path;
+  }, [queryKey, queryValue, topicFacet, genreFacet, daterange]);
+
   useEffect(() => setLoading(isFetching), [isFetching]);
   useProgress(isFetching);
 
@@ -158,10 +174,20 @@ export default function Search({
     }
   );
 
-
   useEffect(() => {
     updateScroll();
-  }, []);
+  }, [updateScroll]);
+
+  useEffect(() => {
+    if (!isFetching && page+1 > 1 && page < pageCount-1) {
+      router.prefetch(getResultPageUrl(page+1));
+    }
+  }, [router, isFetching, getResultPageUrl, page, pageCount]);
+  useEffect(() => setPage(Number(router.query.page)), [router.query.page]);
+
+  if (!isServer && !router.isReady) {
+    return '';
+  }
 
   const search = () => {
     setLoading(false);
@@ -170,19 +196,6 @@ export default function Search({
     router.push(router);
   };
 
-  const getResultPageUrl = (idx) => {
-    let path = null;
-    if (queryKey && queryValue) {
-      path = `/search?${queryKey}=${encodeURIComponent(queryValue)}&page=${idx}`;
-    } else if (topicFacet) {
-      path = `/search?topic=${encodeURIComponent(topicFacet)}&page=${idx}`;
-    } else if (genreFacet) {
-      path = `/search?genre=${encodeURIComponent(genreFacet)}&page=${idx}`;
-    } else if (daterange) {
-      path = `/search?date=${encodeURIComponent(daterange)}&page=${idx}`;
-    }
-    return path;
-  }
   const changePage = (idx) => {
     setLoading(false);
     scrollToTop();
@@ -192,12 +205,6 @@ export default function Search({
     router.push(router);
   };
 
-  useEffect(() => {
-    if (!isFetching && page+1 > 1 && page < pageCount-1) {
-      router.prefetch(getResultPageUrl(page+1));
-    }
-  }, [page, isFetching]);
-  useEffect(() => setPage(Number(router.query.page)), [router.query.page]);
 
   const facetClick = (facet, value) => {
     router.push(`/search?${facet}=${encodeURIComponent(value)}`);

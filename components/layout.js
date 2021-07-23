@@ -57,7 +57,7 @@ const Header = () => {
           </div>
         </div>
         { !showSearch && <div role="button" title="Hae..." className="cursor-pointer ml-2" onClick={() => toggleAutocomplete(true)}>
-          <FaSearch className="animate-spin" style={{ width: '20px', height: '20px'}} className="hover:text-pink-500 text-gray-100" />
+          <FaSearch style={{ width: '20px', height: '20px'}} className="hover:text-pink-500 text-gray-100" />
         </div> }
       </div>
       <div className={clsx("mt-1", animateOn && "overflow-hidden")}>
