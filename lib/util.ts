@@ -1,8 +1,11 @@
+import { IFacet } from '@/lib/api';
+
 import { useDebouncedCallback } from 'use-debounce';
 import { useEffect } from 'react';
 import Fetcher from '@/lib/fetcher';
 import NProgress from "nprogress";
 import { createClient } from '@supabase/supabase-js';
+
 
 const map = {
   1900: '1900-',
@@ -23,19 +26,19 @@ const facetMap = {
   'genre_facet': 'genre'
 };
 
-export const yearTitle = year => map[year];
+export const yearTitle = (year: number) => map[year];
 
-export const facetSearchUrl = (facet, value) => `/search?${facetMap[facet]}=${encodeURIComponent(value)}`;
-export const facetBrowseUrl = (facet, value) => `/browse/${facetMap[facet]}/${encodeURIComponent(value)}`;
+export const facetSearchUrl = (facet: string, value: string) => `/search?${facetMap[facet]}=${encodeURIComponent(value)}`;
+export const facetBrowseUrl = (facet: string, value: string) => `/browse/${facetMap[facet]}/${encodeURIComponent(value)}`;
 
-export const filterFacetFields = facets => {
+export const filterFacetFields = (facets: IFacet[]): IFacet[] => {
   return facets.map(item => {
     const { value, translated } = item;
     return { value, translated };
   });
 };
 
-export const useProgress = (isFetching, delay = 500) => {
+export const useProgress = (isFetching: boolean, delay: number = 500) => {
   const showProgress = useDebouncedCallback(() => {
     NProgress.start();
   }, delay);
@@ -50,12 +53,13 @@ export const useProgress = (isFetching, delay = 500) => {
   }, [isFetching, showProgress]);
 };
 
-export const getStaticFacetPaths = async (facetUrl, recordSearchUrl, facet, facets = null) => {
-  if (facets === null) {
+export const getStaticFacetPaths = async (facetUrl: string, facet: string, facets: IFacet[] = []) => {
+  if (facets.length === 0) {
     const data = await Fetcher(facetUrl);
     facets = data?.facets[`${facet}_facet`] || [];
   }
-  return facets.map(f => `/browse/${facet}/${f.value}`);
+
+  return facets.map((f: IFacet) => `/browse/${facet}/${f.value}`);
 
   // let paths = [];
   // await Promise.all(facets.map(async ({value}) => {
@@ -76,7 +80,7 @@ export const appTitle = "Elävät kuvat";
 export const appSubtitle = "suomalaisia lyhytelokuvia";
 
 
-export const getPageTitle = (title = null, resultPage = null) => {
+export const getPageTitle = (title?: string, resultPage?: number) => {
   let pageTitle = `${appTitle} - ${appSubtitle}`;
   if (title) {
     pageTitle += ` | ${title}`;
@@ -87,8 +91,8 @@ export const getPageTitle = (title = null, resultPage = null) => {
   return pageTitle;
 };
 
-export const getSearchPageTitle = (lookfor = null, topic = null, genre = null, date = null, resultPage = null) => {
-  let sub = null;
+export const getSearchPageTitle = (lookfor?: string, topic?: string, genre?: string, date?: string, resultPage?: number) => {
+  let sub = '';
   if (lookfor) {
     sub = `hae: ${lookfor}`;
   } else if (topic) {
@@ -96,24 +100,24 @@ export const getSearchPageTitle = (lookfor = null, topic = null, genre = null, d
   } else if (genre) {
     sub = `genre: ${genre}`;
   } else if (date) {
-    sub = `aikakausi: ${yearTitle(date.split('-')[0])}`;
+    sub = `aikakausi: ${yearTitle(Number(date.split('-')[0]))}`;
   }
-  return getPageTitle(sub, resultPage ? Number(resultPage) : null);
+  return getPageTitle(sub, resultPage);
 }
 
 export const trackPageView = async (tag) => {
-  if (process.env.NEXT_PUBLIC_TRACK_PAGE_VIEW !== '1'  ) {
+  if (process.env.NEXT_PUBLIC_TRACK_PAGE_VIEW !== '1') {
     return;
   }
   const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_KEY
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.NEXT_PUBLIC_SUPABASE_KEY || ''
   );
-  const {} = await supabase.rpc('increment_tag', {
-      tag_id: tag
+  const { } = await supabase.rpc('increment_tag', {
+    tag_id: tag
   });
 };
 
 export const isServer = typeof window === 'undefined';
-export const appUrl =  process.env.URL  || process.env.NEXT_PUBLIC_URL
+export const appUrl = process.env.URL || process.env.NEXT_PUBLIC_URL
   || 'https://www.elavatkuvat.fi';

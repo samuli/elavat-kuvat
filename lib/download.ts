@@ -1,6 +1,6 @@
-import { searchUrl, recordFields } from '@/lib/api.js';
-import Fetcher from '@/lib/fetcher';
-import fs from 'fs';
+import { searchUrl, recordFields, IRecord } from "@/lib/api";
+import Fetcher from "@/lib/fetcher";
+import fs from "fs";
 
 global.fetch = require("node-fetch");
 
@@ -9,12 +9,12 @@ const downloadRecords = async () => {
   const limit = 100;
   const maxPages = 50;
   let fetchMore = true;
-  while(fetchMore && page < maxPages) {
-    const url = searchUrl('', page++, null, null, null, limit, recordFields);
+  while (fetchMore && page < maxPages) {
+    const url = searchUrl('', page++, undefined, undefined, undefined, limit, recordFields);
     console.log(`page ${page} - ${url}`);
     const data = await Fetcher(url);
     if (data.status === 'OK' && data.records && data.records.length > 0) {
-      data.records.forEach(rec => {
+      data.records.forEach((rec: IRecord) => {
         const file = encodeURIComponent(rec.id);
         fs.writeFileSync(`./data/records/${file}.json`, JSON.stringify(rec));
       });
@@ -22,7 +22,7 @@ const downloadRecords = async () => {
       fetchMore = false;
     }
   }
-  console.log(`Done. Downloaded ${page-1} pages`);
+  console.log(`Done. Downloaded ${page - 1} pages`);
 };
 
 // export default downloadRecords;

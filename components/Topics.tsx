@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import clsx from 'clsx';
 import AppLink from '@/components/Link';
 

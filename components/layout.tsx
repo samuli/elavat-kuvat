@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import dynamic from 'next/dynamic';
 import clsx from 'clsx';
-import { FaSearch, FaPlayCircle } from 'react-icons/fa';
+import { FaSearch } from 'react-icons/fa';
 import { appTitle, appSubtitle } from '@/lib/util';
 
 const Autocomplete = dynamic(() => import('@/components/Autocomplete'));
@@ -19,17 +18,14 @@ const BrandHeading = (props) => {
 
 
 const Header = () => {
-
   const router = useRouter();
   const [ showSearch, setShowSearch ] = useState(false);
   const [ animateOn, setAnimateOn ] = useState(false);
   const inputRef = useRef(null);
-  const animateRef = useRef(null);
+  const animateRef = useRef<number | null>(null);
   const frontpage = router.asPath === "/";
   const clearAnimateRef = () => {
-      if (animateRef.current) {
-        clearInterval(animateRef.current);
-      }
+      window.clearInterval(animateRef.current || 0);
   };
 
   useEffect(() => {
@@ -43,7 +39,7 @@ const Header = () => {
     if (mode) {
       setAnimateOn(true);
       clearAnimateRef();
-      animateRef.current = setInterval(() => setAnimateOn(false), 500);
+      animateRef.current = window.setInterval(() => setAnimateOn(false), 500);
     }
   };
 
