@@ -1,10 +1,10 @@
-import { IFacet } from '@/lib/api';
-
-import { useDebouncedCallback } from 'use-debounce';
-import { useEffect } from 'react';
-import Fetcher from '@/lib/fetcher';
-import NProgress from "nprogress";
 import { createClient } from '@supabase/supabase-js';
+import NProgress from "nprogress";
+import { useEffect } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
+
+import { IFacet, IFacetResult } from '@/lib/api';
+import Fetcher from '@/lib/fetcher';
 
 
 const map = {
@@ -26,10 +26,11 @@ const facetMap = {
   'genre_facet': 'genre'
 };
 
-export const yearTitle = (year: number) => map[year];
+export const yearTitle = (year: number): string => map[year];
 
-export const facetSearchUrl = (facet: string, value: string) => `/search?${facetMap[facet]}=${encodeURIComponent(value)}`;
-export const facetBrowseUrl = (facet: string, value: string) => `/browse/${facetMap[facet]}/${encodeURIComponent(value)}`;
+export const facetSearchUrl = (facet: string, value: string): string => `/search?${facetMap[facet]}=${encodeURIComponent(value)}`;
+export const facetBrowseUrl = (facet: string, value: string): string => `/browse/${facetMap[facet]}/${encodeURIComponent(value).replace(/äöööö/g, '+')}`;
+
 
 export const filterFacetFields = (facets: IFacet[]): IFacet[] => {
   return facets.map(item => {
@@ -38,7 +39,7 @@ export const filterFacetFields = (facets: IFacet[]): IFacet[] => {
   });
 };
 
-export const useProgress = (isFetching: boolean, delay: number = 500) => {
+export const useProgress = (isFetching: boolean, delay = 500): void => {
   const showProgress = useDebouncedCallback(() => {
     NProgress.start();
   }, delay);
@@ -53,10 +54,10 @@ export const useProgress = (isFetching: boolean, delay: number = 500) => {
   }, [isFetching, showProgress]);
 };
 
-export const getStaticFacetPaths = async (facetUrl: string, facet: string, facets: IFacet[] = []) => {
-  if (facets.length === 0) {
-    const data = await Fetcher(facetUrl);
-    facets = data?.facets[`${facet}_facet`] || [];
+export const getStaticFacetPaths = async (facetUrl: string, facet: string, facets: IFacet[] = []): Promise<string[]> => {
+  if (typeof facets === 'undefined' || facets.length === 0) {
+    const data = await Fetcher(facetUrl) as IFacetResult;
+    facets = typeof data.facets !== 'undefined' ? data.facets[`${facet}_facet`] : [];
   }
 
   return facets.map((f: IFacet) => `/browse/${facet}/${f.value}`);
@@ -80,7 +81,7 @@ export const appTitle = "Elävät kuvat";
 export const appSubtitle = "suomalaisia lyhytelokuvia";
 
 
-export const getPageTitle = (title?: string, resultPage?: number) => {
+export const getPageTitle = (title?: string, resultPage?: number): string => {
   let pageTitle = `${appTitle} - ${appSubtitle}`;
   if (title) {
     pageTitle += ` | ${title}`;
@@ -91,7 +92,7 @@ export const getPageTitle = (title?: string, resultPage?: number) => {
   return pageTitle;
 };
 
-export const getSearchPageTitle = (lookfor?: string, topic?: string, genre?: string, date?: string, resultPage?: number) => {
+export const getSearchPageTitle = (lookfor?: string, topic?: string, genre?: string, date?: string, resultPage?: number): string => {
   let sub = '';
   if (lookfor) {
     sub = `hae: ${lookfor}`;
@@ -105,7 +106,7 @@ export const getSearchPageTitle = (lookfor?: string, topic?: string, genre?: str
   return getPageTitle(sub, resultPage);
 }
 
-export const trackPageView = async (tag) => {
+export const trackPageView = async (tag: string): Promise<void> => {
   if (process.env.NEXT_PUBLIC_TRACK_PAGE_VIEW !== '1') {
     return;
   }

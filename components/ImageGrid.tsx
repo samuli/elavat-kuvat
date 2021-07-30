@@ -1,8 +1,9 @@
-import { IRecord } from "@/lib/api";
-import React from "react";
-import clsx from "clsx";
-import { FadeIn } from "react-lazyload-fadein";
-import AppLink from "@/components/Link";
+import clsx from 'clsx';
+import React from 'react';
+import { FadeIn } from 'react-lazyload-fadein';
+
+import AppLink from '@/components/Link';
+import { IRecord } from '@/lib/api';
 
 type ImageProps = {
   src: string;
@@ -10,7 +11,7 @@ type ImageProps = {
   style?: React.CSSProperties;
 };
 
-export const Image = ({ src, width = 300, style = {} }: ImageProps) => (
+export const Image = ({ src, width = 300, style = {} }: ImageProps): JSX.Element => (
   <img
     src={`https://api.finna.fi${src}&w=${width}`}
     className="w-auto rouded-xl overflow-hidden"
@@ -29,22 +30,15 @@ const GridItem = ({ key, placeholder, children }: GridItemProps) => (
   <li
     key={key}
     className={clsx(
-      "px-1 mt-2 w-1/2 sm:w-1/3 md:w-1/4 h-full flex flex-col group",
-      !placeholder && "cursor-pointer"
-    )}
-  >
+      'px-1 mt-2 w-1/2 sm:w-1/3 md:w-1/4 h-full flex flex-col group',
+      !placeholder && 'cursor-pointer'
+    )}>
     {children}
   </li>
 );
 
-const GridImageItem = ({
-  imageUrl,
-  title,
-}: {
-  imageUrl?: string;
-  title?: string;
-}) => (
-  <div style={{ backgroundColor: "rgb(21, 30, 50)" }}>
+const GridImageItem = ({ imageUrl, title }: { imageUrl?: string; title?: string }) => (
+  <div style={{ backgroundColor: 'rgb(21, 30, 50)' }}>
     <div className="flex. rounded-sm aspect-w-5 aspect-h-4 h-full">
       <FadeIn
         duration={300}
@@ -64,11 +58,7 @@ const GridImageItem = ({
       />
     </div>
     <div className="py-2 px-3 text-center text-gray-200 truncate text-center text-xs overflow-ellipsis group-hover:text-white">
-      {title ? (
-        <div className="self-end">{title}</div>
-      ) : (
-        <div className="self-end">&nbsp;</div>
-      )}
+      {title ? <div className="self-end">{title}</div> : <div className="self-end">&nbsp;</div>}
     </div>
   </div>
 );
@@ -81,10 +71,10 @@ type ResultGridProps = {
 export const ResultGrid = ({
   records,
   placeholder = false,
-}: ResultGridProps) => {
+}: ResultGridProps): JSX.Element | null => {
   const items: IRecord[] = placeholder
-    ? Array.from(Array(8)).map((_) => {
-      const rec: IRecord = { id: "", title: "", buildings: [] };
+    ? Array.from(Array(8)).map(() => {
+      const rec: IRecord = { id: '', title: '', buildings: [] };
       return rec;
     })
     : records;
@@ -99,10 +89,7 @@ export const ResultGrid = ({
         {items.map((rec: IRecord, idx: number) => (
           <GridItem key={`record-${idx}`} placeholder={placeholder}>
             {!placeholder && (
-              <AppLink
-                key={`link-${idx}`}
-                href={`/view?id=${encodeURIComponent(rec.id)}`}
-              >
+              <AppLink key={`link-${idx}`} href={`/view?id=${encodeURIComponent(rec.id)}`}>
                 <a className="flex flex-col">
                   <GridImageItem
                     imageUrl={(rec?.images && rec.images[0]) || undefined}

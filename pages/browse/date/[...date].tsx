@@ -1,80 +1,71 @@
-import { useRouter } from "next/router";
+import { GetStaticPathsResult, GetStaticPropsContext, GetStaticPropsResult } from 'next';
+import { useRouter } from 'next/router';
 
-import Search from "@/pages/search";
-import Fetcher from "@/lib/fetcher";
+import { dateRange, decades } from '@/components/DecadeFilter';
 import {
+  IFacet,
+  IFacetResult,
+  ISearchResult,
   searchUrl,
+  TDaterange,
   topicFacetsUrl,
   yearFacetsUrl,
-  ISearchResult,
-  IFacetResult,
-} from "@/lib/api";
-import { decades, dateRange } from "@/components/DecadeFilter";
-import {
-  filterFacetFields,
-  getStaticFacetPaths,
-  isServer,
-  getSearchPageTitle,
-} from "@/lib/util";
+} from '@/lib/api';
+import Fetcher from '@/lib/fetcher';
+import { filterFacetFields, getSearchPageTitle, getStaticFacetPaths, isServer } from '@/lib/util';
+import Search from '@/pages/search';
 
-export async function getStaticPaths() {
-  if (Boolean(process.env.NO_STATIC_EXPORT)) {
+export async function getStaticPaths(): Promise<GetStaticPathsResult> {
+  if ((process.env.NO_STATIC_EXPORT || false) as boolean) {
     return { paths: [], fallback: false };
   }
 
   const facets = decades.map((startYear) => {
-    return { value: dateRange(startYear), translated: "" };
+    return { value: dateRange(startYear), translated: '' };
   });
 
-  const paths = await getStaticFacetPaths(yearFacetsUrl, "date", facets);
-  /* (daterange) => searchUrl("", 1, undefined, undefined, daterange.split("-")),
-   *   "date",
-   *   facets
-     );
-   */
+  const paths = await getStaticFacetPaths(yearFacetsUrl, 'date', facets);
   return { paths, fallback: false };
 }
 
-export async function getStaticProps({ params }) {
-  const daterange = params.date[0];
-  const rangeYears = daterange.split("-");
-  const records = await Fetcher(
-    searchUrl("", 1, undefined, undefined, rangeYears)
-  );
-  const topics = await Fetcher(
-    topicFacetsUrl("", undefined, undefined, rangeYears)
-  );
+type PageProps = {
+  daterange: string | undefined;
+  records: ISearchResult;
+  topics: IFacetResult;
+};
+
+export async function getStaticProps({
+  params,
+}: GetStaticPropsContext): Promise<GetStaticPropsResult<PageProps>> {
+  const daterange = params?.date ? params.date[0] : undefined;
+  const rangeYears = daterange ? (daterange.split('-') as TDaterange) : undefined;
+  const records = (await Fetcher(
+    searchUrl('', 1, undefined, undefined, rangeYears)
+  )) as ISearchResult;
+  const topics = (await Fetcher(
+    topicFacetsUrl('', undefined, undefined, rangeYears)
+  )) as IFacetResult;
   const topicsFiltered = {
     ...topics,
     facets: {
       topic_facet:
-        typeof topics.facets !== "undefined"
-          ? filterFacetFields(topics.facets.topic_facet)
+        typeof topics.facets !== 'undefined'
+          ? filterFacetFields((topics.facets as Record<string, IFacet[]>).topic_facet)
           : [],
     },
   };
   return { props: { daterange, records, topics: topicsFiltered } };
 }
 
-type PageProps = {
-  daterange: string;
-  records: ISearchResult;
-  topics: IFacetResult;
-};
-
-const Date = ({ daterange, records, topics }: PageProps) => {
+const Date = ({ daterange, records, topics }: PageProps): React.ReactElement => {
   const router = useRouter();
   if (!isServer && !router.isReady) {
-    return null;
+    return <></>;
   }
   const page = Number(router.query.page || 1);
-  let pageTitle = getSearchPageTitle(
-    undefined,
-    undefined,
-    undefined,
-    daterange
-  );
-  return (
+  const pageTitle = getSearchPageTitle(undefined, undefined, undefined, daterange);
+
+  const s = (
     <Search
       pageTitle={page === 1 ? pageTitle : undefined}
       daterange={daterange}
@@ -84,6 +75,8 @@ const Date = ({ daterange, records, topics }: PageProps) => {
       queryKey="date"
     />
   );
+
+  return s;
 };
 
 export default Date;

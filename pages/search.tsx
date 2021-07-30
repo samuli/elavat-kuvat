@@ -1,36 +1,32 @@
-import { NextSeo } from "next-seo";
-import clsx from "clsx";
-import { useQuery } from "react-query";
-import { useCallback, useState, useEffect } from "react";
-import { useRouterScroll } from "@moxy/next-router-scroll";
+import { useRouterScroll } from '@moxy/next-router-scroll';
+import clsx from 'clsx';
+import { useRouter } from 'next/router';
+import { NextSeo } from 'next-seo';
+import { useCallback, useEffect, useState } from 'react';
+import { FaArrowLeft as ArrowLeft, FaArrowRight as ArrowRight } from 'react-icons/fa';
+import { useQuery } from 'react-query';
 
-import { SearchHeading } from "@/components/Typo";
-import AppError from "@/components/AppError";
-import { useRouter } from "next/router";
+import AppError from '@/components/AppError';
+import { ResultGrid } from '@/components/ImageGrid';
+import { FacetStripe } from '@/components/Topics';
+import { SearchHeading } from '@/components/Typo';
 import {
-  FaArrowLeft as ArrowLeft,
-  FaArrowRight as ArrowRight,
-} from "react-icons/fa";
-
-import {
-  searchUrl,
-  searchLimit,
-  topicFacetsUrl,
-  ISearchResult,
   IFacetResult,
+  ISearchResult,
+  searchLimit,
+  searchUrl,
   TDaterange,
   TDaterangeEnd,
-} from "@/lib/api";
-import { ResultGrid } from "@/components/ImageGrid";
-import { FacetStripe } from "@/components/Topics";
+  topicFacetsUrl,
+} from '@/lib/api';
 import {
-  facetSearchUrl,
-  yearTitle,
-  useProgress,
-  isServer,
-  getSearchPageTitle,
   appUrl,
-} from "@/lib/util";
+  facetSearchUrl,
+  getSearchPageTitle,
+  isServer,
+  useProgress,
+  yearTitle,
+} from '@/lib/util';
 
 const PageMenu = ({ items, activePage = 1, onPageSelect, small = false }) => {
   return (
@@ -39,11 +35,10 @@ const PageMenu = ({ items, activePage = 1, onPageSelect, small = false }) => {
       onChange={(e) => onPageSelect(e.target.value)}
       value={activePage}
       className={clsx(
-        "-appearance-none outline-none w-auto border bg-gray-100 border-gray-400 rounded-md text-gray-900 cursor-pointer",
-        !small && "mx-3 px-3 py-2 text-md",
-        small && "mx-1 px-1 py-1 text-xs"
-      )}
-    >
+        '-appearance-none outline-none w-auto border bg-gray-100 border-gray-400 rounded-md text-gray-900 cursor-pointer',
+        !small && 'mx-3 px-3 py-2 text-md',
+        small && 'mx-1 px-1 py-1 text-xs'
+      )}>
       {items.map((item: number, idx: number) => {
         const active = (activePage || 0) === item;
         return (
@@ -59,17 +54,16 @@ const PageMenu = ({ items, activePage = 1, onPageSelect, small = false }) => {
 const NaviButton = ({ children, onClick, disabled, small = false }) => (
   <div
     className={clsx(
-      "flex justify-center items-center rounded-full border-gray-400",
-      small && "text-xl",
-      !small && "text-4xl",
-      disabled && " text-gray-500",
-      !disabled && "cursor-pointer active:text-pink-500 text-gray-100"
+      'flex justify-center items-center rounded-full border-gray-400',
+      small && 'text-xl',
+      !small && 'text-4xl',
+      disabled && ' text-gray-500',
+      !disabled && 'cursor-pointer active:text-pink-500 text-gray-100'
     )}
     onClick={() => {
       if (disabled) return;
       onClick();
-    }}
-  >
+    }}>
     {children}
   </div>
 );
@@ -82,15 +76,13 @@ const Pagination = ({ page, pageCount, setPage, small = false }) => {
   return (
     <nav
       className="flex items-start items-center"
-      aria-label={`Hakutuloksen sivutus${small ? "" : ", sivun lopussa"}`}
-    >
+      aria-label={`Hakutuloksen sivutus${small ? '' : ', sivun lopussa'}`}>
       {scrollButtons && (
         <NaviButton
           disabled={disablePrev}
           aria-disabled={disablePrev}
           onClick={() => setPage(page - 1)}
-          small={small}
-        >
+          small={small}>
           <ArrowLeft />
         </NaviButton>
       )}
@@ -105,8 +97,7 @@ const Pagination = ({ page, pageCount, setPage, small = false }) => {
           disabled={disableNext}
           aria-disabled={disableNext}
           onClick={() => setPage(page + 1)}
-          small={small}
-        >
+          small={small}>
           <ArrowRight />
         </NaviButton>
       )}
@@ -114,12 +105,12 @@ const Pagination = ({ page, pageCount, setPage, small = false }) => {
   );
 };
 
-const getPageCount = (results) => Math.ceil(Number(results) / searchLimit);
+const getPageCount = (results: number): number => Math.ceil(Number(results) / searchLimit);
 
 const scrollToTop = () => {
   window.scrollTo({
     top: 0,
-    behavior: "smooth",
+    behavior: 'smooth',
   });
 };
 
@@ -136,13 +127,13 @@ interface ISearchProps {
 }
 
 const parseDaterange = (range: string): TDaterange => {
-  const d = range.split("-");
+  const d = range.split('-');
   const start = Number(d[0]);
-  let end: TDaterangeEnd = d[1] === "*" ? d[1] : Number(d[1]);
+  const end: TDaterangeEnd = d[1] === '*' ? d[1] : Number(d[1]);
   return [start, end];
 };
 
-const Search = ({
+const Search: React.FC<ISearchProps> = ({
   topicFacet,
   initialTopicFacets,
   genreFacet,
@@ -152,27 +143,24 @@ const Search = ({
   queryKey,
   queryValue,
   pageTitle,
-}: ISearchProps) => {
+}): React.ReactElement => {
   const router = useRouter();
   const { updateScroll } = useRouterScroll();
 
   const [lookfor, setLookfor] = useState<string | undefined>();
 
-  const [daterangeFilter, setDaterangeFilter] = useState<
-    TDaterange | undefined
-  >(daterange ? parseDaterange(daterange) : undefined);
-  const [topicFilter, setTopicFilter] = useState<string | undefined>(
-    topicFacet
+  const [daterangeFilter, setDaterangeFilter] = useState<TDaterange | undefined>(
+    daterange ? parseDaterange(daterange) : undefined
   );
+  const [topicFilter, setTopicFilter] = useState<string | undefined>(topicFacet);
   const [genreFilter, setGenreFilter] = useState<string | undefined>();
 
   const [page, setPage] = useState<number | null>(null);
   const [resultCount, setResultCount] = useState<number | undefined>();
+  //const [resultPageCount, setResultPageCount] = useState<number | undefined>();
 
   const currentPage =
-    typeof router.query.page !== "undefined"
-      ? Number(router.query.page)
-      : initialPage || 1;
+    typeof router.query.page !== 'undefined' ? Number(router.query.page) : initialPage || 1;
 
   setPage(currentPage);
   useEffect(() => {
@@ -189,7 +177,7 @@ const Search = ({
       }
       setGenreFilter(genre);
 
-      let l = "";
+      let l = '';
       if (router.query.lookfor) {
         l = String(router.query?.lookfor);
       }
@@ -201,24 +189,18 @@ const Search = ({
     }
   }, [router]);
 
-  let { data, error, isFetching } = useQuery(
-    searchUrl(
-      lookfor || "",
-      currentPage,
-      topicFilter,
-      genreFilter,
-      daterangeFilter
-    ),
+  const { data, error, isFetching } = useQuery(
+    searchUrl(lookfor || '', currentPage, topicFilter, genreFilter, daterangeFilter),
     {
       enabled: true,
       initialData: records,
-      refetchOnMount: typeof records === "undefined",
+      refetchOnMount: typeof records === 'undefined',
     }
   );
 
   const getResultPageUrl = useCallback(
     (idx) => {
-      let path = "";
+      let path = '';
       if (topicFacet) {
         path = `/search?topic=${encodeURIComponent(topicFacet)}&page=${idx}`;
       } else if (genreFacet) {
@@ -226,9 +208,7 @@ const Search = ({
       } else if (daterange) {
         path = `/search?date=${encodeURIComponent(daterange)}&page=${idx}`;
       } else if (queryValue) {
-        path = `/search?${queryKey}=${encodeURIComponent(
-          queryValue
-        )}&page=${idx}`;
+        path = `/search?${queryKey}=${encodeURIComponent(queryValue)}&page=${idx}`;
       }
       return path;
     },
@@ -238,19 +218,19 @@ const Search = ({
   useProgress(isFetching);
 
   const { data: topicFacets, isFetching: isFetchingTopics } = useQuery(
-    topicFacetsUrl(lookfor || "", topicFilter, genreFilter, daterangeFilter),
+    topicFacetsUrl(lookfor || '', topicFilter, genreFilter, daterangeFilter),
     {
       enabled:
         isServer ||
-        typeof initialTopicFacets !== "undefined" ||
-        (typeof lookfor !== "undefined" && typeof page !== "undefined"),
+        typeof initialTopicFacets !== 'undefined' ||
+        (typeof lookfor !== 'undefined' && typeof page !== 'undefined'),
       initialData: initialTopicFacets,
-      refetchOnMount: typeof initialTopicFacets === "undefined",
+      refetchOnMount: typeof initialTopicFacets === 'undefined',
     }
   );
 
   const recordData = records || data;
-  const _resultCount = resultCount || recordData?.resultCount || 0;
+  const _resultCount = recordData?.resultCount || resultCount || 0;
   const pageCount = getPageCount(_resultCount);
   const topicFacetData = initialTopicFacets || topicFacets;
 
@@ -259,9 +239,14 @@ const Search = ({
   }, [updateScroll]);
 
   useEffect(() => {
-    setResultCount(_resultCount);
-  }, [_resultCount]);
+    setResultCount(undefined);
+  }, [lookfor]);
 
+  /* useEffect(() => {
+   *   setResultCount(_resultCount);
+   *   setResultPageCount(getPageCount(_resultCount));
+   * }, [_resultCount]);
+   */
   useEffect(() => {
     if (page && pageCount) {
       if (!isFetching && page + 1 > 1 && page < pageCount - 1) {
@@ -272,20 +257,21 @@ const Search = ({
   useEffect(() => setPage(Number(router.query.page)), [router.query.page]);
 
   if (!isServer && !router.isReady) {
-    return null;
+    return <></>;
   }
 
   const changePage = (idx: number) => {
     scrollToTop();
+    setResultCount(_resultCount);
+    //setResultCount(_resultCount);
     router.query.page = String(idx);
     router.push(router);
   };
 
   const isFaceted = topicFacet || genreFacet;
-  const browseAll = queryKey === "clips";
+  const browseAll = queryKey === 'clips';
   const seoTitle =
-    pageTitle ||
-    getSearchPageTitle(lookfor, topicFacet, genreFacet, daterange, currentPage);
+    pageTitle || getSearchPageTitle(lookfor, topicFacet, genreFacet, daterange, currentPage);
 
   const getPagination = (small = false) =>
     pageCount > 1 && (
@@ -314,10 +300,10 @@ const Search = ({
   };
 
   return (
-    <>
+    <div>
       <NextSeo
         title={seoTitle}
-        noindex={router.asPath.indexOf("/search") === 0}
+        noindex={router.asPath.indexOf('/search') === 0}
         nofollow={true}
         openGraph={{
           title: seoTitle,
@@ -328,25 +314,24 @@ const Search = ({
         <div className="pt-2 w-full">
           <div className="flex flex-col flex-wrap md:flex-nowrap">
             <div className="h-8">
-              {topicFilter && getHeading("Aihe", topicFilter)}
-              {genreFilter && getHeading("Genre", genreFilter)}
-              {daterangeFilter &&
-                getHeading("Aikakausi", yearTitle(daterangeFilter[0]))}
-              {browseAll && getHeading("Selaa elokuvia")}
+              {topicFilter && getHeading('Aihe', topicFilter)}
+              {genreFilter && getHeading('Genre', genreFilter)}
+              {daterangeFilter && getHeading('Aikakausi', yearTitle(daterangeFilter[0]))}
+              {browseAll && getHeading('Selaa elokuvia')}
               {!isFaceted &&
                 !browseAll &&
                 !daterange &&
                 lookfor &&
-                getHeading("Haku", lookfor || undefined, !lookfor)}
+                getHeading('Haku', lookfor || undefined, !lookfor)}
             </div>
             {(isFetchingTopics || (topicFacetData?.resultCount || 0) > 0) && (
               <div className="h-16 min-h-32 w-full mt-1 mb-3">
-                {topicFacets?.status === "OK" && (
+                {topicFacets?.status === 'OK' && (
                   <FacetStripe
                     facet="topic_facet"
-                    facets={(topicFacetData?.facets?.topic_facet || []).filter(
-                      (f) => f.value !== topicFacet
-                    )}
+                    facets={(topicFacetData?.facets?.topic_facet || [])
+                      .filter((f) => f.value !== topicFacet)
+                      .map((f) => f.value)}
                     facetUrl={facetSearchUrl}
                     truncate={true}
                   />
@@ -356,23 +341,17 @@ const Search = ({
           </div>
         </div>
         <div className="mt-6">
-          {!isFetching && (error || (data && data?.status === "ERROR")) && (
-            <AppError />
-          )}
+          {!isFetching && (error || (data && data?.status === 'ERROR')) && <AppError />}
           {!isFetching && data && Number(_resultCount) === 0 && (
             <h1>
               Ei tuloksia haulla <span className="font-normal">{lookfor}</span>
             </h1>
           )}
-          {recordData?.status === "OK" && (
-            <ResultGrid records={recordData?.records || []} />
-          )}
+          {recordData?.status === 'OK' && <ResultGrid records={recordData?.records || []} />}
         </div>
-        <div className="flex justify-center mt-6">
-          {!isFetching && getPagination(false)}
-        </div>
+        <div className="flex justify-center mt-6">{!isFetching && getPagination(false)}</div>
       </div>
-    </>
+    </div>
   );
 };
 

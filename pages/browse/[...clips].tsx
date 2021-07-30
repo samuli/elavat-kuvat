@@ -1,17 +1,13 @@
-import { useRouter } from "next/router";
+import { GetStaticPathsResult, GetStaticPropsResult } from 'next';
+import { useRouter } from 'next/router';
 
-import Search from "@/pages/search";
-import Fetcher from "@/lib/fetcher";
-import {
-  searchUrl,
-  topicFacetsUrl,
-  ISearchResult,
-  IFacetResult,
-} from "@/lib/api";
-import { filterFacetFields, getSearchPageTitle, isServer } from "@/lib/util";
+import { IFacet, IFacetResult, ISearchResult, searchUrl, topicFacetsUrl } from '@/lib/api';
+import Fetcher from '@/lib/fetcher';
+import { filterFacetFields, getSearchPageTitle, isServer } from '@/lib/util';
+import Search from '@/pages/search';
 
-export async function getStaticPaths() {
-  if (Boolean(process.env.NO_STATIC_EXPORT)) {
+export async function getStaticPaths(): Promise<GetStaticPathsResult> {
+  if ((process.env.NO_STATIC_EXPORT || false) as boolean) {
     return { paths: [], fallback: false };
   }
 
@@ -21,22 +17,7 @@ export async function getStaticPaths() {
   // const paths = Array.from(Array(recordPages)).map((_, page) => {
   //   return `${base}/${page+1}`;
   // });
-  return { paths: ["/browse/clips"], fallback: false };
-}
-
-export async function getStaticProps() {
-  const records = await Fetcher(searchUrl("", 1));
-  const topics = await Fetcher(topicFacetsUrl());
-  const topicsFiltered = {
-    ...topics,
-    facets: {
-      topic_facet:
-        typeof topics.facets !== "undefined"
-          ? filterFacetFields(topics.facets.topic_facet)
-          : [],
-    },
-  };
-  return { props: { records, topics: topicsFiltered } };
+  return { paths: ['/browse/clips'], fallback: false };
 }
 
 type PageProps = {
@@ -44,13 +25,28 @@ type PageProps = {
   topics: IFacetResult;
 };
 
-const Clips = ({ records, topics }: PageProps) => {
+export async function getStaticProps(): Promise<GetStaticPropsResult<PageProps>> {
+  const records = (await Fetcher(searchUrl('', 1))) as ISearchResult;
+  const topics = (await Fetcher(topicFacetsUrl())) as IFacetResult;
+  const topicsFiltered = {
+    ...topics,
+    facets: {
+      topic_facet:
+        typeof topics.facets !== 'undefined'
+          ? filterFacetFields((topics.facets as Record<string, IFacet[]>).topic_facet)
+          : [],
+    },
+  };
+  return { props: { records, topics: topicsFiltered } };
+}
+
+const Clips = ({ records, topics }: PageProps): React.ReactElement => {
   const router = useRouter();
   if (!isServer && !router.isReady) {
-    return null;
+    return <></>;
   }
   const page = Number(router.query.page || 1);
-  let pageTitle: string | undefined = getSearchPageTitle();
+  const pageTitle: string | undefined = getSearchPageTitle();
   return (
     <Search
       pageTitle={page == 1 ? pageTitle : undefined}

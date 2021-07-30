@@ -1,15 +1,16 @@
-import { AppProps } from "next/app";
+import '../styles/globals.css';
 
-import { DefaultSeo } from "next-seo";
-import SEO from "../next-seo.config";
-import { useEffect } from "react";
-import { RouterScrollProvider } from "@moxy/next-router-scroll";
-import { useRouter } from "next/router";
-import { QueryClient, QueryClientProvider } from "react-query";
+import { RouterScrollProvider } from '@moxy/next-router-scroll';
+import { AppProps } from 'next/app';
+import { useRouter } from 'next/router';
+import { DefaultSeo } from 'next-seo';
+import { useEffect } from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
-import Layout from "@/components/layout";
-import { trackPageView } from "@/lib/util";
-import "../styles/globals.css";
+import Layout from '@/components/layout';
+import { trackPageView } from '@/lib/util';
+
+import SEO from '../next-seo.config';
 
 const defaultQueryFn = async ({ queryKey }) => {
   const res = await fetch(queryKey[0]);
@@ -25,17 +26,17 @@ const queryClient = new QueryClient({
   },
 });
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }: AppProps): React.ReactNode {
   const router = useRouter();
 
   useEffect(() => {
     function onRouteChangeComplete(url: string) {
       trackPageView(url);
     }
-    router.events.on("routeChangeComplete", onRouteChangeComplete);
+    router.events.on('routeChangeComplete', onRouteChangeComplete);
 
     return () => {
-      router.events.off("routeChangeComplete", onRouteChangeComplete);
+      router.events.off('routeChangeComplete', onRouteChangeComplete);
     };
   }, [router]);
 

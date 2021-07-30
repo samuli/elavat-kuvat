@@ -1,6 +1,6 @@
 import AppError from '@/components/AppError';
 
-function Error() {
+function Error(): React.ReactElement {
   return <AppError />;
 }
 

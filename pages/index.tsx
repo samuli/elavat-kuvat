@@ -1,35 +1,28 @@
-import { IRecord } from "@/lib/api";
+import { useRouterScroll } from '@moxy/next-router-scroll';
+import { NextSeo } from 'next-seo';
+import { useEffect, useState } from 'react';
+import { FaRedoAlt as ReloadIcon } from 'react-icons/fa';
+import { useQuery } from 'react-query';
 
-import { NextSeo } from "next-seo";
-import { useEffect, useState } from "react";
-import { useQuery } from "react-query";
-import { useRouterScroll } from "@moxy/next-router-scroll";
-
-import AppLink from "@/components/Link";
-import Fetcher from "@/lib/fetcher";
+import { decades } from '@/components/DecadeFilter';
+import { ResultGrid } from '@/components/ImageGrid';
+import AppLink from '@/components/Link';
+import { FacetStripe } from '@/components/Topics';
+import { SearchHeading } from '@/components/Typo';
+import { IFacetResult, IRecord } from '@/lib/api';
+import { frontPageUrl, genreFacetsUrl, IFacet, ISearchResult, topicFacetsUrl } from '@/lib/api';
+import Fetcher from '@/lib/fetcher';
 import {
-  frontPageUrl,
-  genreFacetsUrl,
-  topicFacetsUrl,
-  IFacet,
-  ISearchResult,
-} from "@/lib/api";
-import { ResultGrid } from "@/components/ImageGrid";
-import { SearchHeading } from "@/components/Typo";
-import { FacetStripe } from "@/components/Topics";
-import {
+  appUrl,
   facetBrowseUrl,
   filterFacetFields,
-  yearTitle,
-  useProgress,
-  appUrl,
   getPageTitle,
-} from "@/lib/util";
-import { decades } from "@/components/DecadeFilter";
-import { FaRedoAlt as ReloadIcon } from "react-icons/fa";
+  useProgress,
+  yearTitle,
+} from '@/lib/util';
 
 const DecadeFilter = ({ title, startYear }) => {
-  const endYear = startYear < 2000 ? startYear + 9 : "*";
+  const endYear = startYear < 2000 ? startYear + 9 : '*';
   return (
     <AppLink href={`/browse/date/${startYear}-${endYear}`}>
       <a>
@@ -51,11 +44,21 @@ const DecadeFilters = ({ items }: { items: number[] }) => (
   </ul>
 );
 
-export async function getStaticProps() {
-  const topics = await Fetcher(topicFacetsUrl());
-  const topicsFiltered = filterFacetFields(topics.facets.topic_facet);
-  const genres = await Fetcher(genreFacetsUrl);
-  const genresFiltered = filterFacetFields(genres.facets.genre_facet);
+type PageProps = {
+  topics: string[];
+  genres: string[];
+  decades: number[];
+};
+
+export async function getStaticProps(): Promise<Record<string, PageProps>> {
+  const topics = (await Fetcher(topicFacetsUrl())) as IFacetResult;
+  const topicsFiltered = filterFacetFields(
+    (topics.facets as Record<string, IFacet[]>).topic_facet
+  ).map((f) => f.value);
+  const genres = (await Fetcher(genreFacetsUrl)) as IFacetResult;
+  const genresFiltered = filterFacetFields(
+    (genres.facets as Record<string, IFacet[]>).genre_facet
+  ).map((f) => f.value);
   return {
     props: { topics: topicsFiltered, genres: genresFiltered, decades: decades },
   };
@@ -73,17 +76,9 @@ const getRandomClips = (records: IRecord[], cnt: number) => {
   return records.filter((_, idx) => set.has(idx));
 };
 
-type PageProps = {
-  topics: IFacet[];
-  genres: IFacet[];
-  decades: number[];
-};
-
-const FrontPage = ({ topics, genres, decades }: PageProps) => {
+const FrontPage = ({ topics, genres, decades }: PageProps): React.ReactNode => {
   const { updateScroll } = useRouterScroll();
-  const [selectedRandomClips, setSelectedRandomClips] = useState<
-    IRecord[] | undefined
-  >();
+  const [selectedRandomClips, setSelectedRandomClips] = useState<IRecord[] | undefined>();
   const [randomClipsUrl, setRandomClipsUrl] = useState(frontPageUrl());
   const { data, isFetching } = useQuery<ISearchResult>(randomClipsUrl);
   useProgress(isFetching);
@@ -134,25 +129,19 @@ const FrontPage = ({ topics, genres, decades }: PageProps) => {
                     onClick={() => {
                       setSelectedRandomClips(undefined);
                       setRandomClipsUrl(frontPageUrl());
-                    }}
-                  >
+                    }}>
                     <ReloadIcon />
                   </div>
                 </div>
                 <ResultGrid
-                  records={
-                    typeof selectedRandomClips !== "undefined"
-                      ? selectedRandomClips
-                      : []
-                  }
+                  records={typeof selectedRandomClips !== 'undefined' ? selectedRandomClips : []}
                   placeholder={isFetching || !selectedRandomClips}
                 />
                 <AppLink href="/browse/clips">
                   <a>
                     <div
                       role="button"
-                      className="inline-flex mt-6 mb-4 py-3 px-4 text-md subpixel-antialiased font-medium tracking-tight rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer bg-gradient-to-b from-gray-100 to-gray-300 ripple-bg-white"
-                    >
+                      className="inline-flex mt-6 mb-4 py-3 px-4 text-md subpixel-antialiased font-medium tracking-tight rounded-xl bg-gray-200 text-gray-900 hover:text-black hover:bg-white cursor-pointer bg-gradient-to-b from-gray-100 to-gray-300 ripple-bg-white">
                       <div className="flex justify-center items-center">
                         <div className="inline-flex">Selaa elokuvia</div>
                       </div>
@@ -171,11 +160,7 @@ const FrontPage = ({ topics, genres, decades }: PageProps) => {
 
                 <div className="mt-2">
                   <SearchHeading title="Genret" />
-                  <FacetStripe
-                    facet="genre_facet"
-                    facets={filterFacetFields(genres)}
-                    facetUrl={facetBrowseUrl}
-                  />
+                  <FacetStripe facet="genre_facet" facets={genres} facetUrl={facetBrowseUrl} />
                 </div>
               </div>
             </div>

@@ -1,13 +1,22 @@
-import { FacetStripe } from "@/components/Topics";
-import { SearchHeading } from "@/components/Typo";
-import AppError from "@/components/AppError";
-import { recordUrl, IVideoUrl, ISearchResult } from "@/lib/api";
+import { useRouter } from 'next/router';
+import { NextSeo } from 'next-seo';
+import { useRef, useState } from 'react';
+import { FaExternalLinkAlt as ExtLinkIcon, FaPlay as PlayIcon } from 'react-icons/fa';
+import FadeIn from 'react-lazyload-fadein';
+import ReactPlayer from 'react-player/file';
+import FilePlayer from 'react-player/file';
+import { useQuery, UseQueryResult } from 'react-query';
+
+import AppError from '@/components/AppError';
+import { FacetStripe } from '@/components/Topics';
+import { SearchHeading } from '@/components/Typo';
+import { ISearchResult, IVideoUrl, recordUrl } from '@/lib/api';
 import {
   extractVideoUrls,
   finnaRecordPage,
-  recordUrl as recordPageUrl,
   getField as getRecordField,
-} from "@/lib/record";
+  recordUrl as recordPageUrl,
+} from '@/lib/record';
 import {
   appUrl,
   facetSearchUrl,
@@ -15,18 +24,7 @@ import {
   isServer,
   trackPageView,
   useProgress,
-} from "@/lib/util";
-import { NextSeo } from "next-seo";
-import { useRouter } from "next/router";
-import { useRef, useState } from "react";
-import {
-  FaExternalLinkAlt as ExtLinkIcon,
-  FaPlay as PlayIcon,
-} from "react-icons/fa";
-import FadeIn from "react-lazyload-fadein";
-import ReactPlayer from "react-player/file";
-import { useQuery, UseQueryResult } from "react-query";
-import FilePlayer from "react-player/file";
+} from '@/lib/util';
 
 const Copyright = ({ record }) => {
   const copyright = record.imageRights?.copyright;
@@ -40,19 +38,15 @@ const Copyright = ({ record }) => {
       </a>
     );
   }
-
   return (
     <div className="flex flex-col">
-      <span className="uppercase text-xs font-bold">
-        Aineiston käyttöoikeudet:{" "}
-      </span>
+      <span className="uppercase text-xs font-bold">Aineiston käyttöoikeudet: </span>
       <a
         target="_blank"
         rel="noopener noreferrer"
         href={finnaRecordPage(record.recordPage)}
         className="hover:text-gray-800"
-        title="Katso lisätiedot Finnassa"
-      >
+        title="Katso lisätiedot Finnassa">
         <div className="text-sm flex flex-row items-center">
           <div className="underline">{rightsLink}</div>
           <div className="text-gray-600 ml-1 flex jusitfy-center items-center text-xl">
@@ -71,8 +65,8 @@ const Header = ({ record }) => {
     <div>
       <h1 className="text-xl md:text-3xl font-bold">{record.title}</h1>
       <p className="text-md text-gray-100">
-        {getRecordField(record, "author_corporate")}
-        {` ${getRecordField(record, "main_date_str")}`}
+        {getRecordField(record, 'author_corporate')}
+        {` ${getRecordField(record, 'main_date_str')}`}
       </p>
     </div>
   );
@@ -87,7 +81,7 @@ const PlayButtonWrapper = ({ children }) => (
 const PlayButton = () => (
   <PlayButtonWrapper>
     <div className="ml-2 flex items-center uppercase text-sm">
-      Katso{" "}
+      Katso{' '}
       <span className="ml-2 text-xs">
         <PlayIcon />
       </span>
@@ -135,45 +129,36 @@ const Preview = ({ imageUrl }) => {
   );
 };
 
-const Tags = ({ topics, genres }) => (
+type TagsProps = {
+  topics: string[];
+  genres: string[];
+};
+
+const Tags = ({ topics, genres }: TagsProps) => (
   <div>
     {topics.length > 0 && (
       <div className="mb-2">
         <SearchHeading title="Aiheet" />
-        <FacetStripe
-          facet="topic_facet"
-          facets={topics.map((f) => {
-            return { value: f, translated: f };
-          })}
-          facetUrl={facetSearchUrl}
-        />
+        <FacetStripe facet="topic_facet" facets={topics} facetUrl={facetSearchUrl} />
       </div>
     )}
     {genres.length > 0 && (
       <div>
         <SearchHeading title="Genret" />
-        <FacetStripe
-          facet="genre_facet"
-          facets={genres.map((f) => {
-            return { value: f, translated: f };
-          })}
-          facetUrl={facetSearchUrl}
-        />
+        <FacetStripe facet="genre_facet" facets={genres} facetUrl={facetSearchUrl} />
       </div>
     )}
   </div>
 );
 
 const Description = ({ text }) => {
-  const parts = text.replace(/<br( )?\/>/g, "\n").split("\n");
+  const parts = text.replace(/<br( )?\/>/g, '\n').split('\n');
   const collapse = parts.length > 1;
   return (
     <div className="mt-4 leading-snug text-md">
       {collapse && (
         <details>
-          <summary className="cursor-pointer whitespace-pre-line outline-none">
-            {parts[0]}
-          </summary>
+          <summary className="cursor-pointer whitespace-pre-line outline-none">{parts[0]}</summary>
           {parts.length > 1 && (
             <div>
               {parts.slice(1).map((el: string, idx: number) => (
@@ -192,50 +177,44 @@ const Description = ({ text }) => {
 
 interface ViewParams {
   id?: string;
-  recordData?: object;
+  recordData?: Record<string, unknown>;
 }
 
-export default function View({ recordData }: ViewParams) {
+export default function View({ recordData }: ViewParams): React.ReactNode {
   const router = useRouter();
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [videoStarted, setVideoStarted] = useState(false);
   const [pauseVideo, setPauseVideo] = useState(true);
   const videoRef = useRef<FilePlayer>(null);
 
-  const id = (router.query.id || "").toString();
+  const id = (router.query.id || '').toString();
 
-  const { data, error, isFetching }: UseQueryResult<ISearchResult> = useQuery(
-    recordUrl(id),
-    {
-      enabled: !!id,
-      initialData: recordData,
-      onSuccess: (data: ISearchResult) => {
-        if (data.resultCount > 0) {
-          if (data?.records) {
-            const urls = extractVideoUrls(data.records[0]);
-            if (urls.length > 0) {
-              setVideoUrl(urls[0].src);
-            }
+  const { data, error, isFetching }: UseQueryResult<ISearchResult> = useQuery(recordUrl(id), {
+    enabled: !!id,
+    initialData: recordData,
+    onSuccess: (data: ISearchResult) => {
+      if (data.resultCount > 0) {
+        if (data?.records) {
+          const urls = extractVideoUrls(data.records[0]);
+          if (urls.length > 0) {
+            setVideoUrl(urls[0].src);
           }
         }
-      },
-    }
-  );
+      }
+    },
+  });
 
   useProgress(isFetching);
 
-  const rec =
-    data && !error && data.resultCount > 0 && data.records && data.records[0];
+  const rec = data && !error && data.resultCount > 0 && data.records && data.records[0];
 
-  if (error || (!isFetching && data && data.status === "ERROR"))
-    return <AppError />;
+  if (error || (!isFetching && data && data.status === 'ERROR')) return <AppError />;
 
-  const imageUrl =
-    rec && rec.images ? `https://api.finna.fi${rec.images[0]}` : null;
-  const recTitle = rec ? rec.title : "";
-  const recDescription = rec && rec.rawData?.description;
-  const recTopics = (rec && rec.topics) || [];
-  const recGenres = (rec && rec.genres) || [];
+  const imageUrl = rec && rec.images ? `https://api.finna.fi${rec.images[0]}` : null;
+  const recTitle = rec ? rec.title : '';
+  const recDescription = (rec && rec.rawData?.description) as string;
+  const recTopics = ((rec && getRecordField(rec, 'topic_facet')) || []) as string[];
+  const recGenres = ((rec && getRecordField(rec, 'genre_facet')) || []) as string[];
 
   return (
     <>
@@ -249,11 +228,11 @@ export default function View({ recordData }: ViewParams) {
             title: getPageTitle(recTitle),
             description: recDescription,
             url: `${appUrl}${recordPageUrl(id)}`,
-            type: "video.movie",
+            type: 'video.movie',
             images: [
               {
-                url: imageUrl || "",
-                alt: "Preview",
+                url: imageUrl || '',
+                alt: 'Preview',
               },
             ],
           }}
@@ -270,7 +249,7 @@ export default function View({ recordData }: ViewParams) {
                       <ReactPlayer
                         ref={videoRef}
                         className="react-player -mt-2"
-                        url={videoUrl || ""}
+                        url={videoUrl || ''}
                         width="100%"
                         height="100%"
                         playing={true}
@@ -280,13 +259,11 @@ export default function View({ recordData }: ViewParams) {
                         playIcon={<PlayButton />}
                         light={
                           pauseVideo && !videoStarted && rec.images
-                            ? `https://api.finna.fi${rec.images[0] || ""}`
+                            ? `https://api.finna.fi${rec.images[0] || ''}`
                             : false
                         }
                         onStart={() => {
-                          trackPageView(
-                            router.asPath.replace("/view", "/play")
-                          );
+                          trackPageView(router.asPath.replace('/view', '/play'));
                           setVideoStarted(true);
                         }}
                         onEnded={() => {
@@ -299,10 +276,9 @@ export default function View({ recordData }: ViewParams) {
                     )}
                     {!videoUrl && (
                       <a
-                        href={finnaRecordPage(rec?.recordPage || "")}
+                        href={finnaRecordPage(rec?.recordPage || '')}
                         target="_blank"
-                        rel="noopener noreferrer"
-                      >
+                        rel="noopener noreferrer">
                         <Preview imageUrl={imageUrl ? imageUrl : null} />
                       </a>
                     )}
@@ -321,8 +297,7 @@ export default function View({ recordData }: ViewParams) {
                                 videoRef.current.seekTo(0);
                               }
                             }}
-                            className="flex my-2 items-center group text-md text-gray-200 hover:text-white cursor-pointer"
-                          >
+                            className="flex my-2 items-center group text-md text-gray-200 hover:text-white cursor-pointer">
                             <SmallPlayButton />
                             <div className="ml-3">{url.title}</div>
                           </li>
@@ -336,17 +311,14 @@ export default function View({ recordData }: ViewParams) {
                   <div className="my-5 inline-flex flex-col sm:flex-row bg-yellow-50 text-gray-900 p-3 rounded-md">
                     {rec.buildings && (
                       <div className="flex flex-col">
-                        <div className="mr-2 uppercase text-xs font-bold">
-                          Aineiston tarjoaa:{" "}
-                        </div>
+                        <div className="mr-2 uppercase text-xs font-bold">Aineiston tarjoaa: </div>
                         <div className="flex text-sm">
                           <a
                             href="https://kavi.finna.fi"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-center underline hover:text-gray-700"
-                          >
-                            {rec.buildings[0].translated}{" "}
+                            className="flex items-center justify-center underline hover:text-gray-700">
+                            {rec.buildings[0].translated}{' '}
                             <span className="ml-2 mr-5 text-gray-700 text-xs">
                               <ExtLinkIcon />
                             </span>
