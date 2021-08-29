@@ -5,7 +5,7 @@ module.exports = withPreact({
   trailingSlash: true,
   webpack5: true,
   experimental: {
-//    optimizeCss: true,
+    //    optimizeCss: true,
   },
 
   webpack: (config, { dev, webpack, buildId, isServer }) => {
@@ -29,7 +29,7 @@ module.exports = withPreact({
         entry() {
           return config.entry().then((entry) => ({
             ...entry,
-            download: path.resolve(process.cwd(), 'lib/download.js')
+            download: path.resolve(process.cwd(), 'lib/download.ts')
           }));
         }
       };

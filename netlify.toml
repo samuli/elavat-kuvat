@@ -8,7 +8,7 @@
     X-Content-Type-Options = "nosniff"
     X-DNS-Prefetch-Control = "on"
     Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-eval' *.funet.fi *.jsdelivr.net; child-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' * blob: data: https://api.finna.fi; media-src 'self' blob:; connect-src *; font-src 'none'; object-src 'none';"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' blob: 'unsafe-inline' 'unsafe-eval' *.funet.fi https://cdn.jsdelivr.net; media-src 'self' blob: *.funet.fi; connect-src *; img-src 'self' * blob: data: https://api.finna.fi; style-src 'self' 'unsafe-inline'"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
 [[redirects]]
